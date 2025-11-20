@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Tool - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="header-content">
+                <h1><i class="fas fa-envelope-open-text"></i> Email Tool Pro</h1>
+                <p class="subtitle">Hệ thống xử lý Email chuyên nghiệp với LIVE/DIE Detection</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Dashboard Statistics -->
+    <section class="dashboard-stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card stat-total">
+                    <div class="stat-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Tổng Email</h3>
+                        <p class="stat-number" id="totalEmails">0</p>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-live">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>LIVE</h3>
+                        <p class="stat-number" id="liveEmails">0</p>
+                        <p class="stat-percentage" id="livePercent">0%</p>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-die">
+                    <div class="stat-icon">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>DIE</h3>
+                        <p class="stat-number" id="dieEmails">0</p>
+                        <p class="stat-percentage" id="diePercent">0%</p>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-code">
+                    <div class="stat-icon">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Nhận Code</h3>
+                        <p class="stat-number" id="canReceiveCode">0</p>
+                        <p class="stat-percentage" id="codePercent">0%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tools Section -->
+    <section class="tools-section">
+        <div class="container">
+            <h2 class="section-title">
+                <i class="fas fa-tools"></i> Công cụ Email
+            </h2>
+            
+            <div class="tools-grid">
+                <!-- Tool 1: Email Validator -->
+                <div class="tool-button" onclick="openModal('validatorModal')">
+                    <div class="tool-icon">
+                        <i class="fas fa-shield-check"></i>
+                    </div>
+                    <h3>Email Validator</h3>
+                    <p>Kiểm tra LIVE/DIE với MX & SMTP</p>
+                </div>
+
+                <!-- Tool 2: Email Generator -->
+                <div class="tool-button" onclick="openModal('generatorModal')">
+                    <div class="tool-icon">
+                        <i class="fas fa-random"></i>
+                    </div>
+                    <h3>Email Generator</h3>
+                    <p>Tạo email ngẫu nhiên</p>
+                </div>
+
+                <!-- Tool 3: Email Extractor -->
+                <div class="tool-button" onclick="openModal('extractorModal')">
+                    <div class="tool-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>Email Extractor</h3>
+                    <p>Trích xuất email từ text</p>
+                </div>
+
+                <!-- Tool 4: Email Formatter -->
+                <div class="tool-button" onclick="openModal('formatterModal')">
+                    <div class="tool-icon">
+                        <i class="fas fa-align-left"></i>
+                    </div>
+                    <h3>Email Formatter</h3>
+                    <p>Định dạng danh sách email</p>
+                </div>
+
+                <!-- Tool 5: Email Filter -->
+                <div class="tool-button" onclick="openModal('filterModal')">
+                    <div class="tool-icon">
+                        <i class="fas fa-filter"></i>
+                    </div>
+                    <h3>Email Filter</h3>
+                    <p>Lọc email theo điều kiện</p>
+                </div>
+
+                <!-- Tool 6: Email Splitter -->
+                <div class="tool-button" onclick="openModal('splitterModal')">
+                    <div class="tool-icon">
+                        <i class="fas fa-cut"></i>
+                    </div>
+                    <h3>Email Splitter</h3>
+                    <p>Chia nhỏ danh sách</p>
+                </div>
+
+                <!-- Tool 7: Email Combiner -->
+                <div class="tool-button" onclick="openModal('combinerModal')">
+                    <div class="tool-icon">
+                        <i class="fas fa-object-group"></i>
+                    </div>
+                    <h3>Email Combiner</h3>
+                    <p>Gộp nhiều danh sách</p>
+                </div>
+
+                <!-- Tool 8: Email Analyzer -->
+                <div class="tool-button" onclick="openModal('analyzerModal')">
+                    <div class="tool-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>Email Analyzer</h3>
+                    <p>Phân tích thống kê</p>
+                </div>
+
+                <!-- Tool 9: Email Deduplicator -->
+                <div class="tool-button" onclick="openModal('deduplicatorModal')">
+                    <div class="tool-icon">
+                        <i class="fas fa-clone"></i>
+                    </div>
+                    <h3>Email Deduplicator</h3>
+                    <p>Loại bỏ trùng lặp</p>
+                </div>
+
+                <!-- Tool 10: Batch Processor -->
+                <div class="tool-button" onclick="openModal('batchModal')">
+                    <div class="tool-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h3>Batch Processor</h3>
+                    <p>Xử lý hàng loạt</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Tables Section -->
+    <section class="results-section">
+        <div class="container">
+            <div class="tables-container">
+                <!-- LIVE Emails Table -->
+                <div class="result-table-wrapper">
+                    <h3 class="table-title">
+                        <i class="fas fa-check-circle"></i> LIVE Emails
+                        <span class="badge badge-live" id="liveCount">0</span>
+                    </h3>
+                    <div class="table-actions">
+                        <button onclick="copyList('liveEmailsTable')" class="btn btn-sm">
+                            <i class="fas fa-copy"></i> Copy List
+                        </button>
+                        <button onclick="exportList('liveEmailsTable', 'live_emails.txt')" class="btn btn-sm">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="liveEmailsTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Email</th>
+                                    <th>Domain</th>
+                                    <th>Status</th>
+                                    <th>Can Receive Code</th>
+                                </tr>
+                            </thead>
+                            <tbody id="liveEmailsBody">
+                                <tr>
+                                    <td colspan="5" class="empty-state">Chưa có dữ liệu</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- DIE Emails Table -->
+                <div class="result-table-wrapper">
+                    <h3 class="table-title">
+                        <i class="fas fa-times-circle"></i> DIE Emails
+                        <span class="badge badge-die" id="dieCount">0</span>
+                    </h3>
+                    <div class="table-actions">
+                        <button onclick="copyList('dieEmailsTable')" class="btn btn-sm">
+                            <i class="fas fa-copy"></i> Copy List
+                        </button>
+                        <button onclick="exportList('dieEmailsTable', 'die_emails.txt')" class="btn btn-sm">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="dieEmailsTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Email</th>
+                                    <th>Domain</th>
+                                    <th>Reason</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dieEmailsBody">
+                                <tr>
+                                    <td colspan="4" class="empty-state">Chưa có dữ liệu</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Include Modal Templates -->
+    {% include 'modals/validator_modal.html' %}
+    {% include 'modals/generator_modal.html' %}
+    {% include 'modals/extractor_modal.html' %}
+    {% include 'modals/formatter_modal.html' %}
+    {% include 'modals/filter_modal.html' %}
+    {% include 'modals/splitter_modal.html' %}
+    {% include 'modals/combiner_modal.html' %}
+    {% include 'modals/analyzer_modal.html' %}
+    {% include 'modals/deduplicator_modal.html' %}
+    {% include 'modals/batch_modal.html' %}
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modals.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/api_complete.js') }}"></script>
+</body>
+</html>

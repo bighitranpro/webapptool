@@ -1,0 +1,37 @@
+<!-- Email Filter Modal -->
+<div id="filterModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-filter"></i> Email Filter</h2>
+            <span class="modal-close" onclick="closeModal('filterModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label><i class="fas fa-list"></i> Danh sách email</label>
+                <textarea id="filterEmails" rows="8" placeholder="email1@gmail.com&#10;email2@yahoo.com"></textarea>
+            </div>
+            <div class="filter-options">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="filterInvalid" checked>
+                    <span>Loại bỏ email không hợp lệ</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="filterDuplicates" checked>
+                    <span>Loại bỏ trùng lặp</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="filterNumbers">
+                    <span>Chỉ email có số</span>
+                </label>
+            </div>
+            <div class="form-group">
+                <label>Lọc theo domain (phân cách bằng dấu phẩy)</label>
+                <input type="text" id="filterDomains" placeholder="gmail.com, yahoo.com">
+            </div>
+            <button onclick="filterEmails()" class="btn btn-primary btn-large">
+                <i class="fas fa-filter"></i> Lọc
+            </button>
+            <div id="filterResult" class="result-container"></div>
+        </div>
+    </div>
+</div>

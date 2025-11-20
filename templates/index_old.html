@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Tool - Công cụ xử lý Email chuyên nghiệp</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-envelope"></i> Email Tool</h1>
+            <p class="subtitle">Công cụ xử lý Email chuyên nghiệp với đầy đủ tính năng</p>
+        </header>
+
+        <div class="tools-grid">
+            <!-- 1. Kiểm tra liên kết email Facebook và trích xuất -->
+            <div class="tool-card">
+                <div class="tool-header">
+                    <i class="fas fa-link"></i>
+                    <h3>Kiểm tra liên kết email Facebook và trích xuất</h3>
+                </div>
+                <div class="tool-body">
+                    <textarea id="fbExtractInput" placeholder="Nhập văn bản chứa email Facebook..."></textarea>
+                    <button onclick="extractFacebookEmail()" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Trích xuất Email
+                    </button>
+                    <div id="fbExtractResult" class="result"></div>
+                </div>
+            </div>
+
+            <!-- 2. Kiểm tra email nhận được mã code Facebook -->
+            <div class="tool-card">
+                <div class="tool-header">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>Kiểm tra email nhận được mã code Facebook</h3>
+                </div>
+                <div class="tool-body">
+                    <input type="email" id="fbCodeInput" placeholder="Nhập email để kiểm tra...">
+                    <button onclick="checkFacebookCode()" class="btn btn-success">
+                        <i class="fas fa-check"></i> Kiểm tra
+                    </button>
+                    <div id="fbCodeResult" class="result"></div>
+                </div>
+            </div>
+
+            <!-- 3. Check email validation -->
+            <div class="tool-card">
+                <div class="tool-header">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>Check email validation</h3>
+                </div>
+                <div class="tool-body">
+                    <input type="email" id="validateInput" placeholder="Nhập email cần kiểm tra...">
+                    <button onclick="validateEmail()" class="btn btn-info">
+                        <i class="fas fa-check-double"></i> Validate
+                    </button>
+                    <div id="validateResult" class="result"></div>
+                </div>
+            </div>
+
+            <!-- 4. Kiểm tra thông tin tài khoản Facebook từ Email -->
+            <div class="tool-card">
+                <div class="tool-header">
+                    <i class="fas fa-user-circle"></i>
+                    <h3>Kiểm tra thông tin tài khoản Facebook từ Email</h3>
+                </div>
+                <div class="tool-body">
+                    <input type="email" id="accountInfoInput" placeholder="Nhập email Facebook...">
+                    <button onclick="extractAccountInfo()" class="btn btn-primary">
+                        <i class="fas fa-info-circle"></i> Lấy thông tin
+                    </button>
+                    <div id="accountInfoResult" class="result"></div>
+                </div>
+            </div>
+
+            <!-- 5. Check valid Facebook email -->
+            <div class="tool-card">
+                <div class="tool-header">
+                    <i class="fas fa-check"></i>
+                    <h3>Check valid Facebook email</h3>
+                </div>
+                <div class="tool-body">
+                    <input type="email" id="validFbInput" placeholder="Nhập email để kiểm tra tính hợp lệ...">
+                    <button onclick="checkValidFacebook()" class="btn btn-success">
+                        <i class="fas fa-thumbs-up"></i> Kiểm tra
+                    </button>
+                    <div id="validFbResult" class="result"></div>
+                </div>
+            </div>
+
+            <!-- 6. Lọc trùng, tách email từ văn bản bất kì -->
+            <div class="tool-card">
+                <div class="tool-header">
+                    <i class="fas fa-filter"></i>
+                    <h3>Lọc trùng, tách email từ văn bản bất kì</h3>
+                </div>
+                <div class="tool-body">
+                    <textarea id="filterInput" placeholder="Nhập văn bản chứa email..."></textarea>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="removeDuplicates" checked>
+                        Loại bỏ email trùng lặp
+                    </label>
+                    <button onclick="filterEmails()" class="btn btn-warning">
+                        <i class="fas fa-filter"></i> Lọc Email
+                    </button>
+                    <div id="filterResult" class="result"></div>
+                </div>
+            </div>
+
+            <!-- 7. Phân loại email -->
+            <div class="tool-card">
+                <div class="tool-header">
+                    <i class="fas fa-tags"></i>
+                    <h3>Phân loại email</h3>
+                </div>
+                <div class="tool-body">
+                    <input type="email" id="classifyInput" placeholder="Nhập email để phân loại...">
+                    <button onclick="classifyEmail()" class="btn btn-info">
+                        <i class="fas fa-sitemap"></i> Phân loại
+                    </button>
+                    <div id="classifyResult" class="result"></div>
+                </div>
+            </div>
+
+            <!-- 8. Get random email with number -->
+            <div class="tool-card">
+                <div class="tool-header">
+                    <i class="fas fa-random"></i>
+                    <h3>Get random email with number</h3>
+                </div>
+                <div class="tool-body">
+                    <input type="number" id="randomCount" placeholder="Số lượng email..." value="5" min="1" max="50">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="includeNumbers" checked>
+                        Bao gồm số trong email
+                    </label>
+                    <button onclick="generateRandomEmail()" class="btn btn-primary">
+                        <i class="fas fa-dice"></i> Tạo Email ngẫu nhiên
+                    </button>
+                    <div id="randomResult" class="result"></div>
+                </div>
+            </div>
+
+            <!-- 9. Scan uid, tên, thông tin nick FB từ email -->
+            <div class="tool-card">
+                <div class="tool-header">
+                    <i class="fas fa-search"></i>
+                    <h3>Scan uid, tên, thông tin nick FB từ email</h3>
+                </div>
+                <div class="tool-body">
+                    <input type="email" id="scanInput" placeholder="Nhập email để scan thông tin...">
+                    <button onclick="scanEmailInfo()" class="btn btn-danger">
+                        <i class="fas fa-scan"></i> Scan Email
+                    </button>
+                    <div id="scanResult" class="result"></div>
+                </div>
+            </div>
+
+            <!-- 10. Lọc Hotmail - Yahoo - Gmail -->
+            <div class="tool-card">
+                <div class="tool-header">
+                    <i class="fas fa-sort"></i>
+                    <h3>Lọc Hotmail - Yahoo - Gmail</h3>
+                </div>
+                <div class="tool-body">
+                    <textarea id="providerInput" placeholder="Nhập văn bản chứa email từ các nhà cung cấp..."></textarea>
+                    <button onclick="extractProviders()" class="btn btn-success">
+                        <i class="fas fa-filter"></i> Lọc theo nhà cung cấp
+                    </button>
+                    <div id="providerResult" class="result"></div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2024 Email Tool. Phát triển bởi AI Assistant</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

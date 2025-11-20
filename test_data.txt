@@ -1,0 +1,179 @@
+# TEST DATA CHO EMAIL TOOL
+
+## 1. Văn bản chứa Email Facebook
+Contact our team at support@facebook.com or sales@fb.com
+You can also reach john.doe@facebook.com or jane.smith@workplace.facebook.com
+Other emails: test@gmail.com, admin@company.com
+
+## 2. Email để test Facebook Code
+✅ Valid:
+test@gmail.com
+user@yahoo.com
+contact@outlook.com
+info@hotmail.com
+
+❌ Invalid:
+temp@tempmail.com
+test@guerrillamail.com
+fake@10minutemail.com
+
+## 3. Email để test Validation
+✅ Valid emails:
+john.doe@gmail.com
+user_123@yahoo.com
+contact@company.com
+first.last@outlook.com
+
+❌ Invalid emails:
+invalid@
+@gmail.com
+user name@gmail.com
+test..test@gmail.com
+test@
+no-at-sign.com
+
+## 4. Facebook Email để test Account Info
+john.doe@facebook.com
+jane_smith@fb.com
+developer@workplace.facebook.com
+
+## 5. Email để test Valid Facebook
+✅ Recommended:
+user@gmail.com
+contact@yahoo.com
+info@outlook.com
+
+⚠️ Custom domain:
+test@customcompany.com
+hello@mywebsite.net
+
+❌ Temporary:
+temp@tempmail.com
+throwaway@guerrillamail.com
+
+## 6. Văn bản lớn để test Filter
+Dear customers,
+
+Please contact us at:
+- Support: support@company.com
+- Sales: sales@gmail.com
+- HR: hr@yahoo.com
+- Marketing: marketing@hotmail.com
+- CEO: ceo@company.com
+- Info: info@outlook.com
+
+Personal contacts:
+john.doe123@gmail.com
+jane_smith@yahoo.com
+bob-wilson@icloud.com
+alice.wonder@protonmail.com
+
+Duplicates test:
+john.doe123@gmail.com
+sales@gmail.com
+support@company.com
+
+Invalid entries:
+notanemail
+@incomplete.com
+missing@domain
+test..double@gmail.com
+
+## 7. Email để test Classification
+test@facebook.com          → social_media
+user@gmail.com             → free_email
+contact@company.com        → custom
+admin@tempmail.com         → temporary
+john@yahoo.com             → free_email
+support@hotmail.com        → free_email
+
+## 8. Settings cho Random Email Generator
+Count: 10
+Include numbers: Yes
+Style: realistic / random
+
+Expected output format:
+john.smith123@gmail.com
+jane_doe456@yahoo.com
+alex789@outlook.com
+
+## 9. Email để Scan
+Test these emails:
+john.doe123@gmail.com      → Has numbers, dots, complex
+simple@yahoo.com           → Simple pattern
+first_last@hotmail.com     → Has underscore
+test-email@outlook.com     → Has hyphen
+complexuser.name_123@gmail.com → Very complex
+
+## 10. Văn bản để test Provider Filter
+Company Directory 2024:
+
+Gmail users:
+- john@gmail.com
+- jane@gmail.com
+- bob@gmail.com
+
+Yahoo users:
+- alice@yahoo.com
+- charlie@yahoo.com
+
+Hotmail users:
+- david@hotmail.com
+- eve@hotmail.com
+
+Outlook users:
+- frank@outlook.com
+- grace@outlook.com
+
+Other providers:
+- henry@icloud.com
+- iris@protonmail.com
+- jack@company.com
+
+# BULK VALIDATION TEST DATA
+email1@gmail.com
+email2@yahoo.com
+invalid@
+@test.com
+good_email@outlook.com
+test..test@gmail.com
+user_name@hotmail.com
+no-domain@
+complete@valid.com
+bad..format@test.com
+
+# STATISTICS TEST DATA
+Sales team: sales1@gmail.com, sales2@gmail.com, sales3@gmail.com
+Marketing: marketing@yahoo.com, promo@yahoo.com
+Support: help@gmail.com, support@outlook.com
+HR: hr@company.com, recruiting@company.com
+Management: ceo@company.com, cfo@company.com, cto@company.com
+
+Total emails: 13
+Unique domains: 4 (gmail.com, yahoo.com, outlook.com, company.com)
+Provider breakdown:
+- Gmail: 5
+- Yahoo: 2
+- Outlook: 1
+- Company: 5
+
+# EDGE CASES
+test+tag@gmail.com                    → Plus addressing
+user.name+tag@gmail.com               → Complex plus addressing
+very.long.email.address@domain.com    → Long username
+a@b.co                                → Short email
+user@subdomain.domain.com             → Subdomain
+user@domain.co.uk                     → Multiple TLD parts
+
+# INTERNATIONAL DOMAINS
+user@domain.vn
+contact@company.com.vn
+info@test.co.uk
+admin@website.org.au
+
+# SPECIAL PATTERNS
+firstname.lastname@gmail.com          → Standard pattern
+first_last@yahoo.com                  → Underscore pattern
+first-last@outlook.com                → Hyphen pattern
+firstlast123@gmail.com                → Name with number
+randomuser789@yahoo.com               → Random with number

@@ -1,0 +1,93 @@
+<!-- Email Generator Modal -->
+<div id="generatorModal" class="modal">
+    <div class="modal-content modal-large">
+        <div class="modal-header">
+            <h2><i class="fas fa-random"></i> Get Random Email With Number</h2>
+            <span class="modal-close" onclick="closeModal('generatorModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="generator-layout">
+                <div class="generator-controls">
+                    <div class="form-group">
+                        <label for="emailType">
+                            <i class="fas fa-tag"></i> Type Email
+                        </label>
+                        <select id="emailType">
+                            <option value="random">Random Email</option>
+                            <option value="name_based">Name Based</option>
+                            <option value="number_based">Number Based</option>
+                            <option value="mixed">Mixed Format</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="generatorText">
+                            <i class="fas fa-text-height"></i> Text
+                        </label>
+                        <input type="text" id="generatorText" placeholder="Nhập text cơ sở (để trống = random)">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="generatorTotal">
+                                <i class="fas fa-hashtag"></i> Total
+                            </label>
+                            <input type="number" id="generatorTotal" value="10" min="1" max="10000">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="generatorDomain">
+                                <i class="fas fa-globe"></i> Domain
+                            </label>
+                            <input type="text" id="generatorDomain" value="gmail.com" placeholder="gmail.com">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="charType">
+                            <i class="fas fa-font"></i> Ký Tự
+                        </label>
+                        <select id="charType">
+                            <option value="lowercase">Chữ thường (a-z)</option>
+                            <option value="uppercase">Chữ hoa (A-Z)</option>
+                            <option value="mixed">Hỗn hợp (A-Z, a-z)</option>
+                            <option value="alphanumeric">Chữ và số</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="numberType">
+                            <i class="fas fa-sort-numeric-up"></i> Number
+                        </label>
+                        <select id="numberType">
+                            <option value="suffix">Số cuối</option>
+                            <option value="prefix">Số đầu</option>
+                            <option value="middle">Số giữa</option>
+                            <option value="random_position">Vị trí ngẫu nhiên</option>
+                            <option value="no_numbers">Không có số</option>
+                        </select>
+                    </div>
+
+                    <button onclick="generateEmails()" class="btn btn-success btn-large">
+                        <i class="fas fa-magic"></i> Generate
+                    </button>
+                </div>
+
+                <div class="generator-output">
+                    <div class="output-header">
+                        <h3>
+                            <i class="fas fa-list"></i> Output List
+                            <span class="badge" id="generatorCount">0</span>
+                        </h3>
+                        <button onclick="copyGeneratedList()" class="btn btn-sm btn-primary">
+                            <i class="fas fa-copy"></i> Copy List
+                        </button>
+                    </div>
+                    <div class="output-list" id="generatorOutput">
+                        <p class="empty-state">Nhấn Generate để tạo danh sách email</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

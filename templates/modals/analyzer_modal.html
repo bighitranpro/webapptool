@@ -1,0 +1,19 @@
+<!-- Email Analyzer Modal -->
+<div id="analyzerModal" class="modal">
+    <div class="modal-content modal-large">
+        <div class="modal-header">
+            <h2><i class="fas fa-chart-bar"></i> Email Analyzer</h2>
+            <span class="modal-close" onclick="closeModal('analyzerModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label><i class="fas fa-list"></i> Danh sách email</label>
+                <textarea id="analyzerEmails" rows="8" placeholder="email1@gmail.com&#10;email2@yahoo.com"></textarea>
+            </div>
+            <button onclick="analyzeEmails()" class="btn btn-primary btn-large">
+                <i class="fas fa-chart-bar"></i> Phân tích
+            </button>
+            <div id="analyzerResult" class="result-container analytics-view"></div>
+        </div>
+    </div>
+</div>

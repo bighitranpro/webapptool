@@ -1,0 +1,17 @@
+[Unit]
+Description=Email Tool Flask Application
+After=network.target
+
+[Service]
+Type=simple
+User=bighitran1905
+WorkingDirectory=/home/bighitran1905/webapp
+Environment="PATH=/home/bighitran1905/webapp/venv/bin"
+ExecStart=/home/bighitran1905/webapp/venv/bin/python /home/bighitran1905/webapp/app.py
+Restart=always
+RestartSec=10
+StandardOutput=append:/home/bighitran1905/webapp/flask_server.log
+StandardError=append:/home/bighitran1905/webapp/flask_server.log
+
+[Install]
+WantedBy=multi-user.target

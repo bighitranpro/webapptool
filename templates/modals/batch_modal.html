@@ -1,0 +1,43 @@
+<!-- Batch Processor Modal -->
+<div id="batchModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-layer-group"></i> Batch Processor</h2>
+            <span class="modal-close" onclick="closeModal('batchModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label><i class="fas fa-list"></i> Danh sách email lớn</label>
+                <textarea id="batchEmails" rows="8" placeholder="Paste danh sách email lớn vào đây..."></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Batch Size</label>
+                    <input type="number" id="batchSize" value="100" min="10" max="1000">
+                </div>
+                <div class="form-group">
+                    <label>Số luồng</label>
+                    <input type="number" id="batchWorkers" value="5" min="1" max="20">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Thao tác xử lý</label>
+                <select id="batchOperation">
+                    <option value="validate">Validate (LIVE/DIE)</option>
+                    <option value="deduplicate">Loại trùng</option>
+                    <option value="format">Định dạng</option>
+                </select>
+            </div>
+            <button onclick="processBatch()" class="btn btn-primary btn-large">
+                <i class="fas fa-play"></i> Xử lý hàng loạt
+            </button>
+            <div id="batchProgress" class="progress-container" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="batchProgressBar"></div>
+                </div>
+                <p class="progress-text" id="batchProgressText">Đang xử lý...</p>
+            </div>
+            <div id="batchResult" class="result-container"></div>
+        </div>
+    </div>
+</div>

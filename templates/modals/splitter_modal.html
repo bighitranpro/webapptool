@@ -1,0 +1,34 @@
+<!-- Email Splitter Modal -->
+<div id="splitterModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-cut"></i> Email Splitter</h2>
+            <span class="modal-close" onclick="closeModal('splitterModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label><i class="fas fa-list"></i> Danh sách email</label>
+                <textarea id="splitterEmails" rows="8" placeholder="email1@gmail.com&#10;email2@yahoo.com"></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Phương thức chia</label>
+                    <select id="splitterMethod">
+                        <option value="count">Theo số lượng</option>
+                        <option value="chunks">Theo số phần</option>
+                        <option value="domain">Theo domain</option>
+                        <option value="alphabetical">Theo A-Z</option>
+                    </select>
+                </div>
+                <div class="form-group" id="splitterCountGroup">
+                    <label>Số lượng/phần</label>
+                    <input type="number" id="splitterCount" value="10" min="1">
+                </div>
+            </div>
+            <button onclick="splitEmails()" class="btn btn-primary btn-large">
+                <i class="fas fa-cut"></i> Chia
+            </button>
+            <div id="splitterResult" class="result-container"></div>
+        </div>
+    </div>
+</div>

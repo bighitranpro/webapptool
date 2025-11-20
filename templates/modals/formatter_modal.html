@@ -1,0 +1,40 @@
+<!-- Email Formatter Modal -->
+<div id="formatterModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-align-left"></i> Email Formatter</h2>
+            <span class="modal-close" onclick="closeModal('formatterModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label><i class="fas fa-list"></i> Danh sách email</label>
+                <textarea id="formatterEmails" rows="8" placeholder="email1@gmail.com&#10;email2@yahoo.com"></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Định dạng chữ</label>
+                    <select id="formatterCase">
+                        <option value="lowercase">Chữ thường</option>
+                        <option value="uppercase">Chữ hoa</option>
+                        <option value="titlecase">Chữ hoa đầu</option>
+                        <option value="original">Giữ nguyên</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Sắp xếp</label>
+                    <select id="formatterSort">
+                        <option value="">Không sắp xếp</option>
+                        <option value="alphabetical">A-Z</option>
+                        <option value="reverse">Z-A</option>
+                        <option value="domain">Theo domain</option>
+                        <option value="length">Theo độ dài</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="formatEmails()" class="btn btn-primary btn-large">
+                <i class="fas fa-magic"></i> Định dạng
+            </button>
+            <div id="formatterResult" class="result-container"></div>
+        </div>
+    </div>
+</div>
