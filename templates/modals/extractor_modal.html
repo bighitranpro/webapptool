@@ -1,0 +1,29 @@
+<!-- Email Extractor Modal -->
+<div id="extractorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-search"></i> Email Extractor</h2>
+            <span class="modal-close" onclick="closeModal('extractorModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label><i class="fas fa-file-alt"></i> Văn bản chứa email</label>
+                <textarea id="extractorText" rows="10" placeholder="Paste văn bản chứa email vào đây..."></textarea>
+            </div>
+            <div class="form-row">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="extractorRemoveDups" checked>
+                    <span>Loại bỏ trùng lặp</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="extractorCaseInsensitive" checked>
+                    <span>Không phân biệt hoa thường</span>
+                </label>
+            </div>
+            <button onclick="extractEmails()" class="btn btn-primary btn-large">
+                <i class="fas fa-search"></i> Trích xuất
+            </button>
+            <div id="extractorResult" class="result-container"></div>
+        </div>
+    </div>
+</div>

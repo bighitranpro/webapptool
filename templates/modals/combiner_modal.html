@@ -1,0 +1,32 @@
+<!-- Email Combiner Modal -->
+<div id="combinerModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-object-group"></i> Email Combiner</h2>
+            <span class="modal-close" onclick="closeModal('combinerModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label><i class="fas fa-list"></i> Danh sách 1</label>
+                <textarea id="combinerList1" rows="5" placeholder="email1@gmail.com&#10;email2@yahoo.com"></textarea>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-list"></i> Danh sách 2</label>
+                <textarea id="combinerList2" rows="5" placeholder="email3@outlook.com&#10;email4@hotmail.com"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Phương thức gộp</label>
+                <select id="combinerMethod">
+                    <option value="unique">Gộp và loại trùng</option>
+                    <option value="simple">Gộp đơn giản</option>
+                    <option value="intersect">Giao nhau</option>
+                    <option value="difference">Khác biệt (List1 - List2)</option>
+                </select>
+            </div>
+            <button onclick="combineEmails()" class="btn btn-primary btn-large">
+                <i class="fas fa-object-group"></i> Gộp
+            </button>
+            <div id="combinerResult" class="result-container"></div>
+        </div>
+    </div>
+</div>

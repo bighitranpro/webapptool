@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Test - Email Tool Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+        
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+        }
+        
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .test-button {
+            background: #3498db;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .test-button:hover {
+            background: #2980b9;
+        }
+        
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #ecf0f1;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .success {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 12px;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-left: 10px;
+            font-size: 14px;
+        }
+        
+        .status.ok {
+            background: #2ecc71;
+            color: white;
+        }
+        
+        .status.fail {
+            background: #e74c3c;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Quick Test - Email Tool Pro v2.0</h1>
+        <p class="subtitle">Test nhanh tất cả 10 API endpoints</p>
+        
+        <!-- Health Check -->
+        <div class="test-section">
+            <h2>1. Health Check <span id="health-status"></span></h2>
+            <button class="test-button" onclick="testHealth()">Test API Health</button>
+            <div id="health-result" class="result" style="display:none"></div>
+        </div>
+        
+        <!-- Generate -->
+        <div class="test-section">
+            <h2>2. Email Generator <span id="gen-status"></span></h2>
+            <button class="test-button" onclick="testGenerate()">Tạo 5 emails</button>
+            <div id="gen-result" class="result" style="display:none"></div>
+        </div>
+        
+        <!-- Validator -->
+        <div class="test-section">
+            <h2>3. Email Validator (LIVE/DIE) <span id="val-status"></span></h2>
+            <button class="test-button" onclick="testValidator()">Kiểm tra LIVE/DIE</button>
+            <div id="val-result" class="result" style="display:none"></div>
+        </div>
+        
+        <!-- Extract -->
+        <div class="test-section">
+            <h2>4. Email Extractor <span id="ext-status"></span></h2>
+            <button class="test-button" onclick="testExtract()">Trích xuất emails</button>
+            <div id="ext-result" class="result" style="display:none"></div>
+        </div>
+        
+        <!-- Format -->
+        <div class="test-section">
+            <h2>5. Email Formatter <span id="fmt-status"></span></h2>
+            <button class="test-button" onclick="testFormat()">Định dạng emails</button>
+            <div id="fmt-result" class="result" style="display:none"></div>
+        </div>
+        
+        <!-- Filter -->
+        <div class="test-section">
+            <h2>6. Email Filter <span id="flt-status"></span></h2>
+            <button class="test-button" onclick="testFilter()">Lọc emails</button>
+            <div id="flt-result" class="result" style="display:none"></div>
+        </div>
+        
+        <!-- Deduplicate -->
+        <div class="test-section">
+            <h2>7. Email Deduplicator <span id="dup-status"></span></h2>
+            <button class="test-button" onclick="testDeduplicate()">Loại trùng</button>
+            <div id="dup-result" class="result" style="display:none"></div>
+        </div>
+        
+        <!-- Split -->
+        <div class="test-section">
+            <h2>8. Email Splitter <span id="spl-status"></span></h2>
+            <button class="test-button" onclick="testSplit()">Chia emails</button>
+            <div id="spl-result" class="result" style="display:none"></div>
+        </div>
+        
+        <!-- Combine -->
+        <div class="test-section">
+            <h2>9. Email Combiner <span id="cmb-status"></span></h2>
+            <button class="test-button" onclick="testCombine()">Gộp emails</button>
+            <div id="cmb-result" class="result" style="display:none"></div>
+        </div>
+        
+        <!-- Analyze -->
+        <div class="test-section">
+            <h2>10. Email Analyzer <span id="ana-status"></span></h2>
+            <button class="test-button" onclick="testAnalyze()">Phân tích</button>
+            <div id="ana-result" class="result" style="display:none"></div>
+        </div>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #e8f5e9; border-radius: 10px;">
+            <h3 style="color: #2ecc71;">✅ Tất cả tests sẽ gọi API thực tế!</h3>
+            <p>Kết quả sẽ hiển thị ngay phía dưới mỗi button test.</p>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = '/api';
+        
+        async function testHealth() {
+            const resultDiv = document.getElementById('health-result');
+            const statusSpan = document.getElementById('health-status');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p>Đang test...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <p class="success">✅ API Health Check: OK</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                statusSpan.innerHTML = '<span class="status ok">✅ OK</span>';
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+                statusSpan.innerHTML = '<span class="status fail">❌ FAIL</span>';
+            }
+        }
+        
+        async function testGenerate() {
+            const resultDiv = document.getElementById('gen-result');
+            const statusSpan = document.getElementById('gen-status');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p>Đang generate...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email_type: 'random',
+                        text: 'user',
+                        total: 5,
+                        domain: 'gmail.com',
+                        char_type: 'lowercase',
+                        number_type: 'suffix'
+                    })
+                });
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <p class="success">✅ Generated ${data.emails.length} emails:</p>
+                    <pre>${data.emails.join('\\n')}</pre>
+                `;
+                statusSpan.innerHTML = '<span class="status ok">✅ OK</span>';
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+                statusSpan.innerHTML = '<span class="status fail">❌ FAIL</span>';
+            }
+        }
+        
+        async function testValidator() {
+            const resultDiv = document.getElementById('val-result');
+            const statusSpan = document.getElementById('val-status');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p>Đang validate... (có thể mất vài giây)</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/validate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        emails: ['test@gmail.com', 'invalid@fakeinvalid.com', 'user@yahoo.com'],
+                        options: { check_mx: true, max_workers: 3 }
+                    })
+                });
+                const data = await response.json();
+                
+                const stats = data.stats || {};
+                resultDiv.innerHTML = `
+                    <p class="success">✅ Validation Complete!</p>
+                    <p><strong>LIVE:</strong> ${stats.live} | <strong>DIE:</strong> ${stats.die} | <strong>Unknown:</strong> ${stats.unknown}</p>
+                    <p>Processing time: ${stats.processing_time}s</p>
+                `;
+                statusSpan.innerHTML = '<span class="status ok">✅ OK</span>';
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+                statusSpan.innerHTML = '<span class="status fail">❌ FAIL</span>';
+            }
+        }
+        
+        async function testExtract() {
+            const resultDiv = document.getElementById('ext-result');
+            const statusSpan = document.getElementById('ext-status');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p>Đang extract...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/extract`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: 'Contact us at support@example.com or sales@test.com',
+                        options: { remove_dups: true }
+                    })
+                });
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <p class="success">✅ Extracted ${data.total_emails} emails:</p>
+                    <pre>${data.emails.join('\\n')}</pre>
+                `;
+                statusSpan.innerHTML = '<span class="status ok">✅ OK</span>';
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+                statusSpan.innerHTML = '<span class="status fail">❌ FAIL</span>';
+            }
+        }
+        
+        async function testFormat() {
+            const resultDiv = document.getElementById('fmt-result');
+            const statusSpan = document.getElementById('fmt-status');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p>Đang format...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/format`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        emails: ['TEST@GMAIL.COM', 'user@yahoo.com', 'Admin@Outlook.com'],
+                        case_format: 'lowercase',
+                        sort_type: 'alphabetical'
+                    })
+                });
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <p class="success">✅ Formatted ${data.total} emails:</p>
+                    <pre>${data.emails.join('\\n')}</pre>
+                `;
+                statusSpan.innerHTML = '<span class="status ok">✅ OK</span>';
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+                statusSpan.innerHTML = '<span class="status fail">❌ FAIL</span>';
+            }
+        }
+        
+        async function testFilter() {
+            const resultDiv = document.getElementById('flt-result');
+            const statusSpan = document.getElementById('flt-status');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p>Đang filter...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/filter`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        emails: ['test@gmail.com', 'invalid', 'user@yahoo.com', 'admin@gmail.com'],
+                        filters: { remove_invalid: true, domains: ['gmail.com'] }
+                    })
+                });
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <p class="success">✅ Filtered: ${data.emails.length} emails remain</p>
+                    <pre>${data.emails.join('\\n')}</pre>
+                    <p>Filtered out: ${data.stats.filtered_out}</p>
+                `;
+                statusSpan.innerHTML = '<span class="status ok">✅ OK</span>';
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+                statusSpan.innerHTML = '<span class="status fail">❌ FAIL</span>';
+            }
+        }
+        
+        async function testDeduplicate() {
+            const resultDiv = document.getElementById('dup-result');
+            const statusSpan = document.getElementById('dup-status');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p>Đang deduplicate...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/deduplicate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        emails: ['test@gmail.com', 'TEST@gmail.com', 'user@yahoo.com'],
+                        method: 'case_insensitive'
+                    })
+                });
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <p class="success">✅ Removed ${data.stats.duplicates_removed} duplicates</p>
+                    <pre>${data.emails.join('\\n')}</pre>
+                `;
+                statusSpan.innerHTML = '<span class="status ok">✅ OK</span>';
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+                statusSpan.innerHTML = '<span class="status fail">❌ FAIL</span>';
+            }
+        }
+        
+        async function testSplit() {
+            const resultDiv = document.getElementById('spl-result');
+            const statusSpan = document.getElementById('spl-status');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p>Đang split...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/split`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        emails: ['a@test.com', 'b@test.com', 'c@test.com', 'd@test.com'],
+                        method: 'count',
+                        count: 2
+                    })
+                });
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <p class="success">✅ Split into ${data.num_chunks} chunks</p>
+                    <pre>${JSON.stringify(data.chunks, null, 2)}</pre>
+                `;
+                statusSpan.innerHTML = '<span class="status ok">✅ OK</span>';
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+                statusSpan.innerHTML = '<span class="status fail">❌ FAIL</span>';
+            }
+        }
+        
+        async function testCombine() {
+            const resultDiv = document.getElementById('cmb-result');
+            const statusSpan = document.getElementById('cmb-status');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p>Đang combine...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/combine`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email_lists: [
+                            ['test@gmail.com', 'user@yahoo.com'],
+                            ['admin@gmail.com', 'test@gmail.com']
+                        ],
+                        method: 'unique'
+                    })
+                });
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <p class="success">✅ Combined: ${data.total_output} unique emails</p>
+                    <pre>${data.emails.join('\\n')}</pre>
+                `;
+                statusSpan.innerHTML = '<span class="status ok">✅ OK</span>';
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+                statusSpan.innerHTML = '<span class="status fail">❌ FAIL</span>';
+            }
+        }
+        
+        async function testAnalyze() {
+            const resultDiv = document.getElementById('ana-result');
+            const statusSpan = document.getElementById('ana-status');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p>Đang analyze...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/analyze`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        emails: ['test123@gmail.com', 'user@yahoo.com', 'admin@gmail.com']
+                    })
+                });
+                const data = await response.json();
+                
+                const domains = data.domains || {};
+                resultDiv.innerHTML = `
+                    <p class="success">✅ Analysis Complete!</p>
+                    <p><strong>Total domains:</strong> ${domains.total_domains}</p>
+                    <p><strong>Top domain:</strong> ${domains.most_common ? domains.most_common[0] : 'N/A'}</p>
+                    <pre>${JSON.stringify(data.patterns, null, 2)}</pre>
+                `;
+                statusSpan.innerHTML = '<span class="status ok">✅ OK</span>';
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+                statusSpan.innerHTML = '<span class="status fail">❌ FAIL</span>';
+            }
+        }
+        
+        // Auto run health check on load
+        window.onload = () => {
+            testHealth();
+        };
+    </script>
+</body>
+</html>
