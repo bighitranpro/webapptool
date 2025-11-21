@@ -1,6 +1,6 @@
 /**
- * ID Page Mining V1 Functions
- * Mine Facebook page IDs from user UIDs with filtering
+ * ID Page Mining V2 Enhanced Functions
+ * Mine Facebook page IDs from user UIDs with advanced filtering and export
  */
 
 // Global state
@@ -14,15 +14,25 @@ const miningState = {
     stats: {
         total_uids: 0,
         processed_uids: 0,
-        total_pages: 0,
+        total_pages_found: 0,
         pages_with_ads: 0,
-        verified_pages: 0,
-        emails_collected: 0
+        pages_verified: 0,
+        emails_collected: 0,
+        phones_collected: 0,
+        websites_collected: 0,
+        processing_time: 0,
+        cache_hits: 0,
+        api_calls: 0
     },
     filters: {
         has_ads: false,
         country: '',
-        verified: false
+        verified: false,
+        category: '',
+        min_likes: 0,
+        has_email: false,
+        has_phone: false,
+        has_website: false
     }
 };
 
@@ -107,7 +117,7 @@ function miningUpdateStats() {
     
     // Processing stats
     document.getElementById('miningProcessed').textContent = stats.processed_uids;
-    document.getElementById('miningPagesFound').textContent = stats.total_pages;
+    document.getElementById('miningPagesFound').textContent = stats.total_pages_found;
     
     // Calculate speed
     if (miningState.startTime) {
@@ -123,27 +133,59 @@ function miningUpdateStats() {
         progressBar.style.width = `${progress}%`;
     }
     
-    // Results stats
-    document.getElementById('miningTotalPages').textContent = stats.total_pages;
+    // Results stats - Enhanced with new fields
+    document.getElementById('miningTotalPages').textContent = stats.total_pages_found;
     document.getElementById('miningPagesWithAds').textContent = stats.pages_with_ads;
-    document.getElementById('miningVerifiedPages').textContent = stats.verified_pages;
+    document.getElementById('miningVerifiedPages').textContent = stats.pages_verified;
     document.getElementById('miningEmailsCollected').textContent = stats.emails_collected;
+    
+    // New stats
+    const phonesEl = document.getElementById('miningPhonesCollected');
+    if (phonesEl) phonesEl.textContent = stats.phones_collected || 0;
+    
+    const websitesEl = document.getElementById('miningWebsitesCollected');
+    if (websitesEl) websitesEl.textContent = stats.websites_collected || 0;
+    
+    const cacheEl = document.getElementById('miningCacheHits');
+    if (cacheEl) cacheEl.textContent = stats.cache_hits || 0;
 }
 
 /**
- * Add page to results table
+ * Add page to results table - Enhanced with new columns
  */
 function miningAddPageToTable(page) {
     const tbody = document.getElementById('miningTableBody');
     const row = document.createElement('tr');
     
+    // Format location
+    const location = page.location || page.country || '-';
+    
+    // Format phone with link
+    const phoneHtml = page.phone 
+        ? `<a href="tel:${page.phone}" style="color: #3498db;">${page.phone}</a>` 
+        : '-';
+    
+    // Format website with link
+    const websiteHtml = page.website 
+        ? `<a href="${page.website}" target="_blank" style="color: #3498db;"><i class="fas fa-external-link-alt"></i></a>` 
+        : '-';
+    
+    // Format email
+    const emailHtml = page.email 
+        ? `<span title="${page.email}">${page.email.substring(0, 20)}${page.email.length > 20 ? '...' : ''}</span>` 
+        : '-';
+    
     row.innerHTML = `
         <td>${page.page_id}</td>
         <td class="page-name" title="${page.page_name}">${page.page_name}</td>
+        <td>${location}</td>
+        <td>${page.category || '-'}</td>
         <td>${page.has_ads ? '<span class="badge-yes">Yes</span>' : '<span class="badge-no">No</span>'}</td>
-        <td>${page.country || '-'}</td>
         <td>${page.verified ? '<i class="fas fa-check-circle" style="color: #3498db;"></i>' : '-'}</td>
-        <td>${page.likes || 0}</td>
+        <td>${emailHtml}</td>
+        <td>${phoneHtml}</td>
+        <td>${websiteHtml}</td>
+        <td>${page.likes ? page.likes.toLocaleString() : 0}</td>
     `;
     
     tbody.appendChild(row);
@@ -176,7 +218,7 @@ function miningStopTimer() {
 }
 
 /**
- * Run page mining
+ * Run page mining - Enhanced with new filters
  */
 async function miningRun() {
     // Parse UIDs
@@ -187,10 +229,21 @@ async function miningRun() {
         return;
     }
     
-    // Get filters
-    const filterAds = document.getElementById('miningFilterAds').checked;
-    const filterVerified = document.getElementById('miningFilterVerified').checked;
-    const filterCountry = document.getElementById('miningFilterCountry').value;
+    // Get all filters (existing and new)
+    const filters = {
+        has_ads: document.getElementById('miningFilterAds')?.checked || false,
+        verified: document.getElementById('miningFilterVerified')?.checked || false,
+        country: document.getElementById('miningFilterCountry')?.value || '',
+        category: document.getElementById('miningFilterCategory')?.value || '',
+        min_likes: parseInt(document.getElementById('miningFilterMinLikes')?.value || 0),
+        has_email: document.getElementById('miningFilterHasEmail')?.checked || false,
+        has_phone: document.getElementById('miningFilterHasPhone')?.checked || false,
+        has_website: document.getElementById('miningFilterHasWebsite')?.checked || false
+    };
+    
+    // Clean up empty filters
+    if (filters.country === 'all') filters.country = '';
+    if (filters.category === 'all') filters.category = '';
     
     // Get proxy settings
     const proxyType = document.getElementById('miningProxyType').value;
@@ -205,16 +258,17 @@ async function miningRun() {
     miningState.stats = {
         total_uids: uids.length,
         processed_uids: 0,
-        total_pages: 0,
+        total_pages_found: 0,
         pages_with_ads: 0,
-        verified_pages: 0,
-        emails_collected: 0
+        pages_verified: 0,
+        emails_collected: 0,
+        phones_collected: 0,
+        websites_collected: 0,
+        processing_time: 0,
+        cache_hits: 0,
+        api_calls: 0
     };
-    miningState.filters = {
-        has_ads: filterAds,
-        country: filterCountry,
-        verified: filterVerified
-    };
+    miningState.filters = filters;
     
     // Update UI
     document.getElementById('miningRunBtn').disabled = true;
@@ -235,16 +289,31 @@ async function miningRun() {
     miningUpdateStats();
     
     miningAddLog(`Bắt đầu khai thác ${uids.length} UIDs`, 'info');
-    miningAddLog(`Filters: Ads=${filterAds}, Verified=${filterVerified}, Country=${filterCountry || 'All'}`, 'info');
+    
+    // Log active filters
+    const activeFilters = [];
+    if (filters.has_ads) activeFilters.push('Has Ads');
+    if (filters.verified) activeFilters.push('Verified');
+    if (filters.country) activeFilters.push(`Country: ${filters.country}`);
+    if (filters.category) activeFilters.push(`Category: ${filters.category}`);
+    if (filters.min_likes > 0) activeFilters.push(`Min Likes: ${filters.min_likes}`);
+    if (filters.has_email) activeFilters.push('Has Email');
+    if (filters.has_phone) activeFilters.push('Has Phone');
+    if (filters.has_website) activeFilters.push('Has Website');
+    
+    if (activeFilters.length > 0) {
+        miningAddLog(`Filters: ${activeFilters.join(', ')}`, 'info');
+    } else {
+        miningAddLog('Filters: None (all pages)', 'info');
+    }
+    
     miningAddLog(`Proxy: ${proxyType}, Threads: ${threads}`, 'info');
     
-    // Prepare request
+    // Prepare request with enhanced options
     const requestData = {
         uids: uids,
         options: {
-            filter_has_ads: filterAds,
-            filter_country: filterCountry === 'all' ? '' : filterCountry,
-            filter_verified: filterVerified,
+            filters: filters,
             max_workers: threads,
             proxy_config: proxies.length > 0 ? {
                 enabled: true,
@@ -272,28 +341,55 @@ async function miningRun() {
         const data = await response.json();
         
         if (data.success) {
-            // Update results
-            miningState.pages = data.pages;
+            // Update results with enhanced stats
+            miningState.pages = data.results?.pages || [];
             miningState.stats = {
-                total_uids: data.stats.total_uids,
-                processed_uids: data.stats.total_uids,
-                total_pages: data.stats.total_pages,
-                pages_with_ads: data.stats.pages_with_ads,
-                verified_pages: data.stats.verified_pages,
-                emails_collected: data.stats.emails_collected
+                total_uids: data.stats.total_uids || uids.length,
+                processed_uids: data.stats.total_uids || uids.length,
+                total_pages_found: data.stats.total_pages_found || 0,
+                pages_with_ads: data.stats.pages_with_ads || 0,
+                pages_verified: data.stats.pages_verified || 0,
+                emails_collected: data.stats.emails_collected || 0,
+                phones_collected: data.stats.phones_collected || 0,
+                websites_collected: data.stats.websites_collected || 0,
+                processing_time: data.stats.processing_time || 0,
+                cache_hits: data.stats.cache_hits || 0,
+                api_calls: data.stats.api_calls || 0
             };
             
             miningUpdateStats();
             
             // Display pages in table
-            data.pages.forEach(page => miningAddPageToTable(page));
+            miningState.pages.forEach(page => miningAddPageToTable(page));
             
-            miningAddLog(`✅ Hoàn thành! Tìm thấy ${data.stats.total_pages} pages`, 'success');
-            miningAddLog(`Pages có Ads: ${data.stats.pages_with_ads}, Verified: ${data.stats.verified_pages}`, 'info');
-            miningAddLog(`Emails thu thập: ${data.stats.emails_collected}`, 'info');
-            miningAddLog(`Thời gian: ${data.stats.processing_time}s`, 'info');
+            miningAddLog(`✅ Hoàn thành! Tìm thấy ${miningState.stats.total_pages_found} pages`, 'success');
+            miningAddLog(`Pages có Ads: ${miningState.stats.pages_with_ads}, Verified: ${miningState.stats.pages_verified}`, 'info');
+            miningAddLog(`Emails: ${miningState.stats.emails_collected}, Phones: ${miningState.stats.phones_collected}, Websites: ${miningState.stats.websites_collected}`, 'info');
+            miningAddLog(`Cache hits: ${miningState.stats.cache_hits}, API calls: ${miningState.stats.api_calls}`, 'info');
+            miningAddLog(`Thời gian: ${miningState.stats.processing_time.toFixed(2)}s`, 'info');
             
-            showNotification(`✅ Khai thác hoàn tất! Tìm thấy ${data.stats.total_pages} pages`, 'success');
+            showNotification(`✅ Khai thác hoàn tất! Tìm thấy ${miningState.stats.total_pages_found} pages`, 'success');
+            
+            // Log activity to activity feed
+            if (typeof window.logActivity === 'function') {
+                window.logActivity({
+                    type: 'page_mining',
+                    title: 'Khai thác Page hoàn tất',
+                    description: `Tìm thấy ${miningState.stats.total_pages_found} pages - Emails: ${miningState.stats.emails_collected}`,
+                    status: 'success',
+                    icon: 'fa-bullseye',
+                    color: 'purple',
+                    metadata: {
+                        total_pages: miningState.stats.total_pages_found,
+                        pages_with_ads: miningState.stats.pages_with_ads,
+                        pages_verified: miningState.stats.pages_verified,
+                        emails_collected: miningState.stats.emails_collected,
+                        phones_collected: miningState.stats.phones_collected,
+                        websites_collected: miningState.stats.websites_collected,
+                        processing_time: miningState.stats.processing_time
+                    }
+                });
+            }
         } else {
             throw new Error(data.message || 'Unknown error');
         }
@@ -337,96 +433,135 @@ function miningPause() {
 }
 
 /**
- * Export results to TXT
+ * Export results to TXT - Enhanced
  */
-function miningExportTXT() {
+async function miningExportTXT() {
     if (miningState.pages.length === 0) {
         showNotification('Chưa có kết quả để export', 'info');
         return;
     }
     
-    let content = `ID Page Mining Results\n`;
-    content += `Generated: ${new Date().toLocaleString()}\n`;
-    content += `Total UIDs: ${miningState.stats.total_uids}\n`;
-    content += `Total Pages: ${miningState.stats.total_pages}\n`;
-    content += `Pages with Ads: ${miningState.stats.pages_with_ads}\n`;
-    content += `Verified Pages: ${miningState.stats.verified_pages}\n`;
-    content += `Emails Collected: ${miningState.stats.emails_collected}\n\n`;
-    
-    content += `=== PAGE LIST ===\n`;
-    miningState.pages.forEach((page, index) => {
-        content += `${index + 1}. ${page.page_name}\n`;
-        content += `   Page ID: ${page.page_id}\n`;
-        content += `   URL: ${page.page_url}\n`;
-        content += `   Owner UID: ${page.uid_owner}\n`;
-        content += `   Has Ads: ${page.has_ads ? 'Yes' : 'No'}\n`;
-        content += `   Country: ${page.country || 'N/A'}\n`;
-        content += `   Verified: ${page.verified ? 'Yes' : 'No'}\n`;
-        content += `   Likes: ${page.likes || 0}\n`;
-        if (page.email) {
-            content += `   Email: ${page.email}\n`;
+    try {
+        const response = await fetch(`${API_BASE}/page-mining/export`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                pages: miningState.pages,
+                format: 'txt'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Create download
+            const blob = new Blob([data.data], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `page_mining_${Date.now()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Đã export TXT', 'success');
+        } else {
+            throw new Error(data.message);
         }
-        if (page.domain_email) {
-            content += `   Domain Email: ${page.domain_email}\n`;
-        }
-        content += `\n`;
-    });
-    
-    // Create download
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `page_mining_${Date.now()}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    showNotification('Đã export TXT', 'success');
+    } catch (error) {
+        showNotification(`Lỗi export: ${error.message}`, 'error');
+    }
 }
 
 /**
- * Export results to CSV
+ * Export results to CSV - Enhanced
  */
-function miningExportCSV() {
+async function miningExportCSV() {
     if (miningState.pages.length === 0) {
         showNotification('Chưa có kết quả để export', 'info');
         return;
     }
     
-    // CSV header
-    let csv = 'Page ID,Page Name,URL,Owner UID,Has Ads,Country,Verified,Likes,Email,Domain Email\n';
+    try {
+        const response = await fetch(`${API_BASE}/page-mining/export`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                pages: miningState.pages,
+                format: 'csv'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Create download
+            const blob = new Blob([data.data], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `page_mining_${Date.now()}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Đã export CSV', 'success');
+        } else {
+            throw new Error(data.message);
+        }
+    } catch (error) {
+        showNotification(`Lỗi export: ${error.message}`, 'error');
+    }
+}
+
+/**
+ * Export results to JSON - New
+ */
+async function miningExportJSON() {
+    if (miningState.pages.length === 0) {
+        showNotification('Chưa có kết quả để export', 'info');
+        return;
+    }
     
-    // CSV rows
-    miningState.pages.forEach(page => {
-        const row = [
-            page.page_id,
-            `"${page.page_name.replace(/"/g, '""')}"`, // Escape quotes in name
-            page.page_url,
-            page.uid_owner,
-            page.has_ads ? 'Yes' : 'No',
-            page.country || '',
-            page.verified ? 'Yes' : 'No',
-            page.likes || 0,
-            page.email || '',
-            page.domain_email || ''
-        ];
-        csv += row.join(',') + '\n';
-    });
-    
-    // Create download
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `page_mining_${Date.now()}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    showNotification('Đã export CSV', 'success');
+    try {
+        const response = await fetch(`${API_BASE}/page-mining/export`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                pages: miningState.pages,
+                format: 'json'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Create download
+            const blob = new Blob([data.data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `page_mining_${Date.now()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Đã export JSON', 'success');
+        } else {
+            throw new Error(data.message);
+        }
+    } catch (error) {
+        showNotification(`Lỗi export: ${error.message}`, 'error');
+    }
 }
 
 /**
@@ -490,4 +625,48 @@ function miningCopyDomainEmails() {
     });
 }
 
-console.log('Page Mining functions loaded');
+/**
+ * Copy Phones to clipboard - New
+ */
+function miningCopyPhones() {
+    const phones = miningState.pages
+        .filter(p => p.phone)
+        .map(p => p.phone)
+        .join('\n');
+    
+    if (!phones) {
+        showNotification('Không có số điện thoại nào', 'info');
+        return;
+    }
+    
+    navigator.clipboard.writeText(phones).then(() => {
+        const count = miningState.pages.filter(p => p.phone).length;
+        showNotification(`Đã copy ${count} số điện thoại`, 'success');
+    }).catch(err => {
+        showNotification('Lỗi copy: ' + err.message, 'error');
+    });
+}
+
+/**
+ * Copy Websites to clipboard - New
+ */
+function miningCopyWebsites() {
+    const websites = miningState.pages
+        .filter(p => p.website)
+        .map(p => p.website)
+        .join('\n');
+    
+    if (!websites) {
+        showNotification('Không có website nào', 'info');
+        return;
+    }
+    
+    navigator.clipboard.writeText(websites).then(() => {
+        const count = miningState.pages.filter(p => p.website).length;
+        showNotification(`Đã copy ${count} websites`, 'success');
+    }).catch(err => {
+        showNotification('Lỗi copy: ' + err.message, 'error');
+    });
+}
+
+console.log('Page Mining V2 Enhanced functions loaded');
