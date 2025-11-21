@@ -824,7 +824,7 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'session_token' not in session:
-            return redirect(url_for('login_page'))
+            return redirect(url_for('auth.login_page'))
         
         # Verify session is still valid
         auth_system = AuthVIPSystem()
@@ -832,7 +832,7 @@ def login_required(f):
         
         if not session_info.get('valid'):
             session.clear()
-            return redirect(url_for('login_page'))
+            return redirect(url_for('auth.login_page'))
         
         return f(*args, **kwargs)
     return decorated_function
@@ -843,7 +843,7 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'session_token' not in session:
-            return redirect(url_for('login_page'))
+            return redirect(url_for('auth.login_page'))
         
         auth_system = AuthVIPSystem()
         session_info = auth_system.verify_session(session['session_token'])
