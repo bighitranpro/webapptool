@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BI GHI TOOL MMO - Professional Email & Facebook Tools Suite</title>
+    <title>BI GHI TOOL MMO - Bộ Công Cụ Email & Facebook Chuyên Nghiệp</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Lexend:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -13,44 +16,74 @@
         }
 
         :root {
+            /* Màu sắc chính */
             --primary-dark: #0a0e27;
             --secondary-dark: #1a1f3a;
-            --accent-gold: #f39c12;
-            --accent-gold-hover: #e67e22;
-            --success-green: #2ecc71;
-            --info-blue: #3498db;
+            --tertiary-dark: #252b48;
+            --accent-gold: #ffd700;
+            --accent-gold-hover: #ffed4e;
+            --accent-orange: #ff6b35;
+            --success-green: #00f5a0;
+            --info-blue: #00d9ff;
+            --danger-red: #ff5757;
             --text-primary: #ffffff;
-            --text-secondary: #b0b3c1;
+            --text-secondary: #c0c5e0;
             --border-color: #2d3348;
-            --gradient-gold: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-            --gradient-blue: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+            
+            /* Gradients đẹp */
+            --gradient-gold: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-success: linear-gradient(135deg, #00f5a0 0%, #00d9ff 100%);
+            --gradient-danger: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            --gradient-hero: radial-gradient(ellipse at top, rgba(102, 126, 234, 0.15), transparent 50%), 
+                             radial-gradient(ellipse at bottom, rgba(255, 215, 0, 0.1), transparent 50%);
+            
+            /* Shadows nâng cao */
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.15);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
+            --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.35);
+            --shadow-glow: 0 0 30px rgba(255, 215, 0, 0.3);
+            
+            /* Typography */
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-display: 'Lexend', 'Inter', sans-serif;
         }
 
         body {
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: var(--font-primary);
             background: var(--primary-dark);
             color: var(--text-primary);
-            line-height: 1.6;
+            line-height: 1.7;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        /* Navigation */
+        /* Navigation hiện đại */
         .navbar {
             position: fixed;
             top: 0;
             width: 100%;
-            background: rgba(26, 31, 58, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border-color);
+            background: rgba(26, 31, 58, 0.8);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             padding: 20px 0;
             z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .navbar.scrolled {
+            background: rgba(10, 14, 39, 0.95);
+            padding: 15px 0;
+            box-shadow: var(--shadow-lg);
         }
 
         .nav-container {
-            max-width: 1200px;
+            max-width: 1280px;
             margin: 0 auto;
-            padding: 0 30px;
+            padding: 0 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -60,90 +93,175 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            font-size: 24px;
-            font-weight: 700;
+            font-family: var(--font-display);
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            transition: all 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
         }
 
         .logo i {
-            color: var(--accent-gold);
-            font-size: 32px;
+            font-size: 36px;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
         }
 
         .nav-links {
             display: flex;
-            gap: 30px;
+            gap: 40px;
             align-items: center;
         }
 
         .nav-link {
             color: var(--text-secondary);
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 15px;
+            letter-spacing: 0.3px;
             transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-gold);
+            transition: width 0.3s ease;
         }
 
         .nav-link:hover {
             color: var(--accent-gold);
         }
 
-        .btn-primary {
-            padding: 12px 30px;
-            background: var(--gradient-gold);
-            color: white;
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .btn-primary, .btn-secondary {
+            padding: 14px 32px;
             border: none;
-            border-radius: 8px;
-            font-weight: 600;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 15px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: var(--gradient-gold);
+            color: var(--primary-dark);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-primary:hover::before {
+            width: 300px;
+            height: 300px;
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(243, 156, 18, 0.4);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-xl), var(--shadow-glow);
         }
 
         .btn-secondary {
-            padding: 12px 30px;
             background: transparent;
             color: var(--accent-gold);
             border: 2px solid var(--accent-gold);
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
         }
 
         .btn-secondary:hover {
             background: var(--accent-gold);
-            color: white;
+            color: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
         }
 
-        /* Hero Section */
+        /* Hero Section siêu đẹp */
         .hero {
-            padding: 150px 30px 100px;
+            padding: 180px 40px 120px;
             text-align: center;
-            background: linear-gradient(135deg, rgba(243, 156, 18, 0.1) 0%, rgba(52, 152, 219, 0.1) 100%);
+            background: var(--gradient-hero);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 70%);
+            animation: rotate 30s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
         }
 
         .hero h1 {
-            font-size: 56px;
-            font-weight: 800;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, var(--accent-gold), var(--info-blue));
+            font-family: var(--font-display);
+            font-size: 68px;
+            font-weight: 900;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #ffffff 0%, #ffd700 50%, #00d9ff 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.15;
+            letter-spacing: -2px;
             animation: fadeInUp 0.8s ease;
         }
 
-        .hero p {
-            font-size: 20px;
+        .hero .subtitle {
+            font-size: 22px;
             color: var(--text-secondary);
-            max-width: 700px;
-            margin: 0 auto 40px;
+            max-width: 800px;
+            margin: 0 auto 48px;
+            line-height: 1.8;
+            font-weight: 400;
             animation: fadeInUp 0.8s ease 0.2s backwards;
         }
 
@@ -151,13 +269,24 @@
             display: flex;
             gap: 20px;
             justify-content: center;
+            flex-wrap: wrap;
             animation: fadeInUp 0.8s ease 0.4s backwards;
+        }
+
+        .hero-buttons .btn-primary {
+            font-size: 18px;
+            padding: 18px 40px;
+        }
+
+        .hero-buttons .btn-secondary {
+            font-size: 18px;
+            padding: 18px 40px;
         }
 
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(40px);
             }
             to {
                 opacity: 1;
@@ -167,189 +296,305 @@
 
         /* Features Section */
         .features {
-            max-width: 1200px;
-            margin: 80px auto;
-            padding: 0 30px;
+            max-width: 1280px;
+            margin: 100px auto;
+            padding: 0 40px;
         }
 
         .section-title {
             text-align: center;
-            font-size: 42px;
-            font-weight: 700;
-            margin-bottom: 50px;
+            font-family: var(--font-display);
+            font-size: 52px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 20px;
+            color: var(--text-secondary);
+            margin-bottom: 60px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 32px;
         }
 
         .feature-card {
-            background: var(--secondary-dark);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 40px 30px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, rgba(26, 31, 58, 0.5) 0%, rgba(37, 43, 72, 0.3) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.05), transparent);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
         }
 
         .feature-card:hover {
-            transform: translateY(-10px);
-            border-color: var(--accent-gold);
-            box-shadow: var(--shadow-lg);
+            transform: translateY(-12px) scale(1.02);
+            border-color: rgba(255, 215, 0, 0.5);
+            box-shadow: var(--shadow-xl), 0 0 50px rgba(255, 215, 0, 0.2);
         }
 
         .feature-icon {
-            width: 70px;
-            height: 70px;
-            border-radius: 16px;
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
-            margin-bottom: 20px;
+            font-size: 36px;
+            margin-bottom: 24px;
+            position: relative;
+            transition: all 0.5s ease;
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
         }
 
         .feature-icon.gold {
             background: var(--gradient-gold);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
         }
 
         .feature-icon.blue {
-            background: var(--gradient-blue);
+            background: var(--gradient-success);
+            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.3);
         }
 
         .feature-icon.green {
-            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            background: var(--gradient-danger);
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
+        }
+
+        .feature-icon i {
+            color: var(--primary-dark);
         }
 
         .feature-card h3 {
-            font-size: 24px;
+            font-family: var(--font-display);
+            font-size: 26px;
             font-weight: 700;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
         }
 
         .feature-card p {
             color: var(--text-secondary);
             line-height: 1.8;
+            font-size: 16px;
         }
 
         /* Pricing Section */
         .pricing {
-            max-width: 1200px;
-            margin: 80px auto;
-            padding: 0 30px;
+            max-width: 1280px;
+            margin: 100px auto;
+            padding: 0 40px;
         }
 
         .pricing-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            margin-top: 50px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+            margin-top: 60px;
         }
 
         .pricing-card {
-            background: var(--secondary-dark);
-            border: 2px solid var(--border-color);
-            border-radius: 16px;
-            padding: 40px 30px;
+            background: linear-gradient(135deg, rgba(26, 31, 58, 0.6) 0%, rgba(37, 43, 72, 0.4) 100%);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 48px 36px;
             text-align: center;
-            transition: all 0.3s ease;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pricing-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .pricing-card:hover::before {
+            opacity: 1;
         }
 
         .pricing-card.featured {
             border-color: var(--accent-gold);
             transform: scale(1.05);
-            background: linear-gradient(135deg, rgba(243, 156, 18, 0.1) 0%, rgba(243, 156, 18, 0.05) 100%);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 215, 0, 0.05) 100%);
+            box-shadow: var(--shadow-xl), var(--shadow-glow);
         }
 
         .pricing-card:hover {
-            transform: translateY(-10px);
-            box-shadow: var(--shadow-lg);
+            transform: translateY(-12px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--accent-gold);
+        }
+
+        .pricing-card.featured:hover {
+            transform: scale(1.08) translateY(-12px);
         }
 
         .pricing-badge {
             display: inline-block;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
+            padding: 10px 20px;
+            border-radius: 24px;
+            font-size: 13px;
+            font-weight: 800;
             text-transform: uppercase;
-            margin-bottom: 20px;
+            letter-spacing: 1px;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 1;
         }
 
         .pricing-badge.free {
-            background: #6c7293;
+            background: linear-gradient(135deg, #6c7293 0%, #8891b9 100%);
         }
 
         .pricing-badge.pro {
             background: var(--gradient-gold);
+            color: var(--primary-dark);
+            animation: pulse-badge 2s infinite;
+        }
+
+        @keyframes pulse-badge {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
 
         .pricing-price {
-            font-size: 48px;
-            font-weight: 800;
-            margin-bottom: 10px;
+            font-family: var(--font-display);
+            font-size: 64px;
+            font-weight: 900;
+            margin-bottom: 12px;
+            letter-spacing: -2px;
+            position: relative;
+            z-index: 1;
         }
 
         .pricing-price span {
-            font-size: 18px;
-            font-weight: 400;
+            font-size: 20px;
+            font-weight: 500;
             color: var(--text-secondary);
         }
 
         .pricing-features {
             list-style: none;
-            margin: 30px 0;
+            margin: 32px 0;
             text-align: left;
+            position: relative;
+            z-index: 1;
         }
 
         .pricing-features li {
-            padding: 10px 0;
+            padding: 14px 0;
             color: var(--text-secondary);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            font-size: 15px;
         }
 
         .pricing-features li i {
             color: var(--success-green);
+            font-size: 18px;
         }
 
         /* CTA Section */
         .cta {
-            background: linear-gradient(135deg, rgba(243, 156, 18, 0.2) 0%, rgba(52, 152, 219, 0.2) 100%);
-            padding: 80px 30px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(255, 215, 0, 0.2) 100%);
+            padding: 100px 40px;
             text-align: center;
-            margin: 80px 0;
+            margin: 100px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,217,255,0.1) 0%, transparent 70%);
+            animation: rotate 40s linear infinite reverse;
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 1;
         }
 
         .cta h2 {
-            font-size: 42px;
-            font-weight: 700;
-            margin-bottom: 20px;
+            font-family: var(--font-display);
+            font-size: 52px;
+            font-weight: 800;
+            margin-bottom: 24px;
+            letter-spacing: -1px;
         }
 
         .cta p {
-            font-size: 18px;
+            font-size: 20px;
             color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto 40px;
+            max-width: 700px;
+            margin: 0 auto 48px;
+            line-height: 1.8;
         }
 
         /* Footer */
         .footer {
             background: var(--secondary-dark);
-            border-top: 1px solid var(--border-color);
-            padding: 40px 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 48px 40px;
             text-align: center;
         }
 
         .footer p {
             color: var(--text-secondary);
+            font-size: 15px;
         }
 
-        /* Registration Modal */
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -357,10 +602,17 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
             z-index: 2000;
             justify-content: center;
             align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .modal.active {
@@ -368,38 +620,64 @@
         }
 
         .modal-content {
-            background: var(--secondary-dark);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 40px;
+            background: linear-gradient(135deg, var(--secondary-dark) 0%, var(--tertiary-dark) 100%);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 24px;
+            padding: 48px;
             max-width: 500px;
             width: 90%;
             text-align: center;
+            box-shadow: var(--shadow-xl);
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .modal-content h2 {
-            margin-bottom: 20px;
+            font-family: var(--font-display);
+            font-size: 32px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .modal-content h2 i {
+            color: var(--accent-gold);
         }
 
         .modal-content p {
             color: var(--text-secondary);
-            margin-bottom: 30px;
+            margin-bottom: 32px;
+            font-size: 16px;
+            line-height: 1.7;
         }
 
         .modal-buttons {
             display: flex;
-            gap: 15px;
+            gap: 16px;
             justify-content: center;
+            flex-wrap: wrap;
         }
 
         /* Responsive */
         @media (max-width: 768px) {
             .hero h1 {
-                font-size: 36px;
+                font-size: 42px;
             }
 
-            .hero p {
-                font-size: 16px;
+            .hero .subtitle {
+                font-size: 18px;
             }
 
             .hero-buttons {
@@ -411,175 +689,229 @@
                 display: none;
             }
 
+            .section-title {
+                font-size: 36px;
+            }
+
             .pricing-card.featured {
                 transform: scale(1);
+            }
+
+            .features-grid,
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero {
+                padding: 140px 20px 80px;
+            }
+
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .hero .subtitle {
+                font-size: 16px;
+            }
+
+            .section-title {
+                font-size: 28px;
+            }
+
+            .feature-card,
+            .pricing-card {
+                padding: 32px 24px;
             }
         }
     </style>
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar">
+    <nav class="navbar" id="navbar">
         <div class="nav-container">
             <div class="logo">
                 <i class="fas fa-bolt"></i>
                 <span>BI GHI TOOL MMO</span>
             </div>
             <div class="nav-links">
-                <a href="#features" class="nav-link">Features</a>
-                <a href="#pricing" class="nav-link">Pricing</a>
-                <a href="/login" class="btn-secondary">Login</a>
-                <a href="/register" class="btn-primary">Get Started</a>
+                <a href="#features" class="nav-link">Tính Năng</a>
+                <a href="#pricing" class="nav-link">Bảng Giá</a>
+                <a href="/login" class="btn-secondary">Đăng Nhập</a>
+                <a href="/register" class="btn-primary">
+                    <i class="fas fa-rocket"></i>
+                    Bắt Đầu Ngay
+                </a>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
     <section class="hero">
-        <h1>Professional Email & Facebook Tools</h1>
-        <p>Validate, generate, and analyze emails with 95% accuracy. Check Facebook links, 2FA status, and mine pages - all in one powerful platform.</p>
-        <div class="hero-buttons">
-            <a href="/register" class="btn-primary" style="font-size: 18px; padding: 16px 40px;">
-                <i class="fas fa-rocket"></i> Start Free Trial
-            </a>
-            <button class="btn-secondary" onclick="showFeatureDemo()" style="font-size: 18px; padding: 16px 40px;">
-                <i class="fas fa-play"></i> View Demo
-            </button>
+        <div class="hero-content">
+            <h1>Công Cụ Email & Facebook<br>Chuyên Nghiệp Hàng Đầu</h1>
+            <p class="subtitle">Kiểm tra, tạo và phân tích email với độ chính xác 95%. Kiểm tra liên kết Facebook, trạng thái 2FA, khai thác trang - tất cả trong một nền tảng mạnh mẽ.</p>
+            <div class="hero-buttons">
+                <a href="/register" class="btn-primary">
+                    <i class="fas fa-rocket"></i>
+                    Dùng Thử Miễn Phí
+                </a>
+                <button class="btn-secondary" onclick="showFeatureDemo()">
+                    <i class="fas fa-play"></i>
+                    Xem Demo
+                </button>
+            </div>
         </div>
     </section>
 
     <!-- Features Section -->
     <section class="features" id="features">
-        <h2 class="section-title">Powerful Features</h2>
+        <h2 class="section-title">Tính Năng Mạnh Mẽ</h2>
+        <p class="section-subtitle">Bộ công cụ toàn diện giúp bạn tối ưu hóa công việc với email và Facebook</p>
         <div class="features-grid">
-            <div class="feature-card" onclick="showLoginPrompt('Email Validator')">
+            <div class="feature-card" onclick="showLoginPrompt('Kiểm tra Email')">
                 <div class="feature-icon gold">
                     <i class="fas fa-shield-check"></i>
                 </div>
-                <h3>Email Validator</h3>
-                <p>Validate emails with 95% accuracy. Detect LIVE/DIE status, MX records, SMTP reachability, and code reception capability.</p>
+                <h3>Kiểm Tra Email</h3>
+                <p>Xác thực email với độ chính xác 95%. Phát hiện trạng thái LIVE/DIE, bản ghi MX, khả năng kết nối SMTP và khả năng nhận mã xác thực.</p>
             </div>
 
-            <div class="feature-card" onclick="showLoginPrompt('Email Generator')">
+            <div class="feature-card" onclick="showLoginPrompt('Tạo Email')">
                 <div class="feature-icon blue">
                     <i class="fas fa-random"></i>
                 </div>
-                <h3>Email Generator</h3>
-                <p>Generate unlimited random emails or custom patterns across multiple domains. Perfect for testing and bulk operations.</p>
+                <h3>Tạo Email</h3>
+                <p>Tạo email ngẫu nhiên không giới hạn hoặc theo mẫu tùy chỉnh trên nhiều tên miền. Hoàn hảo cho thử nghiệm và thao tác hàng loạt.</p>
             </div>
 
-            <div class="feature-card" onclick="showLoginPrompt('Facebook Checker')">
+            <div class="feature-card" onclick="showLoginPrompt('Công cụ Facebook')">
                 <div class="feature-icon green">
                     <i class="fab fa-facebook"></i>
                 </div>
-                <h3>Facebook Tools</h3>
-                <p>Check email-Facebook links with 6 APIs, verify 2FA status, extract pages, and mine valuable account information.</p>
+                <h3>Công Cụ Facebook</h3>
+                <p>Kiểm tra liên kết email-Facebook với 6 API, xác minh trạng thái 2FA, trích xuất trang và khai thác thông tin tài khoản có giá trị.</p>
             </div>
 
-            <div class="feature-card" onclick="showLoginPrompt('Email Extractor')">
+            <div class="feature-card" onclick="showLoginPrompt('Trích xuất Email')">
                 <div class="feature-icon gold">
                     <i class="fas fa-search"></i>
                 </div>
-                <h3>Email Extractor</h3>
-                <p>Extract emails from text, files, or URLs. Smart pattern recognition for multiple sources and formats.</p>
+                <h3>Trích Xuất Email</h3>
+                <p>Trích xuất email từ văn bản, tệp hoặc URL. Nhận diện mẫu thông minh cho nhiều nguồn và định dạng khác nhau.</p>
             </div>
 
-            <div class="feature-card" onclick="showLoginPrompt('Email Analyzer')">
+            <div class="feature-card" onclick="showLoginPrompt('Phân tích Email')">
                 <div class="feature-icon blue">
                     <i class="fas fa-chart-bar"></i>
                 </div>
-                <h3>Email Analyzer</h3>
-                <p>Analyze email patterns, domains, and statistics. Get insights from your email lists with detailed reports.</p>
+                <h3>Phân Tích Email</h3>
+                <p>Phân tích mẫu email, tên miền và thống kê. Nhận thông tin chi tiết từ danh sách email với báo cáo chi tiết.</p>
             </div>
 
-            <div class="feature-card" onclick="showLoginPrompt('Batch Processor')">
+            <div class="feature-card" onclick="showLoginPrompt('Xử lý hàng loạt')">
                 <div class="feature-icon green">
                     <i class="fas fa-layer-group"></i>
                 </div>
-                <h3>Batch Processing</h3>
-                <p>Process thousands of emails simultaneously. Split, combine, filter, and deduplicate with high performance.</p>
+                <h3>Xử Lý Hàng Loạt</h3>
+                <p>Xử lý hàng nghìn email đồng thời. Tách, kết hợp, lọc và loại bỏ trùng lặp với hiệu suất cao.</p>
             </div>
         </div>
     </section>
 
     <!-- Pricing Section -->
     <section class="pricing" id="pricing">
-        <h2 class="section-title">Simple, Transparent Pricing</h2>
+        <h2 class="section-title">Bảng Giá Đơn Giản, Minh Bạch</h2>
+        <p class="section-subtitle">Chọn gói phù hợp với nhu cầu của bạn</p>
         <div class="pricing-grid">
             <div class="pricing-card">
-                <div class="pricing-badge free">FREE</div>
-                <div class="pricing-price">$0<span>/month</span></div>
+                <div class="pricing-badge free">MIỄN PHÍ</div>
+                <div class="pricing-price">0đ<span>/tháng</span></div>
                 <ul class="pricing-features">
-                    <li><i class="fas fa-check"></i> 50 validations/day</li>
-                    <li><i class="fas fa-check"></i> Basic email tools</li>
-                    <li><i class="fas fa-check"></i> Standard support</li>
+                    <li><i class="fas fa-check"></i> 50 lượt kiểm tra/ngày</li>
+                    <li><i class="fas fa-check"></i> Công cụ email cơ bản</li>
+                    <li><i class="fas fa-check"></i> Hỗ trợ tiêu chuẩn</li>
                 </ul>
-                <a href="/register" class="btn-secondary" style="width: 100%;">Get Started</a>
+                <a href="/register" class="btn-secondary" style="width: 100%;">Bắt Đầu Ngay</a>
             </div>
 
             <div class="pricing-card featured">
                 <div class="pricing-badge pro">PRO ⭐</div>
-                <div class="pricing-price">$29<span>/month</span></div>
+                <div class="pricing-price">690K<span>/tháng</span></div>
                 <ul class="pricing-features">
-                    <li><i class="fas fa-check"></i> Unlimited validations</li>
-                    <li><i class="fas fa-check"></i> All tools unlocked</li>
-                    <li><i class="fas fa-check"></i> Facebook advanced</li>
-                    <li><i class="fas fa-check"></i> 24/7 VIP support</li>
-                    <li><i class="fas fa-check"></i> API access</li>
+                    <li><i class="fas fa-check"></i> Không giới hạn kiểm tra</li>
+                    <li><i class="fas fa-check"></i> Mở khóa tất cả công cụ</li>
+                    <li><i class="fas fa-check"></i> Facebook nâng cao</li>
+                    <li><i class="fas fa-check"></i> Hỗ trợ VIP 24/7</li>
+                    <li><i class="fas fa-check"></i> Truy cập API</li>
                 </ul>
-                <a href="/register" class="btn-primary" style="width: 100%;">Upgrade to PRO</a>
+                <a href="/register" class="btn-primary" style="width: 100%;">Nâng Cấp PRO</a>
             </div>
 
             <div class="pricing-card">
-                <div class="pricing-badge pro">ENTERPRISE</div>
-                <div class="pricing-price">$99<span>/month</span></div>
+                <div class="pricing-badge pro">DOANH NGHIỆP</div>
+                <div class="pricing-price">2.3M<span>/tháng</span></div>
                 <ul class="pricing-features">
-                    <li><i class="fas fa-check"></i> Everything in PRO</li>
-                    <li><i class="fas fa-check"></i> Dedicated server</li>
-                    <li><i class="fas fa-check"></i> Custom integrations</li>
-                    <li><i class="fas fa-check"></i> White-label option</li>
+                    <li><i class="fas fa-check"></i> Tất cả tính năng PRO</li>
+                    <li><i class="fas fa-check"></i> Server riêng biệt</li>
+                    <li><i class="fas fa-check"></i> Tích hợp tùy chỉnh</li>
+                    <li><i class="fas fa-check"></i> Tùy chọn white-label</li>
                 </ul>
-                <a href="/register" class="btn-secondary" style="width: 100%;">Contact Sales</a>
+                <a href="/register" class="btn-secondary" style="width: 100%;">Liên Hệ Sales</a>
             </div>
         </div>
     </section>
 
     <!-- CTA Section -->
     <section class="cta">
-        <h2>Ready to Get Started?</h2>
-        <p>Join thousands of users who trust BI GHI TOOL MMO for their email and Facebook automation needs.</p>
-        <a href="/register" class="btn-primary" style="font-size: 18px; padding: 16px 40px;">
-            <i class="fas fa-user-plus"></i> Create Free Account
-        </a>
+        <div class="cta-content">
+            <h2>Sẵn Sàng Bắt Đầu?</h2>
+            <p>Tham gia cùng hàng nghìn người dùng tin tưởng BI GHI TOOL MMO cho nhu cầu tự động hóa email và Facebook của họ.</p>
+            <a href="/register" class="btn-primary" style="font-size: 20px; padding: 20px 48px;">
+                <i class="fas fa-user-plus"></i>
+                Tạo Tài Khoản Miễn Phí
+            </a>
+        </div>
     </section>
 
     <!-- Footer -->
     <footer class="footer">
-        <p>&copy; 2024 BI GHI TOOL MMO. All rights reserved. | Professional Email & Facebook Tools Suite</p>
+        <p>&copy; 2024 BI GHI TOOL MMO. Bảo lưu mọi quyền. | Bộ Công Cụ Email & Facebook Chuyên Nghiệp</p>
     </footer>
 
     <!-- Login Prompt Modal -->
     <div class="modal" id="loginModal">
         <div class="modal-content">
-            <h2><i class="fas fa-lock"></i> Login Required</h2>
-            <p id="modalMessage">Please create an account or login to access this feature.</p>
+            <h2><i class="fas fa-lock"></i> Yêu Cầu Đăng Nhập</h2>
+            <p id="modalMessage">Vui lòng tạo tài khoản hoặc đăng nhập để truy cập tính năng này.</p>
             <div class="modal-buttons">
-                <a href="/register" class="btn-primary">Register Now</a>
-                <a href="/login" class="btn-secondary">Login</a>
+                <a href="/register" class="btn-primary">Đăng Ký Ngay</a>
+                <a href="/login" class="btn-secondary">Đăng Nhập</a>
             </div>
         </div>
     </div>
 
     <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
         function showLoginPrompt(featureName) {
             const modal = document.getElementById('loginModal');
             const message = document.getElementById('modalMessage');
-            message.textContent = `Please register or login to access ${featureName}.`;
+            message.textContent = `Vui lòng đăng ký hoặc đăng nhập để truy cập ${featureName}.`;
             modal.classList.add('active');
         }
 
         function showFeatureDemo() {
-            showLoginPrompt('Feature Demo');
+            showLoginPrompt('Demo Tính Năng');
         }
 
         // Close modal on outside click
@@ -601,6 +933,35 @@
                     });
                 }
             });
+        });
+
+        // Parallax effect for hero
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero');
+            if (hero) {
+                hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+            }
+        });
+
+        // Animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeInUp 0.8s ease forwards';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature-card, .pricing-card').forEach(el => {
+            el.style.opacity = '0';
+            observer.observe(el);
         });
     </script>
 </body>
