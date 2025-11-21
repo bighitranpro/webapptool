@@ -2,8 +2,10 @@
 API Routes - All Email Tool Endpoints
 """
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from datetime import datetime
+import sqlite3
+import json
 from database import Database
 from modules import (
     EmailValidator,

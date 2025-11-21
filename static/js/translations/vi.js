@@ -461,6 +461,160 @@ const vi = {
         drag_to_upload: 'Kéo thả file vào đây',
         max_file_size: 'Kích thước tối đa',
         allowed_formats: 'Định dạng cho phép'
+    },
+
+    // Info Sections
+    info_sections: {
+        usage_notes: {
+            title: 'Lưu Ý Quan Trọng',
+            email_validation: 'Kiểm tra Email:',
+            email_validation_desc: 'Kết quả chính xác 95%. Luôn xác minh thủ công email quan trọng.',
+            rate_limits: 'Giới hạn tốc độ:',
+            rate_limits_desc: 'MIỄN PHÍ: 50/ngày, CƠ BẢN: 500/ngày, PRO: Không giới hạn.',
+            data_privacy: 'Bảo mật dữ liệu:',
+            data_privacy_desc: 'Tất cả dữ liệu được mã hóa và lưu trữ an toàn. Chúng tôi không bao giờ chia sẻ thông tin của bạn.',
+            best_performance: 'Hiệu suất tốt nhất:',
+            best_performance_desc: 'Sử dụng xử lý hàng loạt cho danh sách lớn (1000+ email) để có kết quả nhanh hơn.'
+        },
+        quick_start: {
+            title: 'Hướng Dẫn Nhanh',
+            step1_title: 'Chọn Công Cụ',
+            step1_desc: 'Chọn từ Kiểm tra Email, Tạo Email, hoặc Công cụ Facebook dựa trên nhu cầu của bạn.',
+            step2_title: 'Nhập Dữ Liệu',
+            step2_desc: 'Dán email hoặc nhập tham số. Hỗ trợ nhập hàng loạt (mỗi dòng một email).',
+            step3_title: 'Xử Lý & Tải Xuống',
+            step3_desc: 'Nhấn "Xử lý" và tải xuống kết quả ở định dạng TXT, CSV, hoặc JSON.',
+            view_docs: 'Xem Tài Liệu Đầy Đủ'
+        },
+        vip_packages: {
+            title: 'Gói VIP',
+            free_plan: 'MIỄN PHÍ',
+            basic_plan: 'CƠ BẢN',
+            pro_plan: 'PRO',
+            enterprise_plan: 'DOANH NGHIỆP',
+            per_month: '/tháng',
+            validations_day: 'kiểm tra/ngày',
+            basic_tools: 'Công cụ email cơ bản',
+            all_email_tools: 'Tất cả công cụ email',
+            all_tools_unlocked: 'Mở khóa tất cả công cụ',
+            facebook_basic: 'Facebook cơ bản',
+            facebook_advanced: 'Facebook nâng cao',
+            standard_support: 'Hỗ trợ tiêu chuẩn',
+            priority_support: 'Hỗ trợ ưu tiên',
+            vip_support_24_7: 'Hỗ trợ VIP 24/7',
+            api_access: 'Truy cập API',
+            everything_in_pro: 'Mọi thứ trong PRO',
+            dedicated_server: 'Máy chủ riêng',
+            custom_integrations: 'Tích hợp tùy chỉnh',
+            white_label: 'Tùy chọn nhãn trắng',
+            no_facebook_tools: 'Không có công cụ Facebook',
+            unlimited_validations: 'Kiểm tra không giới hạn',
+            upgrade_to_pro: 'Nâng cấp lên PRO',
+            popular: 'PHỔ BIẾN'
+        }
+    },
+
+    // Settings Modal
+    settings_modal: {
+        title: 'Cài Đặt',
+        profile_tab: 'Hồ sơ',
+        preferences_tab: 'Tùy chọn',
+        api_tab: 'API Keys',
+        security_tab: 'Bảo mật',
+        theme_tab: 'Giao diện',
+        
+        profile: {
+            title: 'Thông Tin Hồ Sơ',
+            full_name: 'Họ và tên',
+            full_name_placeholder: 'Nhập họ và tên của bạn',
+            email: 'Địa chỉ Email',
+            email_placeholder: 'your@email.com',
+            username: 'Tên đăng nhập',
+            vip_level: 'Cấp VIP',
+            upgrade: 'Nâng cấp',
+            save_changes: 'Lưu Thay Đổi'
+        },
+        
+        preferences: {
+            title: 'Tùy Chọn Ứng Dụng',
+            language: 'Ngôn ngữ',
+            theme: 'Giao diện',
+            theme_dark: 'Tối (Mặc định)',
+            theme_light: 'Sáng',
+            theme_auto: 'Tự động (Hệ thống)',
+            enable_notifications: 'Bật thông báo desktop',
+            auto_save_results: 'Tự động lưu kết quả kiểm tra',
+            enable_sound: 'Bật hiệu ứng âm thanh',
+            save_preferences: 'Lưu Tùy Chọn'
+        },
+        
+        api: {
+            title: 'Truy Cập API',
+            info: 'Truy cập API có sẵn cho người dùng PRO và ENTERPRISE. Tạo API keys để tích hợp dịch vụ của chúng tôi vào ứng dụng của bạn.',
+            your_api_key: 'API Key Của Bạn',
+            regenerate: 'Tạo Lại API Key',
+            view_docs: 'Xem Tài Liệu API'
+        },
+        
+        security: {
+            title: 'Cài Đặt Bảo Mật',
+            current_password: 'Mật khẩu hiện tại',
+            current_password_placeholder: 'Nhập mật khẩu hiện tại',
+            new_password: 'Mật khẩu mới',
+            new_password_placeholder: 'Nhập mật khẩu mới',
+            confirm_password: 'Xác nhận mật khẩu mới',
+            confirm_password_placeholder: 'Xác nhận mật khẩu mới',
+            change_password: 'Đổi Mật Khẩu',
+            two_factor_auth: 'Xác Thực Hai Yếu Tố',
+            two_factor_desc: 'Thêm một lớp bảo mật bổ sung cho tài khoản của bạn',
+            enable_2fa: 'Bật 2FA'
+        },
+        
+        theme: {
+            title: 'Cài Đặt Giao Diện',
+            theme_mode: 'Chế độ giao diện',
+            light_mode: 'Sáng',
+            dark_mode: 'Tối',
+            preset_themes: 'Giao diện mẫu',
+            professional: 'Chuyên nghiệp',
+            creative: 'Sáng tạo',
+            minimal: 'Tối giản',
+            bold: 'Táo bạo',
+            elegant: 'Thanh lịch',
+            primary_color: 'Màu chính',
+            secondary_color: 'Màu phụ',
+            accent_color: 'Màu nhấn',
+            background_color: 'Màu nền',
+            text_color: 'Màu chữ',
+            font_family: 'Font chữ',
+            font_size: 'Kích thước chữ',
+            sidebar_width: 'Độ rộng sidebar',
+            border_radius: 'Bo góc',
+            animation_speed: 'Tốc độ animation',
+            custom_css: 'CSS tùy chỉnh',
+            custom_css_placeholder: 'Nhập CSS tùy chỉnh của bạn...',
+            reset_theme: 'Đặt lại mặc định',
+            export_theme: 'Xuất giao diện',
+            import_theme: 'Nhập giao diện',
+            save_theme: 'Lưu Giao Diện'
+        }
+    },
+
+    // Notifications Panel
+    notifications_panel: {
+        title: 'Thông Báo',
+        mark_all_read: 'Đánh dấu tất cả đã đọc',
+        validation_complete: 'Hoàn Thành Kiểm Tra',
+        validation_complete_msg: 'Đã kiểm tra thành công 150 email với tỷ lệ LIVE 95%',
+        system_update: 'Cập Nhật Hệ Thống',
+        system_update_msg: 'Tính năng mới: Công cụ kiểm tra Facebook nâng cao với 6 APIs',
+        upgrade_pro: 'Nâng cấp lên PRO',
+        upgrade_pro_msg: 'Nhận kiểm tra không giới hạn và mở khóa tất cả tính năng nâng cao',
+        welcome_title: 'Chào mừng!',
+        welcome_msg: 'Tài khoản của bạn đã được tạo thành công',
+        minutes_ago: 'phút trước',
+        hours_ago: 'giờ trước',
+        days_ago: 'ngày trước'
     }
 };
 
