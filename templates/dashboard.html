@@ -4,6 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BI GHI TOOL MMO - Dashboard</title>
+    
+    <!-- Dynamic Theme Variables -->
+    <style>
+        :root {
+            --primary-color: {{ theme_vars.primary_color }};
+            --secondary-color: {{ theme_vars.secondary_color }};
+            --accent-color: {{ theme_vars.accent_color }};
+            --background-color: {{ theme_vars.background_color }};
+            --text-color: {{ theme_vars.text_color }};
+            --font-primary: {{ theme_vars.font_family }}, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-size-base: {{ theme_vars.font_size_base }};
+            --sidebar-width: {{ theme_vars.sidebar_width }};
+            --border-radius: {{ theme_vars.border_radius }};
+            --animation-speed: {{ theme_vars.animation_speed }};
+        }
+    </style>
+    
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_pro.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/i18n.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">

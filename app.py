@@ -25,6 +25,49 @@ def add_header(response):
     response.headers['Expires'] = '-1'
     return response
 
+# Context processor to inject theme variables
+@app.context_processor
+def inject_theme_variables():
+    """Inject theme CSS variables into all templates"""
+    from flask import session
+    import sqlite3
+    import json
+    
+    # Default theme
+    theme_vars = {
+        'primary_color': '#ffd700',
+        'secondary_color': '#00d9ff',
+        'accent_color': '#ff6b35',
+        'background_color': '#0a0e27',
+        'text_color': '#ffffff',
+        'font_family': 'Inter',
+        'font_size_base': '16px',
+        'sidebar_width': '280px',
+        'border_radius': '12px',
+        'animation_speed': '0.3s'
+    }
+    
+    # Try to load user's custom theme
+    user_id = session.get('user_id')
+    if user_id:
+        try:
+            conn = sqlite3.connect('email_tool.db')
+            cursor = conn.cursor()
+            cursor.execute(
+                'SELECT theme_config FROM admin_settings WHERE user_id = ? ORDER BY updated_at DESC LIMIT 1',
+                (user_id,)
+            )
+            result = cursor.fetchone()
+            conn.close()
+            
+            if result and result[0]:
+                custom_theme = json.loads(result[0])
+                theme_vars.update(custom_theme)
+        except Exception as e:
+            print(f"Error loading theme: {e}")
+    
+    return {'theme_vars': theme_vars}
+
 
 # Register Blueprints
 from routes import auth_bp, api_bp, dashboard_bp
