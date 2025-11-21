@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realistic Email Generator - Tạo Email Theo Xu Hướng Thực Tế</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        .panel {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+        }
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: normal;
+        }
+        .btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 14px;
+            background: #6c757d;
+        }
+        .btn-small:hover { background: #5a6268; }
+        .result-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .result-box h3 {
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .email-list {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-card h3 { font-size: 0.9em; margin-bottom: 10px; }
+        .stat-card .number { font-size: 2em; font-weight: bold; }
+        .pattern-examples {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .pattern-examples h4 {
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+        .pattern-examples ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .pattern-examples li {
+            padding: 5px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        .notification.success { border-left: 4px solid #28a745; }
+        .notification.error { border-left: 4px solid #dc3545; }
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        .info-box h4 {
+            color: #2196F3;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-magic"></i> Realistic Email Generator</h1>
+            <p>Tạo Email Theo Xu Hướng Đăng Ký Thực Tế của Người Dùng</p>
+        </div>
+
+        <!-- Configuration Panel -->
+        <div class="panel">
+            <h2><i class="fas fa-cog"></i> Cấu Hình Tạo Email</h2>
+            
+            <div class="form-group">
+                <label>Số Lượng Email</label>
+                <input type="number" id="emailCount" value="50" min="1" max="10000">
+                <small style="color: #666;">Tối đa 10,000 email</small>
+            </div>
+
+            <div class="form-group">
+                <label>Chế Độ Tạo</label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="mode" value="standard" checked>
+                        <span>Standard - Chuẩn (Tất cả patterns)</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="mode" value="themed">
+                        <span>Themed - Theo chủ đề</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="mode" value="bulk">
+                        <span>Bulk - Số lượng lớn</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group" id="themeGroup" style="display: none;">
+                <label>Chủ Đề (Theme)</label>
+                <select id="theme">
+                    <option value="professional">Professional - Công việc chuyên nghiệp</option>
+                    <option value="casual">Casual - Thông thường</option>
+                    <option value="social">Social - Mạng xã hội</option>
+                    <option value="gaming">Gaming - Game thủ</option>
+                    <option value="business">Business - Kinh doanh</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="varietyGroup" style="display: none;">
+                <label>Mức Độ Đa Dạng</label>
+                <select id="variety">
+                    <option value="low">Low - Thấp (3-4 patterns)</option>
+                    <option value="medium" selected>Medium - Trung bình (5-6 patterns)</option>
+                    <option value="high">High - Cao (8 patterns)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Domains (Mỗi dòng một domain)</label>
+                <textarea id="domains" placeholder="gmail.com&#10;yahoo.com&#10;outlook.com">gmail.com
+yahoo.com
+outlook.com
+hotmail.com</textarea>
+            </div>
+
+            <button class="btn" onclick="generateRealisticEmails()">
+                <i class="fas fa-magic"></i> Tạo Email Realistic
+            </button>
+            <button class="btn-small" onclick="loadExamples()">
+                <i class="fas fa-eye"></i> Xem Ví Dụ Patterns
+            </button>
+        </div>
+
+        <!-- Info Box -->
+        <div class="panel">
+            <div class="info-box">
+                <h4><i class="fas fa-info-circle"></i> Về Realistic Email Generator</h4>
+                <p><strong>8 Patterns Dựa Trên Xu Hướng Thực Tế:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>✅ <strong>firstname.lastname</strong> (25%) - john.smith@gmail.com</li>
+                    <li>✅ <strong>firstname_lastname</strong> (15%) - john_smith@gmail.com</li>
+                    <li>✅ <strong>firstnamelastname</strong> (10%) - johnsmith@gmail.com</li>
+                    <li>✅ <strong>firstname123</strong> (20%) - john123@gmail.com</li>
+                    <li>✅ <strong>firstname.lastname123</strong> (10%) - john.smith123@gmail.com</li>
+                    <li>✅ <strong>j.lastname</strong> (5%) - j.smith@gmail.com</li>
+                    <li>✅ <strong>firstname_l</strong> (5%) - john_s@gmail.com</li>
+                    <li>✅ <strong>username123</strong> (10%) - coolking123@gmail.com</li>
+                </ul>
+                <p style="margin-top: 10px;"><strong>109 First Names + 57 Last Names + 43 Username Words</strong> - Tạo hàng triệu tổ hợp khác nhau!</p>
+            </div>
+        </div>
+
+        <!-- Results Panel -->
+        <div class="panel" id="resultsPanel" style="display: none;">
+            <h2><i class="fas fa-list"></i> Kết Quả</h2>
+            
+            <div class="stats-grid" id="statsGrid"></div>
+
+            <div class="result-box">
+                <h3>
+                    <span>Generated Emails (<span id="emailCount2">0</span>)</span>
+                    <div>
+                        <button class="btn-small" onclick="copyEmails()">
+                            <i class="fas fa-copy"></i> Copy All
+                        </button>
+                        <button class="btn-small" onclick="exportEmails()">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+                </h3>
+                <div class="email-list" id="emailList"></div>
+            </div>
+
+            <div class="result-box" id="statisticsBox">
+                <h3>Thống Kê Chi Tiết</h3>
+                <div id="detailedStats"></div>
+            </div>
+        </div>
+
+        <!-- Examples Panel -->
+        <div class="panel" id="examplesPanel" style="display: none;">
+            <h2><i class="fas fa-eye"></i> Ví Dụ Patterns</h2>
+            <div id="examplesContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        let generatedEmails = [];
+        let currentStats = {};
+
+        // Handle mode change
+        document.querySelectorAll('input[name="mode"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const mode = this.value;
+                document.getElementById('themeGroup').style.display = mode === 'themed' ? 'block' : 'none';
+                document.getElementById('varietyGroup').style.display = mode === 'bulk' ? 'block' : 'none';
+            });
+        });
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `<strong>${message}</strong>`;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        async function generateRealisticEmails() {
+            const count = parseInt(document.getElementById('emailCount').value);
+            const mode = document.querySelector('input[name="mode"]:checked').value;
+            const domainsText = document.getElementById('domains').value;
+            const domains = domainsText.split('\n').map(d => d.trim()).filter(d => d);
+
+            if (count < 1 || count > 10000) {
+                showNotification('Số lượng phải từ 1 đến 10,000!', 'error');
+                return;
+            }
+
+            if (domains.length === 0) {
+                showNotification('Vui lòng nhập ít nhất 1 domain!', 'error');
+                return;
+            }
+
+            const payload = {
+                count: count,
+                mode: mode,
+                domains: domains
+            };
+
+            if (mode === 'themed') {
+                payload.theme = document.getElementById('theme').value;
+            } else if (mode === 'bulk') {
+                payload.variety = document.getElementById('variety').value;
+            }
+
+            try {
+                showNotification('Đang tạo emails...', 'success');
+                
+                const response = await fetch('/api/generate/realistic', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    generatedEmails = data.emails;
+                    currentStats = data.statistics;
+                    displayResults(data);
+                    showNotification(`✅ Đã tạo ${data.count} emails!`, 'success');
+                } else {
+                    showNotification('❌ Lỗi: ' + data.message, 'error');
+                }
+            } catch (error) {
+                showNotification('❌ Lỗi kết nối!', 'error');
+                console.error(error);
+            }
+        }
+
+        function displayResults(data) {
+            // Show results panel
+            document.getElementById('resultsPanel').style.display = 'block';
+            document.getElementById('resultsPanel').scrollIntoView({ behavior: 'smooth' });
+
+            // Update count
+            document.getElementById('emailCount2').textContent = data.count;
+
+            // Display emails
+            const emailList = document.getElementById('emailList');
+            emailList.innerHTML = data.emails.map((email, idx) => 
+                `${idx + 1}. ${email}`
+            ).join('<br>');
+
+            // Display stats
+            if (data.statistics) {
+                displayStatistics(data.statistics);
+            }
+        }
+
+        function displayStatistics(stats) {
+            // Stats cards
+            const statsGrid = document.getElementById('statsGrid');
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <h3>Total Emails</h3>
+                    <div class="number">${stats.patterns_used || 0}</div>
+                    <small>Patterns Used</small>
+                </div>
+                <div class="stat-card">
+                    <h3>Domains</h3>
+                    <div class="number">${stats.domains_used || 0}</div>
+                    <small>Domains Used</small>
+                </div>
+            `;
+
+            // Detailed stats
+            const detailedStats = document.getElementById('detailedStats');
+            let html = '<h4>Pattern Distribution:</h4><ul>';
+            for (const [pattern, count] of Object.entries(stats.pattern_distribution || {})) {
+                if (count > 0) {
+                    html += `<li><strong>${pattern}:</strong> ${count} emails</li>`;
+                }
+            }
+            html += '</ul>';
+
+            html += '<h4>Domain Distribution:</h4><ul>';
+            for (const [domain, count] of Object.entries(stats.domain_distribution || {})) {
+                if (count > 0) {
+                    html += `<li><strong>${domain}:</strong> ${count} emails</li>`;
+                }
+            }
+            html += '</ul>';
+
+            detailedStats.innerHTML = html;
+        }
+
+        function copyEmails() {
+            if (generatedEmails.length === 0) {
+                showNotification('Chưa có email nào để copy!', 'error');
+                return;
+            }
+
+            const text = generatedEmails.join('\n');
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification(`✅ Đã copy ${generatedEmails.length} emails!`, 'success');
+            }).catch(() => {
+                showNotification('❌ Lỗi khi copy!', 'error');
+            });
+        }
+
+        function exportEmails() {
+            if (generatedEmails.length === 0) {
+                showNotification('Chưa có email nào để export!', 'error');
+                return;
+            }
+
+            const text = generatedEmails.join('\n');
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `realistic_emails_${Date.now()}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification('✅ Đã tải file!', 'success');
+        }
+
+        async function loadExamples() {
+            try {
+                const response = await fetch('/api/generate/realistic/options');
+                const data = await response.json();
+
+                if (data.success) {
+                    displayExamples(data.examples);
+                    document.getElementById('examplesPanel').style.display = 'block';
+                    document.getElementById('examplesPanel').scrollIntoView({ behavior: 'smooth' });
+                }
+            } catch (error) {
+                showNotification('❌ Lỗi tải ví dụ!', 'error');
+            }
+        }
+
+        function displayExamples(examples) {
+            const container = document.getElementById('examplesContainer');
+            let html = '';
+
+            for (const [pattern, emails] of Object.entries(examples)) {
+                html += `
+                    <div class="pattern-examples">
+                        <h4>${pattern}</h4>
+                        <ul>
+                            ${emails.map(email => `<li>${email}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

@@ -12,6 +12,7 @@ from flask import Flask, render_template, request, jsonify, send_file
 from flask_socketio import SocketIO, emit
 from datetime import datetime
 import sys
+import os
 import json
 import io
 import csv
@@ -22,6 +23,7 @@ from modules import (
     EmailValidator,
     EmailValidatorPro,  # NEW Professional Validator
     EmailGenerator,
+    RealisticEmailGenerator,  # NEW Realistic Generator
     EmailExtractor,
     EmailFormatter,
     EmailFilter,
@@ -29,7 +31,8 @@ from modules import (
     EmailCombiner,
     EmailAnalyzer,
     EmailDeduplicator,
-    EmailBatchProcessor
+    EmailBatchProcessor,
+    EmailCheckerIntegrated  # NEW Integrated Email Checker
 )
 
 # Import database
@@ -51,6 +54,7 @@ db = Database()
 validator = EmailValidator()  # Legacy validator
 validator_pro = EmailValidatorPro()  # NEW Professional validator
 generator = EmailGenerator()
+realistic_generator = RealisticEmailGenerator()  # NEW Realistic generator
 extractor = EmailExtractor()
 formatter = EmailFormatter()
 email_filter = EmailFilter()
@@ -59,6 +63,14 @@ combiner = EmailCombiner()
 analyzer = EmailAnalyzer()
 deduplicator = EmailDeduplicator()
 batch_processor = EmailBatchProcessor()
+
+# Email Checker Integrated module
+try:
+    email_checker = EmailCheckerIntegrated()
+    print("✅ Email Checker Integrated loaded successfully")
+except Exception as e:
+    print(f"⚠️  Email Checker disabled: {e}")
+    email_checker = None
 
 # Session storage for validation results
 validation_sessions = {}
@@ -81,6 +93,18 @@ def test_page():
 def complete_validator():
     """Render complete validator with full copy/export functionality"""
     return render_template('validator_complete.html')
+
+
+@app.route('/generator')
+def realistic_generator_page():
+    """Render realistic email generator page"""
+    return render_template('realistic_generator.html')
+
+
+@app.route('/checker')
+def email_checker_page():
+    """Render integrated email checker page"""
+    return render_template('email_checker.html')
 
 
 # ============================================================================
@@ -386,7 +410,18 @@ def api_generate():
         email_type = data.get('email_type', 'random')
         text = data.get('text', '')
         total = int(data.get('total', 10))
-        domain = data.get('domain', 'gmail.com')
+        
+        # Support both 'domain' (legacy) and 'domains' (new)
+        if 'domains' in data:
+            domains = data.get('domains', ['gmail.com'])
+            # Ensure it's a list
+            if isinstance(domains, str):
+                domains = [domains]
+        else:
+            # Legacy support: convert single domain to list
+            domain = data.get('domain', 'gmail.com')
+            domains = [domain]
+        
         char_type = data.get('char_type', 'lowercase')
         number_type = data.get('number_type', 'suffix')
         
@@ -397,14 +432,14 @@ def api_generate():
             }), 400
         
         result = generator.generate_emails(
-            email_type, text, total, domain, char_type, number_type
+            email_type, text, total, domains, char_type, number_type
         )
         
         # Save to database
         if result.get('success') and result.get('emails'):
             params = {
                 'email_type': email_type,
-                'domain': domain,
+                'domains': ','.join(domains),  # Store as comma-separated string
                 'char_type': char_type,
                 'number_type': number_type
             }
@@ -419,6 +454,100 @@ def api_generate():
         
         return jsonify(result)
         
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+
+@app.route('/api/generate/realistic', methods=['POST'])
+def api_generate_realistic():
+    """
+    Generate realistic emails based on real-world registration patterns
+    
+    Request body:
+    {
+        "count": 100,
+        "domains": ["gmail.com", "yahoo.com"],  // optional
+        "mode": "standard",  // standard, themed, bulk
+        "theme": "professional",  // for themed mode
+        "variety": "medium"  // for bulk mode
+    }
+    """
+    try:
+        data = request.get_json()
+        
+        count = int(data.get('count', 10))
+        domains = data.get('domains', None)
+        mode = data.get('mode', 'standard')
+        
+        if count < 1 or count > 10000:
+            return jsonify({
+                'success': False,
+                'message': 'Count must be between 1 and 10,000'
+            }), 400
+        
+        # Generate based on mode
+        if mode == 'themed':
+            theme = data.get('theme', 'professional')
+            result = realistic_generator.generate_themed_emails(
+                theme=theme,
+                count=count,
+                domains=domains
+            )
+        elif mode == 'bulk':
+            variety = data.get('variety', 'medium')
+            result = realistic_generator.generate_bulk_with_variety(
+                total=count,
+                domains=domains,
+                variety_level=variety
+            )
+        else:  # standard
+            result = realistic_generator.generate_realistic_emails(
+                count=count,
+                domains=domains,
+                include_stats=True
+            )
+        
+        # Save to database
+        if result.get('success') and result.get('emails'):
+            params = {
+                'mode': mode,
+                'generator': 'realistic',
+                'theme': data.get('theme', 'N/A'),
+                'variety': data.get('variety', 'N/A')
+            }
+            
+            for email in result['emails']:
+                try:
+                    db.save_generated_email(email, params)
+                except Exception as save_error:
+                    print(f"Warning: Failed to save email {email}: {save_error}")
+            
+            result['db_saved'] = True
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+
+@app.route('/api/generate/realistic/options', methods=['GET'])
+def api_realistic_options():
+    """Get available options for realistic email generation"""
+    try:
+        options = realistic_generator.get_available_options()
+        examples = realistic_generator.get_pattern_examples()
+        
+        return jsonify({
+            'success': True,
+            'options': options,
+            'examples': examples
+        })
     except Exception as e:
         return jsonify({
             'success': False,
@@ -483,6 +612,27 @@ def api_db_stats():
         }), 500
 
 
+@app.route('/api/validate/single', methods=['POST'])
+def api_validate_single():
+    """Simple single email validation for testing"""
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        
+        if not email:
+            return jsonify({'success': False, 'message': 'No email provided'}), 400
+        
+        # Direct validation
+        result = validator_pro.validate_email_deep(email)
+        
+        return jsonify({
+            'success': True,
+            'result': result
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check with enhanced info"""
@@ -511,12 +661,177 @@ def health_check():
             'validator': True,
             'validator_pro': True,
             'generator': True,
+            'realistic_generator': True,
             'extractor': True,
             'formatter': True,
             'filter': True,
             'database': db_healthy
         }
     })
+
+
+# ============================================================================
+# EMAIL CHECKER API (NEW)
+# ============================================================================
+
+@app.route('/api/checker/generate', methods=['POST'])
+def api_checker_generate():
+    """Generate emails for checking"""
+    try:
+        data = request.get_json()
+        count = int(data.get('count', 10))
+        mix_ratio = float(data.get('mix_ratio', 0.7))
+        
+        result = email_checker.generate_emails(count=count, mix_ratio=mix_ratio)
+        return jsonify(result)
+    
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'emails': [],
+            'count': 0,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/api/checker/check', methods=['POST'])
+def api_checker_check():
+    """Start checking emails"""
+    try:
+        data = request.get_json()
+        emails = data.get('emails', [])
+        
+        if not emails:
+            return jsonify({
+                'success': False,
+                'message': 'No emails provided'
+            }), 400
+        
+        if len(emails) > 1000:
+            return jsonify({
+                'success': False,
+                'message': 'Maximum 1000 emails per batch'
+            }), 400
+        
+        # Check if already running
+        progress = email_checker.get_progress()
+        if progress['is_running']:
+            return jsonify({
+                'success': False,
+                'message': 'Check already in progress'
+            }), 400
+        
+        # Start checking in background thread
+        import threading
+        thread = threading.Thread(target=email_checker.check_emails_batch, args=(emails,))
+        thread.daemon = True
+        thread.start()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Checking started',
+            'total': len(emails)
+        })
+    
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+
+@app.route('/api/checker/progress', methods=['GET'])
+def api_checker_progress():
+    """Get checking progress"""
+    try:
+        progress = email_checker.get_progress()
+        return jsonify(progress)
+    
+    except Exception as e:
+        return jsonify({
+            'is_running': False,
+            'current': 0,
+            'total': 0,
+            'status': f'error: {str(e)}',
+            'results': []
+        }), 500
+
+
+@app.route('/api/checker/export', methods=['POST'])
+def api_checker_export():
+    """Export results to CSV"""
+    try:
+        data = request.get_json()
+        results = data.get('results', [])
+        filename = data.get('filename', None)
+        
+        if not results:
+            return jsonify({
+                'success': False,
+                'error': 'No results to export'
+            }), 400
+        
+        export_result = email_checker.export_results(results, filename)
+        return jsonify(export_result)
+    
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/api/checker/download/<filename>', methods=['GET'])
+def api_checker_download(filename):
+    """Download exported CSV file"""
+    try:
+        filepath = os.path.join('mail_checker_app/results', filename)
+        
+        if not os.path.exists(filepath):
+            return jsonify({
+                'success': False,
+                'error': 'File not found'
+            }), 404
+        
+        return send_file(
+            filepath,
+            mimetype='text/csv',
+            as_attachment=True,
+            download_name=filename
+        )
+    
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/api/checker/stats', methods=['POST'])
+def api_checker_stats():
+    """Get statistics from results"""
+    try:
+        data = request.get_json()
+        results = data.get('results', [])
+        
+        if not results:
+            return jsonify({
+                'success': False,
+                'error': 'No results provided'
+            }), 400
+        
+        stats = email_checker.get_stats(results)
+        
+        return jsonify({
+            'success': True,
+            'stats': stats
+        })
+    
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 
 @app.errorhandler(404)
