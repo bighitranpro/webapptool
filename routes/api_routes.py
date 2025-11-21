@@ -1054,3 +1054,301 @@ def reset_theme_settings():
         
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
+
+# ============================================
+# SETTINGS MODAL APIs
+# ============================================
+
+@api_bp.route('/api/user/profile', methods=['GET', 'POST'])
+def user_profile():
+    """Get or update user profile"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    user_id = session['user_id']
+    
+    if request.method == 'GET':
+        try:
+            conn = sqlite3.connect('email_tool.db')
+            cursor = conn.cursor()
+            cursor.execute('''
+                SELECT username, email, full_name, role, created_at 
+                FROM users WHERE id = ?
+            ''', (user_id,))
+            user = cursor.fetchone()
+            conn.close()
+            
+            if user:
+                return jsonify({
+                    'success': True,
+                    'user': {
+                        'username': user[0],
+                        'email': user[1],
+                        'full_name': user[2],
+                        'role': user[3],
+                        'created_at': user[4]
+                    }
+                })
+            return jsonify({'success': False, 'message': 'User not found'}), 404
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+    
+    elif request.method == 'POST':
+        try:
+            data = request.json
+            full_name = data.get('full_name', '')
+            email = data.get('email', '')
+            
+            conn = sqlite3.connect('email_tool.db')
+            cursor = conn.cursor()
+            cursor.execute('''
+                UPDATE users 
+                SET full_name = ?, email = ?
+                WHERE id = ?
+            ''', (full_name, email, user_id))
+            conn.commit()
+            conn.close()
+            
+            return jsonify({
+                'success': True,
+                'message': 'Profile updated successfully'
+            })
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api_bp.route('/api/user/preferences', methods=['GET', 'POST'])
+def user_preferences():
+    """Get or update user preferences"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    user_id = session['user_id']
+    
+    if request.method == 'GET':
+        try:
+            conn = sqlite3.connect('email_tool.db')
+            cursor = conn.cursor()
+            
+            # Try to get preferences from a preferences table (we'll create it if needed)
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS user_preferences (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    language VARCHAR(10) DEFAULT 'vi',
+                    theme VARCHAR(20) DEFAULT 'dark',
+                    notifications_enabled BOOLEAN DEFAULT 1,
+                    auto_save_results BOOLEAN DEFAULT 1,
+                    sound_effects BOOLEAN DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES users(id)
+                )
+            ''')
+            
+            cursor.execute('SELECT * FROM user_preferences WHERE user_id = ?', (user_id,))
+            prefs = cursor.fetchone()
+            
+            if not prefs:
+                # Create default preferences
+                cursor.execute('''
+                    INSERT INTO user_preferences (user_id, language, theme)
+                    VALUES (?, 'vi', 'dark')
+                ''', (user_id,))
+                conn.commit()
+                prefs = ('', user_id, 'vi', 'dark', 1, 1, 0, '', '')
+            
+            conn.close()
+            
+            return jsonify({
+                'success': True,
+                'preferences': {
+                    'language': prefs[2],
+                    'theme': prefs[3],
+                    'notifications_enabled': bool(prefs[4]),
+                    'auto_save_results': bool(prefs[5]),
+                    'sound_effects': bool(prefs[6])
+                }
+            })
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+    
+    elif request.method == 'POST':
+        try:
+            data = request.json
+            
+            conn = sqlite3.connect('email_tool.db')
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                UPDATE user_preferences
+                SET language = ?,
+                    theme = ?,
+                    notifications_enabled = ?,
+                    auto_save_results = ?,
+                    sound_effects = ?,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE user_id = ?
+            ''', (
+                data.get('language', 'vi'),
+                data.get('theme', 'dark'),
+                1 if data.get('notifications_enabled') else 0,
+                1 if data.get('auto_save_results') else 0,
+                1 if data.get('sound_effects') else 0,
+                user_id
+            ))
+            
+            conn.commit()
+            conn.close()
+            
+            return jsonify({
+                'success': True,
+                'message': 'Preferences saved successfully'
+            })
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api_bp.route('/api/user/password', methods=['POST'])
+def change_password():
+    """Change user password"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    try:
+        data = request.json
+        user_id = session['user_id']
+        current_password = data.get('current_password', '')
+        new_password = data.get('new_password', '')
+        
+        if not current_password or not new_password:
+            return jsonify({
+                'success': False,
+                'message': 'Current password and new password are required'
+            }), 400
+        
+        if len(new_password) < 6:
+            return jsonify({
+                'success': False,
+                'message': 'New password must be at least 6 characters'
+            }), 400
+        
+        conn = sqlite3.connect('email_tool.db')
+        cursor = conn.cursor()
+        
+        # Verify current password
+        cursor.execute('SELECT password FROM users WHERE id = ?', (user_id,))
+        user = cursor.fetchone()
+        
+        if not user or user[0] != current_password:
+            conn.close()
+            return jsonify({
+                'success': False,
+                'message': 'Current password is incorrect'
+            }), 400
+        
+        # Update password
+        cursor.execute('''
+            UPDATE users 
+            SET password = ?
+            WHERE id = ?
+        ''', (new_password, user_id))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Password changed successfully'
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api_bp.route('/api/user/apikey', methods=['GET', 'POST'])
+def manage_api_key():
+    """Get or regenerate API key"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    user_id = session['user_id']
+    
+    if request.method == 'GET':
+        try:
+            conn = sqlite3.connect('email_tool.db')
+            cursor = conn.cursor()
+            
+            # Create API keys table if not exists
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS api_keys (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    api_key VARCHAR(64) NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    last_used TIMESTAMP,
+                    is_active BOOLEAN DEFAULT 1,
+                    FOREIGN KEY (user_id) REFERENCES users(id)
+                )
+            ''')
+            
+            cursor.execute('''
+                SELECT api_key, created_at, last_used 
+                FROM api_keys 
+                WHERE user_id = ? AND is_active = 1
+                ORDER BY created_at DESC LIMIT 1
+            ''', (user_id,))
+            
+            key = cursor.fetchone()
+            
+            if not key:
+                # Generate new key
+                import secrets
+                api_key = 'sk_live_' + secrets.token_hex(24)
+                cursor.execute('''
+                    INSERT INTO api_keys (user_id, api_key)
+                    VALUES (?, ?)
+                ''', (user_id, api_key))
+                conn.commit()
+                key = (api_key, datetime.now(), None)
+            
+            conn.close()
+            
+            return jsonify({
+                'success': True,
+                'api_key': key[0],
+                'created_at': str(key[1]),
+                'last_used': str(key[2]) if key[2] else None
+            })
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+    
+    elif request.method == 'POST':
+        # Regenerate API key
+        try:
+            import secrets
+            
+            conn = sqlite3.connect('email_tool.db')
+            cursor = conn.cursor()
+            
+            # Deactivate old keys
+            cursor.execute('''
+                UPDATE api_keys SET is_active = 0 WHERE user_id = ?
+            ''', (user_id,))
+            
+            # Generate new key
+            api_key = 'sk_live_' + secrets.token_hex(24)
+            cursor.execute('''
+                INSERT INTO api_keys (user_id, api_key)
+                VALUES (?, ?)
+            ''', (user_id, api_key))
+            
+            conn.commit()
+            conn.close()
+            
+            return jsonify({
+                'success': True,
+                'message': 'API key regenerated successfully',
+                'api_key': api_key
+            })
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
