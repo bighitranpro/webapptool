@@ -3,11 +3,12 @@ Email Tool Modules
 Modular architecture for email processing
 """
 
-__version__ = "2.0.0"
+__version__ = "3.0.0"
 __author__ = "AI Assistant"
 
 # Import all modules
 from .email_validator import EmailValidator
+from .email_validator_pro import EmailValidatorPro  # NEW: Professional validator
 from .email_generator import EmailGenerator
 from .email_extractor import EmailExtractor
 from .email_formatter import EmailFormatter
@@ -23,6 +24,7 @@ from .page_mining import PageMining
 
 __all__ = [
     'EmailValidator',
+    'EmailValidatorPro',  # NEW
     'EmailGenerator',
     'EmailExtractor',
     'EmailFormatter',
