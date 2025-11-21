@@ -22,6 +22,7 @@ from modules import (
     EmailPass2FAChecker,
     PageMining
 )
+from modules.page_mining_enhanced import PageMiningEnhanced
 
 api_bp = Blueprint('api', __name__)
 
@@ -42,6 +43,19 @@ batch_processor = EmailBatchProcessor()
 fb_checker = FBLinkedChecker()
 pass_2fa_checker = EmailPass2FAChecker()
 page_miner = PageMining()
+
+# Initialize Enhanced Page Mining Module
+page_miner_enhanced = PageMiningEnhanced(api_configs={
+    'graph_api': {
+        'enabled': False,  # Enable when token is available
+        'token': None,
+        'version': 'v18.0'
+    },
+    'scraper_api': {
+        'enabled': True,
+        'endpoints': []
+    }
+})
 
 
 @api_bp.route('/api/validate', methods=['POST'])
@@ -652,7 +666,7 @@ def api_check_2fa():
 @api_bp.route('/api/page-mining', methods=['POST'])
 def api_page_mining():
     """
-    ID Page Mining - Extract pages from UIDs
+    ID Page Mining - Enhanced Extract pages from UIDs
     
     Request:
         {
@@ -661,9 +675,16 @@ def api_page_mining():
                 "proxy_config": {...},
                 "max_workers": 100,
                 "start_from": 0,
-                "filter_has_ads": true,
-                "filter_country": "Vietnam",
-                "filter_verified": false
+                "filters": {
+                    "has_ads": true,
+                    "country": "Vietnam",
+                    "verified": false,
+                    "category": "Restaurant",
+                    "min_likes": 1000,
+                    "has_email": true,
+                    "has_phone": true,
+                    "has_website": false
+                }
             }
         }
     
@@ -676,11 +697,38 @@ def api_page_mining():
                 "pages_with_ads": 75,
                 "pages_verified": 38,
                 "emails_collected": 100,
-                "processing_time": 45.2
+                "phones_collected": 85,
+                "websites_collected": 120,
+                "processing_time": 45.2,
+                "cache_hits": 15,
+                "api_calls": 85
             },
             "results": {
-                "pages": [{page_id, page_name, has_ads, country, ...}],
-                "emails": ["page123@gmail.com", ...]
+                "pages": [{
+                    "page_id": "123456789",
+                    "page_name": "Nhà Hàng ABC",
+                    "username": "nhahangarbc",
+                    "page_url": "https://facebook.com/nhahangarbc",
+                    "uid_owner": "100001234567890",
+                    "has_ads": true,
+                    "country": "Vietnam",
+                    "location": "Hồ Chí Minh",
+                    "verified": false,
+                    "likes": 15000,
+                    "category": "Restaurant",
+                    "about": "...",
+                    "email": "contact@abc.com",
+                    "domain_email": "abc.com",
+                    "phone": "+84901234567",
+                    "website": "https://abc.com",
+                    "data_source": "graph_api",
+                    "timestamp": "2024-01-15T..."
+                }],
+                "statistics": {
+                    "by_category": {...},
+                    "by_country": {...},
+                    "by_domain": {...}
+                }
             }
         }
     """
@@ -695,10 +743,144 @@ def api_page_mining():
                 'message': 'No UIDs provided'
             }), 400
         
-        # Run bulk mining
-        result = page_miner.bulk_mine(uids, options)
+        # Run enhanced bulk mining with all new features
+        result = page_miner_enhanced.bulk_mine(uids, options)
+        
+        # Log activity if session exists
+        if 'user_id' in session:
+            try:
+                user_id = session['user_id']
+                conn = sqlite3.connect('email_tool.db')
+                cursor = conn.cursor()
+                
+                # Log the mining activity
+                cursor.execute('''
+                    INSERT INTO user_activities 
+                    (user_id, activity_type, activity_title, activity_description, 
+                     status, icon, color, metadata)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (
+                    user_id,
+                    'page_mining',
+                    'Khai thác Page từ UID',
+                    f'Đã khai thác {result.get("stats", {}).get("total_pages_found", 0)} trang từ {len(uids)} UID',
+                    'success' if result.get('success') else 'error',
+                    'fa-bullseye',
+                    'purple',
+                    json.dumps({
+                        'uids_count': len(uids),
+                        'pages_found': result.get("stats", {}).get("total_pages_found", 0),
+                        'emails_collected': result.get("stats", {}).get("emails_collected", 0)
+                    })
+                ))
+                
+                conn.commit()
+                conn.close()
+            except Exception as log_error:
+                print(f"Warning: Failed to log activity: {log_error}")
         
         return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+
+@api_bp.route('/api/page-mining/export', methods=['POST'])
+def api_page_mining_export():
+    """
+    Export Page Mining results in various formats
+    
+    Request:
+        {
+            "pages": [{...page data...}],
+            "format": "csv" | "json" | "txt"
+        }
+    
+    Response:
+        {
+            "success": true,
+            "data": "exported content as string",
+            "format": "csv"
+        }
+    """
+    try:
+        data = request.get_json()
+        pages = data.get('pages', [])
+        export_format = data.get('format', 'csv')
+        
+        if not pages:
+            return jsonify({
+                'success': False,
+                'message': 'No pages provided for export'
+            }), 400
+        
+        if export_format == 'csv':
+            exported_data = page_miner_enhanced.export_pages_csv(pages)
+        elif export_format == 'json':
+            exported_data = page_miner_enhanced.export_pages_json(pages)
+        elif export_format == 'txt':
+            exported_data = page_miner_enhanced.export_pages_txt(pages)
+        else:
+            return jsonify({
+                'success': False,
+                'message': f'Unsupported export format: {export_format}'
+            }), 400
+        
+        return jsonify({
+            'success': True,
+            'data': exported_data,
+            'format': export_format,
+            'count': len(pages)
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+
+@api_bp.route('/api/page-mining/statistics', methods=['POST'])
+def api_page_mining_statistics():
+    """
+    Get detailed statistics from mining results
+    
+    Request:
+        {
+            "pages": [{...page data...}]
+        }
+    
+    Response:
+        {
+            "success": true,
+            "statistics": {
+                "by_category": {...},
+                "by_country": {...},
+                "by_domain": {...}
+            }
+        }
+    """
+    try:
+        data = request.get_json()
+        pages = data.get('pages', [])
+        
+        if not pages:
+            return jsonify({
+                'success': False,
+                'message': 'No pages provided for statistics'
+            }), 400
+        
+        # Temporarily set pages in module for statistics
+        page_miner_enhanced.pages = pages
+        statistics = page_miner_enhanced.get_statistics_summary()
+        
+        return jsonify({
+            'success': True,
+            'statistics': statistics
+        })
         
     except Exception as e:
         return jsonify({

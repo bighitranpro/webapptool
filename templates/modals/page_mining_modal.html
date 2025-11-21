@@ -1,17 +1,17 @@
-<!-- ID Page Mining Modal -->
+<!-- ID Page Mining Modal V2 Enhanced -->
 <div id="pageMiningModal" class="modal">
     <div class="modal-content modal-page-mining">
         <span class="close" onclick="closeModal('pageMiningModal')">&times;</span>
         <h2 class="modal-title">
-            <i class="fas fa-mining"></i> ID Page Mining V1
-            <span class="badge badge-info">Đào ID Page, Check Ads, Quốc Gia</span>
+            <i class="fas fa-bullseye"></i> ID Page Mining V2 Enhanced
+            <span class="badge badge-info">Khai thác Page, Check Ads, Location, Email, Phone, Website</span>
         </h2>
         
         <div class="mining-layout">
             <!-- LEFT PANEL: Input -->
             <div class="mining-panel mining-panel-input">
                 <div class="panel-header">
-                    <i class="fas fa-keyboard"></i> INPUT UID
+                    <i class="fas fa-keyboard"></i> INPUT UID & FILTERS
                 </div>
                 
                 <div class="panel-content">
@@ -19,7 +19,7 @@
                         <label>Danh sách UID cá nhân:</label>
                         <textarea 
                             id="miningUidInput" 
-                            rows="15" 
+                            rows="10" 
                             placeholder="100001234567890&#10;100009876543210&#10;100005555555555"
                         ></textarea>
                         <div class="input-actions">
@@ -33,24 +33,55 @@
                         <input type="file" id="miningFileInput" accept=".txt" style="display: none" onchange="miningHandleFile(event)">
                     </div>
 
-                    <!-- Filters -->
+                    <!-- Enhanced Filters Section -->
                     <div class="filters-section">
-                        <h4><i class="fas fa-filter"></i> FILTERS</h4>
+                        <h4><i class="fas fa-filter"></i> ADVANCED FILTERS</h4>
                         
-                        <div class="form-group">
-                            <label>
-                                <input type="checkbox" id="miningFilterAds">
-                                Chỉ lấy page có chạy Ads
-                            </label>
+                        <!-- Row 1 -->
+                        <div class="filter-row">
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="miningFilterAds">
+                                    Chỉ page có Ads
+                                </label>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="miningFilterVerified">
+                                    Chỉ page tích xanh
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Row 2 - New Filters -->
+                        <div class="filter-row">
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="miningFilterHasEmail">
+                                    Có Email
+                                </label>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="miningFilterHasPhone">
+                                    Có Phone
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Row 3 -->
+                        <div class="filter-row">
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="miningFilterHasWebsite">
+                                    Có Website
+                                </label>
+                            </div>
                         </div>
                         
-                        <div class="form-group">
-                            <label>
-                                <input type="checkbox" id="miningFilterVerified">
-                                Chỉ lấy page có tích xanh
-                            </label>
-                        </div>
-                        
+                        <!-- Country Filter -->
                         <div class="form-group">
                             <label>Lọc theo quốc gia:</label>
                             <select id="miningFilterCountry" class="form-control">
@@ -65,7 +96,36 @@
                                 <option value="Singapore">Singapore</option>
                                 <option value="Japan">Japan</option>
                                 <option value="Korea">Korea</option>
+                                <option value="China">China</option>
+                                <option value="UK">UK</option>
+                                <option value="Australia">Australia</option>
                             </select>
+                        </div>
+
+                        <!-- Category Filter -->
+                        <div class="form-group">
+                            <label>Lọc theo danh mục:</label>
+                            <select id="miningFilterCategory" class="form-control">
+                                <option value="">All Categories</option>
+                                <option value="Restaurant">Restaurant</option>
+                                <option value="Shopping">Shopping & Retail</option>
+                                <option value="Beauty">Beauty & Spa</option>
+                                <option value="Health">Health & Wellness</option>
+                                <option value="Education">Education</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Travel">Travel & Tourism</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Fashion">Fashion</option>
+                                <option value="Real Estate">Real Estate</option>
+                                <option value="Automotive">Automotive</option>
+                                <option value="Finance">Finance & Banking</option>
+                            </select>
+                        </div>
+
+                        <!-- Min Likes Filter -->
+                        <div class="form-group">
+                            <label>Số lượt thích tối thiểu:</label>
+                            <input type="number" id="miningFilterMinLikes" value="0" min="0" max="10000000" step="1000">
                         </div>
                     </div>
 
@@ -114,12 +174,13 @@
             <div class="mining-panel mining-panel-processing">
                 <div class="panel-header">
                     <i class="fas fa-cogs"></i> PROCESSING
+                    <span class="status-badge" id="miningStatus">READY</span>
                 </div>
                 
                 <div class="panel-content">
                     <div class="processing-stats">
                         <div class="stat-item">
-                            <span class="stat-label">UID đã xử lý:</span>
+                            <span class="stat-label">UID xử lý:</span>
                             <span class="stat-value" id="miningProcessed">0</span>
                         </div>
                         <div class="stat-item">
@@ -129,6 +190,14 @@
                         <div class="stat-item">
                             <span class="stat-label">Tốc độ:</span>
                             <span class="stat-value" id="miningSpeed">0/s</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Thời gian:</span>
+                            <span class="stat-value" id="miningRunningTime">00:00</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Proxy:</span>
+                            <span class="stat-value" id="miningTotalProxy">0</span>
                         </div>
                     </div>
 
@@ -141,7 +210,7 @@
 
                     <div class="log-display" id="miningLog">
                         <div class="log-entry log-info">
-                            <span class="log-time">00:00:00</span>
+                            <span class="log-time">[00:00:00]</span>
                             <span class="log-message">Sẵn sàng khai thác...</span>
                         </div>
                     </div>
@@ -151,11 +220,11 @@
             <!-- RIGHT PANEL: Results -->
             <div class="mining-panel mining-panel-results">
                 <div class="panel-header">
-                    <i class="fas fa-table"></i> RESULTS & DATA
+                    <i class="fas fa-table"></i> RESULTS & EXPORT
                 </div>
                 
                 <div class="panel-content">
-                    <!-- Statistics -->
+                    <!-- Enhanced Statistics -->
                     <div class="stats-section">
                         <h4>STATISTICS</h4>
                         <div class="stats-grid">
@@ -165,58 +234,88 @@
                             </div>
                             <div class="stat-box">
                                 <div class="stat-number" id="miningPagesWithAds">0</div>
-                                <div class="stat-label">Pages With Ads</div>
+                                <div class="stat-label">With Ads</div>
                             </div>
                             <div class="stat-box">
                                 <div class="stat-number" id="miningVerifiedPages">0</div>
-                                <div class="stat-label">Verified Pages</div>
+                                <div class="stat-label">Verified</div>
                             </div>
                             <div class="stat-box">
                                 <div class="stat-number" id="miningEmailsCollected">0</div>
-                                <div class="stat-label">Emails Collected</div>
+                                <div class="stat-label">Emails</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-number" id="miningPhonesCollected">0</div>
+                                <div class="stat-label">Phones</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-number" id="miningWebsitesCollected">0</div>
+                                <div class="stat-label">Websites</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-number" id="miningCacheHits">0</div>
+                                <div class="stat-label">Cache Hits</div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Pages Table -->
+                    <!-- Pages Table with Enhanced Columns -->
                     <div class="results-table-container">
                         <h4>PAGES FOUND</h4>
                         <div class="table-wrapper">
                             <table class="results-table" id="miningResultsTable">
                                 <thead>
                                     <tr>
-                                        <th>#</th>
                                         <th>Page ID</th>
                                         <th>Name</th>
+                                        <th>Location</th>
+                                        <th>Category</th>
                                         <th>Ads</th>
-                                        <th>Country</th>
                                         <th>✓</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Web</th>
                                         <th>Likes</th>
                                     </tr>
                                 </thead>
                                 <tbody id="miningTableBody">
                                     <tr>
-                                        <td colspan="7" class="no-data">Chưa có dữ liệu</td>
+                                        <td colspan="10" class="no-data">Chưa có dữ liệu</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
 
-                    <!-- Export Options -->
+                    <!-- Enhanced Export Options -->
                     <div class="export-section">
-                        <button class="btn btn-primary btn-sm" onclick="miningExportTXT()">
-                            <i class="fas fa-file-alt"></i> Export TXT
-                        </button>
-                        <button class="btn btn-success btn-sm" onclick="miningExportCSV()">
-                            <i class="fas fa-file-csv"></i> Export CSV
-                        </button>
-                        <button class="btn btn-info btn-sm" onclick="miningCopyPageIDs()">
-                            <i class="fas fa-copy"></i> Copy Page IDs
-                        </button>
-                        <button class="btn btn-warning btn-sm" onclick="miningCopyEmails()">
-                            <i class="fas fa-envelope"></i> Copy Emails
-                        </button>
+                        <h4>EXPORT & COPY</h4>
+                        <div class="export-grid">
+                            <button class="btn btn-primary btn-sm" onclick="miningExportTXT()">
+                                <i class="fas fa-file-alt"></i> Export TXT
+                            </button>
+                            <button class="btn btn-success btn-sm" onclick="miningExportCSV()">
+                                <i class="fas fa-file-csv"></i> Export CSV
+                            </button>
+                            <button class="btn btn-warning btn-sm" onclick="miningExportJSON()">
+                                <i class="fas fa-file-code"></i> Export JSON
+                            </button>
+                            <button class="btn btn-info btn-sm" onclick="miningCopyPageIDs()">
+                                <i class="fas fa-copy"></i> Copy IDs
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="miningCopyEmails()">
+                                <i class="fas fa-envelope"></i> Copy Emails
+                            </button>
+                            <button class="btn btn-info btn-sm" onclick="miningCopyPhones()">
+                                <i class="fas fa-phone"></i> Copy Phones
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="miningCopyWebsites()">
+                                <i class="fas fa-globe"></i> Copy Websites
+                            </button>
+                            <button class="btn btn-warning btn-sm" onclick="miningCopyDomainEmails()">
+                                <i class="fas fa-at"></i> Copy Domains
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -225,19 +324,19 @@
 </div>
 
 <style>
-/* Page Mining Modal Styles */
+/* Page Mining Modal V2 Enhanced Styles */
 .modal-page-mining {
-    max-width: 95vw;
-    width: 1600px;
-    height: 90vh;
+    max-width: 98vw;
+    width: 1800px;
+    height: 92vh;
     padding: 20px;
 }
 
 .mining-layout {
     display: grid;
-    grid-template-columns: 380px 1fr 420px;
+    grid-template-columns: 400px 1fr 480px;
     gap: 15px;
-    height: calc(90vh - 80px);
+    height: calc(92vh - 80px);
     margin-top: 15px;
 }
 
@@ -251,14 +350,34 @@
 }
 
 .mining-panel .panel-header {
-    background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+    background: linear-gradient(135deg, #9b59b6 0%, #6c3483 100%);
     color: white;
     padding: 12px 15px;
     font-weight: bold;
     font-size: 13px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 8px;
+}
+
+.status-badge {
+    background: #27ae60;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.status-badge.running {
+    background: #e74c3c;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
 }
 
 .mining-panel .panel-content {
@@ -288,22 +407,29 @@
 
 .filters-section,
 .settings-group {
-    margin-top: 20px;
+    margin-top: 15px;
     padding: 12px;
     background: #252525;
     border-radius: 6px;
-    border-left: 3px solid #3498db;
+    border-left: 3px solid #9b59b6;
 }
 
 .filters-section h4,
 .settings-group h4 {
     margin: 0 0 10px 0;
-    color: #3498db;
-    font-size: 12px;
+    color: #9b59b6;
+    font-size: 11px;
     font-weight: bold;
     display: flex;
     align-items: center;
     gap: 6px;
+}
+
+.filter-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 8px;
 }
 
 .form-group {
@@ -315,6 +441,10 @@
     margin-bottom: 4px;
     color: #aaa;
     font-size: 11px;
+}
+
+.form-group input[type="checkbox"] {
+    margin-right: 6px;
 }
 
 .form-group input[type="text"],
@@ -331,7 +461,7 @@
 }
 
 .control-section {
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 /* Processing Panel */
@@ -377,7 +507,7 @@
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #3498db 0%, #2c3e50 100%);
+    background: linear-gradient(90deg, #9b59b6 0%, #6c3483 100%);
     transition: width 0.3s ease;
 }
 
@@ -393,7 +523,7 @@
     background: #0a0a0a;
     border: 1px solid #333;
     border-radius: 4px;
-    height: calc(100% - 160px);
+    height: calc(100% - 200px);
     overflow-y: auto;
     padding: 10px;
     font-family: 'Courier New', monospace;
@@ -408,7 +538,7 @@
 
 .log-time {
     color: #888;
-    min-width: 60px;
+    min-width: 80px;
 }
 
 .log-info { color: #3498db; }
@@ -426,14 +556,14 @@
 
 .stats-section h4 {
     margin: 0 0 10px 0;
-    color: #3498db;
-    font-size: 12px;
+    color: #9b59b6;
+    font-size: 11px;
     font-weight: bold;
 }
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 8px;
 }
 
@@ -446,14 +576,14 @@
 }
 
 .stat-number {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: bold;
-    color: #3498db;
+    color: #9b59b6;
     margin-bottom: 4px;
 }
 
 .stat-box .stat-label {
-    font-size: 10px;
+    font-size: 9px;
     color: #888;
 }
 
@@ -463,13 +593,13 @@
 
 .results-table-container h4 {
     margin: 0 0 8px 0;
-    color: #3498db;
-    font-size: 12px;
+    color: #9b59b6;
+    font-size: 11px;
     font-weight: bold;
 }
 
 .table-wrapper {
-    max-height: 300px;
+    max-height: 280px;
     overflow-y: auto;
     border: 1px solid #333;
     border-radius: 4px;
@@ -477,7 +607,7 @@
 
 .results-table {
     width: 100%;
-    font-size: 11px;
+    font-size: 10px;
     border-collapse: collapse;
 }
 
@@ -493,12 +623,20 @@
     color: #aaa;
     border-bottom: 1px solid #444;
     font-weight: bold;
+    font-size: 10px;
 }
 
 .results-table td {
     padding: 6px;
     border-bottom: 1px solid #2a2a2a;
     color: #ddd;
+}
+
+.results-table .page-name {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .results-table tbody tr:hover {
@@ -511,7 +649,36 @@
     padding: 20px !important;
 }
 
+.badge-yes {
+    background: #27ae60;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 9px;
+}
+
+.badge-no {
+    background: #7f8c8d;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 9px;
+}
+
 .export-section {
+    padding: 12px;
+    background: #252525;
+    border-radius: 6px;
+}
+
+.export-section h4 {
+    margin: 0 0 10px 0;
+    color: #9b59b6;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.export-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
@@ -533,7 +700,7 @@
 .mining-panel .panel-content::-webkit-scrollbar-thumb,
 .log-display::-webkit-scrollbar-thumb,
 .table-wrapper::-webkit-scrollbar-thumb {
-    background: #3498db;
+    background: #9b59b6;
     border-radius: 3px;
 }
 </style>
