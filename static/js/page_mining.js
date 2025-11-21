@@ -294,6 +294,25 @@ async function miningRun() {
             miningAddLog(`Thời gian: ${data.stats.processing_time}s`, 'info');
             
             showNotification(`✅ Khai thác hoàn tất! Tìm thấy ${data.stats.total_pages} pages`, 'success');
+            
+            // Log activity to activity feed
+            if (typeof window.logActivity === 'function') {
+                window.logActivity({
+                    type: 'page_mining',
+                    title: 'Page Mining Complete',
+                    description: `Tìm thấy ${data.stats.total_pages} pages - Emails: ${data.stats.emails_collected}`,
+                    status: 'success',
+                    icon: 'fas fa-gem',
+                    color: 'purple',
+                    metadata: {
+                        total_pages: data.stats.total_pages,
+                        pages_with_ads: data.stats.pages_with_ads,
+                        verified_pages: data.stats.verified_pages,
+                        emails_collected: data.stats.emails_collected,
+                        processing_time: data.stats.processing_time
+                    }
+                });
+            }
         } else {
             throw new Error(data.message || 'Unknown error');
         }

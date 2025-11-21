@@ -220,6 +220,26 @@ async function check2faRun() {
             allResults.forEach(result => check2faAddResult(result));
             
             showNotification(`✅ Check complete! Found ${data.stats.hit_2fa} with 2FA`, 'success');
+            
+            // Log activity to activity feed
+            if (typeof window.logActivity === 'function') {
+                window.logActivity({
+                    type: '2fa_check',
+                    title: '2FA Check Complete',
+                    description: `Đã kiểm tra ${data.stats.total} accounts - 2FA: ${data.stats.hit_2fa}, Pages: ${data.stats.has_page}`,
+                    status: 'success',
+                    icon: 'fas fa-shield-alt',
+                    color: 'orange',
+                    metadata: {
+                        total: data.stats.total,
+                        hit_2fa: data.stats.hit_2fa,
+                        has_page: data.stats.has_page,
+                        not_hit: data.stats.not_hit,
+                        error: data.stats.error,
+                        api_type: apiType
+                    }
+                });
+            }
         } else {
             throw new Error(data.message || 'Unknown error');
         }

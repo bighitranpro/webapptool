@@ -301,6 +301,29 @@ async function fbStartChecking() {
             fbAddLog(`Thời gian xử lý: ${data.stats.processing_time}s`, 'info');
             
             showNotification('Kiểm tra hoàn tất!', 'success');
+            
+            // Log activity to activity feed
+            if (typeof window.logActivity === 'function') {
+                window.logActivity({
+                    type: 'facebook_check',
+                    title: 'Facebook Link Check',
+                    description: `Đã kiểm tra ${data.stats.total} emails - LINKED: ${data.stats.linked}, HIDDEN: ${data.stats.hidden_linked}`,
+                    status: 'success',
+                    icon: 'fab fa-facebook',
+                    color: 'blue',
+                    metadata: {
+                        total: data.stats.total,
+                        linked: data.stats.linked,
+                        hidden_linked: data.stats.hidden_linked,
+                        not_linked: data.stats.not_linked,
+                        error: data.stats.error,
+                        code6: data.stats.code6_count || 0,
+                        code8: data.stats.code8_count || 0,
+                        processing_time: data.stats.processing_time,
+                        api_type: apiType
+                    }
+                });
+            }
         } else {
             throw new Error(data.message || 'Unknown error');
         }

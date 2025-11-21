@@ -102,6 +102,25 @@ async function runValidator() {
             // Display detailed result
             displayValidationResult('validatorResult', data);
             showNotification(`Kiểm tra hoàn tất! LIVE: ${data.stats.live}, DIE: ${data.stats.die}`, 'success');
+            
+            // Log activity to activity feed
+            if (typeof window.logActivity === 'function') {
+                window.logActivity({
+                    type: 'validation',
+                    title: 'Email Validation',
+                    description: `Đã kiểm tra ${data.stats.total} emails - LIVE: ${data.stats.live}, DIE: ${data.stats.die}`,
+                    status: 'success',
+                    icon: 'fas fa-envelope-circle-check',
+                    color: 'blue',
+                    metadata: {
+                        total: data.stats.total,
+                        live: data.stats.live,
+                        die: data.stats.die,
+                        can_receive_code: data.stats.can_receive_code || 0,
+                        processing_time: data.stats.processing_time
+                    }
+                });
+            }
         } else {
             displayResult('validatorResult', data, 'error');
             showNotification('Có lỗi xảy ra', 'error');
@@ -221,6 +240,23 @@ async function generateEmails() {
             ).join('');
             
             showNotification(`Đã tạo ${data.emails.length} emails`, 'success');
+            
+            // Log activity to activity feed
+            if (typeof window.logActivity === 'function') {
+                window.logActivity({
+                    type: 'generation',
+                    title: 'Email Generation',
+                    description: `Đã tạo ${data.emails.length} emails với ${domains.length} domain(s)`,
+                    status: 'success',
+                    icon: 'fas fa-magic',
+                    color: 'purple',
+                    metadata: {
+                        count: data.emails.length,
+                        domains: domains,
+                        email_type: params.email_type
+                    }
+                });
+            }
         } else {
             outputDiv.innerHTML = `<p class="empty-state error">Có lỗi: ${data.message || 'Unknown error'}</p>`;
             showNotification('Có lỗi xảy ra', 'error');
@@ -495,6 +531,23 @@ async function autoDetectLiveDie(emails) {
             document.getElementById('extractorDieCount').textContent = extractorState.dieEmails.length;
             
             updateExtractorProgress(100, 'Hoàn tất!');
+            
+            // Log activity to activity feed
+            if (typeof window.logActivity === 'function') {
+                window.logActivity({
+                    type: 'extraction',
+                    title: 'Email Extraction',
+                    description: `Trích xuất ${extractorState.allEmails.length} emails - LIVE: ${extractorState.liveEmails.length}, DIE: ${extractorState.dieEmails.length}`,
+                    status: 'success',
+                    icon: 'fas fa-filter',
+                    color: 'teal',
+                    metadata: {
+                        total: extractorState.allEmails.length,
+                        live: extractorState.liveEmails.length,
+                        die: extractorState.dieEmails.length
+                    }
+                });
+            }
         }
     } catch (error) {
         addExtractorLog('Lỗi kiểm tra LIVE/DIE: ' + error.message, 'error');
