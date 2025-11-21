@@ -1,0 +1,614 @@
+<!-- TOOLS CONTROL SECTION -->
+<!-- Email Validator Control -->
+<div class="admin-page" id="page-validator">
+    <div class="page-header">
+        <h2><i class="fas fa-shield-check"></i> Email Validator Control</h2>
+        <p>Kiểm tra tính hợp lệ của email, phân loại LIVE/DIE với database tracking</p>
+    </div>
+
+    <div class="tool-control-card">
+        <div class="card-header">
+            <h3>Validator Configuration</h3>
+            <div class="card-actions">
+                <button class="btn btn-secondary" onclick="loadValidatorStats()">
+                    <i class="fas fa-chart-bar"></i> Stats
+                </button>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <!-- Input Area -->
+            <div class="form-group">
+                <label for="validatorInput">Email List (mỗi email một dòng)</label>
+                <textarea id="validatorInput" class="form-control" rows="10" 
+                    placeholder="email1@gmail.com&#10;email2@yahoo.com&#10;email3@hotmail.com"></textarea>
+                <div class="input-info">
+                    <span id="validatorInputCount">0 emails</span>
+                    <button class="btn-link" onclick="loadSampleEmails('validator')">Load Sample</button>
+                </div>
+            </div>
+
+            <!-- Options -->
+            <div class="options-grid">
+                <div class="option-item">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="checkMX" checked>
+                        <span>Check MX Record</span>
+                    </label>
+                </div>
+                <div class="option-item">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="checkSMTP" checked>
+                        <span>Check SMTP</span>
+                    </label>
+                </div>
+                <div class="option-item">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="checkDisposable" checked>
+                        <span>Check Disposable</span>
+                    </label>
+                </div>
+                <div class="option-item">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="checkFBCompat">
+                        <span>Check FB Compatible</span>
+                    </label>
+                </div>
+                <div class="option-item">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="useCache" checked>
+                        <span>Use Cache</span>
+                    </label>
+                </div>
+                <div class="option-item">
+                    <label>Max Workers</label>
+                    <input type="number" id="validatorWorkers" class="form-control-sm" value="10" min="1" max="100">
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="runValidator()">
+                    <i class="fas fa-play"></i> Run Validator
+                </button>
+                <button class="btn btn-secondary" onclick="clearValidatorInput()">
+                    <i class="fas fa-eraser"></i> Clear
+                </button>
+            </div>
+
+            <!-- Progress -->
+            <div id="validatorProgress" class="progress-container" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="validatorProgressBar"></div>
+                </div>
+                <div class="progress-text" id="validatorProgressText">Processing...</div>
+            </div>
+
+            <!-- Results -->
+            <div id="validatorResults" class="results-container" style="display: none;">
+                <div class="results-header">
+                    <h4>Validation Results</h4>
+                    <div class="results-stats">
+                        <span class="stat-badge green">LIVE: <span id="validatorLiveCount">0</span></span>
+                        <span class="stat-badge red">DIE: <span id="validatorDieCount">0</span></span>
+                        <span class="stat-badge gray">UNKNOWN: <span id="validatorUnknownCount">0</span></span>
+                    </div>
+                </div>
+
+                <div class="results-tabs">
+                    <button class="tab-btn active" onclick="showValidatorTab('live')">LIVE</button>
+                    <button class="tab-btn" onclick="showValidatorTab('die')">DIE</button>
+                    <button class="tab-btn" onclick="showValidatorTab('unknown')">UNKNOWN</button>
+                </div>
+
+                <div class="results-content">
+                    <div class="results-actions">
+                        <button class="btn btn-sm btn-success" onclick="exportValidatorResults('live')">
+                            <i class="fas fa-download"></i> Export LIVE
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="exportValidatorResults('die')">
+                            <i class="fas fa-download"></i> Export DIE
+                        </button>
+                        <button class="btn btn-sm btn-secondary" onclick="exportValidatorResults('all')">
+                            <i class="fas fa-download"></i> Export All
+                        </button>
+                        <button class="btn btn-sm btn-primary" onclick="copyValidatorResults()">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+
+                    <div class="results-list" id="validatorResultsList">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Validator Statistics -->
+    <div class="tool-control-card">
+        <div class="card-header">
+            <h3>Validator Statistics</h3>
+        </div>
+        <div class="card-body">
+            <div class="stats-grid-compact">
+                <div class="stat-item">
+                    <div class="stat-label">Total Validated</div>
+                    <div class="stat-value" id="validatorTotalStat">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Success Rate</div>
+                    <div class="stat-value" id="validatorSuccessRate">0%</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Avg Processing Time</div>
+                    <div class="stat-value" id="validatorAvgTime">0s</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Cached Results</div>
+                    <div class="stat-value" id="validatorCachedCount">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Email Generator Control -->
+<div class="admin-page" id="page-generator">
+    <div class="page-header">
+        <h2><i class="fas fa-random"></i> Email Generator Control</h2>
+        <p>Tạo danh sách email ngẫu nhiên hoặc theo pattern với multiple domains</p>
+    </div>
+
+    <div class="tool-control-card">
+        <div class="card-header">
+            <h3>Generator Configuration</h3>
+        </div>
+
+        <div class="card-body">
+            <!-- Generator Options -->
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="emailType">Email Type</label>
+                    <select id="emailType" class="form-control">
+                        <option value="random">Random</option>
+                        <option value="pattern">Pattern-based</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="emailTotal">Total Emails</label>
+                    <input type="number" id="emailTotal" class="form-control" value="10" min="1" max="10000">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="charType">Character Type</label>
+                    <select id="charType" class="form-control">
+                        <option value="lowercase">Lowercase</option>
+                        <option value="uppercase">UPPERCASE</option>
+                        <option value="mixed">Mixed Case</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="baseText">Base Text (for Pattern type)</label>
+                    <input type="text" id="baseText" class="form-control" placeholder="e.g., user, admin, test">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="numberType">Number Position</label>
+                    <select id="numberType" class="form-control">
+                        <option value="suffix">Suffix (user123)</option>
+                        <option value="prefix">Prefix (123user)</option>
+                        <option value="random">Random Position</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="emailDomains">Domains (comma separated)</label>
+                <input type="text" id="emailDomains" class="form-control" 
+                    value="gmail.com,yahoo.com,hotmail.com,outlook.com" 
+                    placeholder="gmail.com, yahoo.com, hotmail.com">
+                <small class="form-text">Emails sẽ được phân phối đều qua các domains</small>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="runGenerator()">
+                    <i class="fas fa-magic"></i> Generate Emails
+                </button>
+                <button class="btn btn-secondary" onclick="clearGeneratorResults()">
+                    <i class="fas fa-eraser"></i> Clear
+                </button>
+            </div>
+
+            <!-- Results -->
+            <div id="generatorResults" class="results-container" style="display: none;">
+                <div class="results-header">
+                    <h4>Generated Emails (<span id="generatorCount">0</span>)</h4>
+                    <div class="results-actions">
+                        <button class="btn btn-sm btn-success" onclick="exportGeneratorResults()">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                        <button class="btn btn-sm btn-primary" onclick="copyGeneratorResults()">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                        <button class="btn btn-sm btn-warning" onclick="sendToValidator()">
+                            <i class="fas fa-arrow-right"></i> Send to Validator
+                        </button>
+                    </div>
+                </div>
+                <div class="results-list" id="generatorResultsList"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Facebook Checker Control -->
+<div class="admin-page" id="page-fb-checker">
+    <div class="page-header">
+        <h2><i class="fab fa-facebook"></i> Facebook Linked Checker Control</h2>
+        <p>Kiểm tra email có liên kết với Facebook, hỗ trợ proxy và multi-API</p>
+    </div>
+
+    <div class="tool-control-card">
+        <div class="card-header">
+            <h3>FB Checker Configuration</h3>
+        </div>
+
+        <div class="card-body">
+            <!-- Input -->
+            <div class="form-group">
+                <label for="fbCheckerInput">Email List</label>
+                <textarea id="fbCheckerInput" class="form-control" rows="10"
+                    placeholder="email1@gmail.com&#10;email2@yahoo.com"></textarea>
+                <div class="input-info">
+                    <span id="fbCheckerInputCount">0 emails</span>
+                    <button class="btn-link" onclick="loadSampleEmails('fb')">Load Sample</button>
+                </div>
+            </div>
+
+            <!-- Options -->
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="fbApiType">API Type</label>
+                    <select id="fbApiType" class="form-control">
+                        <option value="random">Random (All APIs)</option>
+                        <option value="api1">API 1</option>
+                        <option value="api2">API 2</option>
+                        <option value="api3">API 3</option>
+                        <option value="api4">API 4</option>
+                        <option value="api5">API 5</option>
+                        <option value="api6">API 6</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="fbMaxWorkers">Max Workers</label>
+                    <input type="number" id="fbMaxWorkers" class="form-control" value="100" min="1" max="500">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="fbStartFrom">Start From</label>
+                    <input type="number" id="fbStartFrom" class="form-control" value="0" min="0">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="checkCode68">
+                    <span>Check Code 6/8 Length</span>
+                </label>
+            </div>
+
+            <!-- Proxy Configuration (Collapsible) -->
+            <div class="collapsible-section">
+                <button class="collapsible-header" onclick="toggleSection('fbProxyConfig')">
+                    <i class="fas fa-network-wired"></i> Proxy Configuration (Optional)
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div id="fbProxyConfig" class="collapsible-content">
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <label>Proxy Type</label>
+                            <select id="fbProxyType" class="form-control">
+                                <option value="">No Proxy</option>
+                                <option value="http">HTTP</option>
+                                <option value="socks4">SOCKS4</option>
+                                <option value="socks5">SOCKS5</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>Host</label>
+                            <input type="text" id="fbProxyHost" class="form-control" placeholder="proxy.example.com">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label>Port</label>
+                            <input type="number" id="fbProxyPort" class="form-control" placeholder="8080">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label>Username</label>
+                            <input type="text" id="fbProxyUser" class="form-control">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label>Password</label>
+                            <input type="password" id="fbProxyPass" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="runFBChecker()">
+                    <i class="fab fa-facebook"></i> Check Facebook
+                </button>
+                <button class="btn btn-secondary" onclick="clearFBResults()">
+                    <i class="fas fa-eraser"></i> Clear
+                </button>
+            </div>
+
+            <!-- Progress -->
+            <div id="fbProgress" class="progress-container" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="fbProgressBar"></div>
+                </div>
+                <div class="progress-text" id="fbProgressText">Checking...</div>
+            </div>
+
+            <!-- Results -->
+            <div id="fbResults" class="results-container" style="display: none;">
+                <div class="results-header">
+                    <h4>FB Check Results</h4>
+                    <div class="results-stats">
+                        <span class="stat-badge green">LINKED: <span id="fbLinkedCount">0</span></span>
+                        <span class="stat-badge yellow">HIDDEN: <span id="fbHiddenCount">0</span></span>
+                        <span class="stat-badge red">NOT LINKED: <span id="fbNotLinkedCount">0</span></span>
+                        <span class="stat-badge gray">ERROR: <span id="fbErrorCount">0</span></span>
+                    </div>
+                </div>
+
+                <div class="results-tabs">
+                    <button class="tab-btn active" onclick="showFBTab('linked')">LINKED</button>
+                    <button class="tab-btn" onclick="showFBTab('hidden')">HIDDEN</button>
+                    <button class="tab-btn" onclick="showFBTab('not-linked')">NOT LINKED</button>
+                    <button class="tab-btn" onclick="showFBTab('error')">ERROR</button>
+                </div>
+
+                <div class="results-content">
+                    <div class="results-actions">
+                        <button class="btn btn-sm btn-success" onclick="exportFBResults('linked')">
+                            <i class="fas fa-download"></i> Export Linked
+                        </button>
+                        <button class="btn btn-sm btn-secondary" onclick="exportFBResults('all')">
+                            <i class="fas fa-download"></i> Export All
+                        </button>
+                    </div>
+                    <div class="results-list" id="fbResultsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 2FA & Page Checker Control -->
+<div class="admin-page" id="page-2fa-checker">
+    <div class="page-header">
+        <h2><i class="fas fa-shield-alt"></i> 2FA & Page Checker Control</h2>
+        <p>Kiểm tra email:password có 2FA và Page Facebook</p>
+    </div>
+
+    <div class="tool-control-card">
+        <div class="card-header">
+            <h3>2FA Checker Configuration</h3>
+        </div>
+
+        <div class="card-body">
+            <!-- Input -->
+            <div class="form-group">
+                <label for="twoFAInput">Email:Password List</label>
+                <textarea id="twoFAInput" class="form-control" rows="10"
+                    placeholder="email1@gmail.com:password123&#10;email2@yahoo.com:mypass456"></textarea>
+                <div class="input-info">
+                    <span id="twoFAInputCount">0 accounts</span>
+                    <button class="btn-link" onclick="loadSampleAccounts()">Load Sample</button>
+                </div>
+            </div>
+
+            <!-- Options -->
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="twoFAApiType">API Type</label>
+                    <select id="twoFAApiType" class="form-control">
+                        <option value="random">Random</option>
+                        <option value="api1">API 1</option>
+                        <option value="api2">API 2</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="twoFAMaxWorkers">Max Workers</label>
+                    <input type="number" id="twoFAMaxWorkers" class="form-control" value="200" min="1" max="500">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="twoFAStartFrom">Start From</label>
+                    <input type="number" id="twoFAStartFrom" class="form-control" value="0" min="0">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-8">
+                    <label for="passwordPattern">Password Pattern (Optional)</label>
+                    <input type="text" id="passwordPattern" class="form-control" 
+                        placeholder="1|@|.|#|*|5|*|!|?" 
+                        title="Pattern dùng để validate mật khẩu">
+                    <small class="form-text">Ví dụ: 1|@|.|#|*|5|*|!|?</small>
+                </div>
+                <div class="form-group col-md-4">
+                    <label>&nbsp;</label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="validatePattern">
+                        <span>Validate Pattern</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="run2FAChecker()">
+                    <i class="fas fa-key"></i> Check 2FA
+                </button>
+                <button class="btn btn-secondary" onclick="clear2FAResults()">
+                    <i class="fas fa-eraser"></i> Clear
+                </button>
+            </div>
+
+            <!-- Progress -->
+            <div id="twoFAProgress" class="progress-container" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="twoFAProgressBar"></div>
+                </div>
+                <div class="progress-text" id="twoFAProgressText">Checking...</div>
+            </div>
+
+            <!-- Results -->
+            <div id="twoFAResults" class="results-container" style="display: none;">
+                <div class="results-header">
+                    <h4>2FA Check Results</h4>
+                    <div class="results-stats">
+                        <span class="stat-badge green">HIT 2FA: <span id="twoFAHitCount">0</span></span>
+                        <span class="stat-badge blue">HAS PAGE: <span id="twoFAPageCount">0</span></span>
+                        <span class="stat-badge red">NOT HIT: <span id="twoFANotHitCount">0</span></span>
+                        <span class="stat-badge gray">ERROR: <span id="twoFAErrorCount">0</span></span>
+                    </div>
+                </div>
+
+                <div class="results-tabs">
+                    <button class="tab-btn active" onclick="show2FATab('hit')">HIT 2FA</button>
+                    <button class="tab-btn" onclick="show2FATab('page')">HAS PAGE</button>
+                    <button class="tab-btn" onclick="show2FATab('not-hit')">NOT HIT</button>
+                    <button class="tab-btn" onclick="show2FATab('error')">ERROR</button>
+                </div>
+
+                <div class="results-content">
+                    <div class="results-actions">
+                        <button class="btn btn-sm btn-success" onclick="export2FAResults('hit')">
+                            <i class="fas fa-download"></i> Export Hit 2FA
+                        </button>
+                        <button class="btn btn-sm btn-primary" onclick="export2FAResults('page')">
+                            <i class="fas fa-download"></i> Export Has Page
+                        </button>
+                        <button class="btn btn-sm btn-secondary" onclick="export2FAResults('all')">
+                            <i class="fas fa-download"></i> Export All
+                        </button>
+                    </div>
+                    <div class="results-list" id="twoFAResultsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Page Mining Control -->
+<div class="admin-page" id="page-mining">
+    <div class="page-header">
+        <h2><i class="fas fa-search-dollar"></i> Page Mining Control</h2>
+        <p>Mining thông tin Page từ Facebook UIDs</p>
+    </div>
+
+    <div class="tool-control-card">
+        <div class="card-header">
+            <h3>Page Mining Configuration</h3>
+        </div>
+
+        <div class="card-body">
+            <!-- Input -->
+            <div class="form-group">
+                <label for="miningInput">UID List</label>
+                <textarea id="miningInput" class="form-control" rows="10"
+                    placeholder="100001234567890&#10;100009876543210&#10;100012345678901"></textarea>
+                <div class="input-info">
+                    <span id="miningInputCount">0 UIDs</span>
+                    <button class="btn-link" onclick="loadSampleUIDs()">Load Sample</button>
+                </div>
+            </div>
+
+            <!-- Options -->
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="miningMaxWorkers">Max Workers</label>
+                    <input type="number" id="miningMaxWorkers" class="form-control" value="100" min="1" max="500">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="miningStartFrom">Start From</label>
+                    <input type="number" id="miningStartFrom" class="form-control" value="0" min="0">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="filterCountry">Filter Country</label>
+                    <input type="text" id="filterCountry" class="form-control" placeholder="Vietnam, USA...">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="filterHasAds">
+                        <span>Only Pages with Ads</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="filterVerified">
+                        <span>Only Verified Pages</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="runPageMining()">
+                    <i class="fas fa-search"></i> Start Mining
+                </button>
+                <button class="btn btn-secondary" onclick="clearMiningResults()">
+                    <i class="fas fa-eraser"></i> Clear
+                </button>
+            </div>
+
+            <!-- Progress -->
+            <div id="miningProgress" class="progress-container" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="miningProgressBar"></div>
+                </div>
+                <div class="progress-text" id="miningProgressText">Mining...</div>
+            </div>
+
+            <!-- Results -->
+            <div id="miningResults" class="results-container" style="display: none;">
+                <div class="results-header">
+                    <h4>Mining Results</h4>
+                    <div class="results-stats">
+                        <span class="stat-badge blue">PAGES: <span id="miningPagesCount">0</span></span>
+                        <span class="stat-badge green">EMAILS: <span id="miningEmailsCount">0</span></span>
+                        <span class="stat-badge yellow">WITH ADS: <span id="miningAdsCount">0</span></span>
+                        <span class="stat-badge purple">VERIFIED: <span id="miningVerifiedCount">0</span></span>
+                    </div>
+                </div>
+
+                <div class="results-tabs">
+                    <button class="tab-btn active" onclick="showMiningTab('pages')">PAGES</button>
+                    <button class="tab-btn" onclick="showMiningTab('emails')">EMAILS</button>
+                </div>
+
+                <div class="results-content">
+                    <div class="results-actions">
+                        <button class="btn btn-sm btn-success" onclick="exportMiningResults('pages')">
+                            <i class="fas fa-download"></i> Export Pages
+                        </button>
+                        <button class="btn btn-sm btn-primary" onclick="exportMiningResults('emails')">
+                            <i class="fas fa-download"></i> Export Emails
+                        </button>
+                        <button class="btn btn-sm btn-secondary" onclick="exportMiningResults('all')">
+                            <i class="fas fa-download"></i> Export All
+                        </button>
+                    </div>
+                    <div class="results-list" id="miningResultsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

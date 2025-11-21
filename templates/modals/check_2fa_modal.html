@@ -1,0 +1,476 @@
+<!-- Check Email Pass 2FA FB Modal -->
+<div id="check2faModal" class="modal">
+    <div class="modal-content modal-check-2fa">
+        <span class="close" onclick="closeModal('check2faModal')">&times;</span>
+        <h2 class="modal-title">
+            <i class="fas fa-shield-alt"></i> Check Email Pass 2FA FB
+            <span class="badge badge-success">2 API Maxspeed</span>
+        </h2>
+        
+        <div class="check2fa-layout">
+            <!-- LEFT PANEL: Results Display -->
+            <div class="check2fa-panel check2fa-panel-results">
+                <div class="panel-header">
+                    <i class="fas fa-list-check"></i> RESULTS
+                </div>
+                
+                <div class="panel-content">
+                    <!-- Results Display Area -->
+                    <div class="results-display" id="check2faResultsDisplay">
+                        <div class="result-placeholder">
+                            <i class="fas fa-info-circle"></i>
+                            <p>Nhập email:password và click RUN để bắt đầu kiểm tra</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: Settings & Data -->
+            <div class="check2fa-panel check2fa-panel-settings">
+                <div class="panel-header">
+                    <i class="fas fa-cog"></i> SETTINGS & DATA
+                </div>
+                
+                <div class="panel-content">
+                    <!-- DATA Section -->
+                    <div class="data-section">
+                        <h4>DATA</h4>
+                        <div class="data-grid">
+                            <div class="data-item">
+                                <span class="data-label">Total Mail:</span>
+                                <span class="data-value" id="check2faTotalMail">0</span>
+                            </div>
+                            <div class="data-item">
+                                <span class="data-label">Total Proxy:</span>
+                                <span class="data-value" id="check2faTotalProxy">0</span>
+                            </div>
+                            <div class="data-item hit-2fa">
+                                <span class="data-label">Hit Có 2FA:</span>
+                                <span class="data-value" id="check2faHit2FA">0</span>
+                            </div>
+                            <div class="data-item has-page">
+                                <span class="data-label">Số Acc Có Page:</span>
+                                <span class="data-value" id="check2faHasPage">0</span>
+                            </div>
+                            <div class="data-item not-hit">
+                                <span class="data-label">Not Hit:</span>
+                                <span class="data-value" id="check2faNotHit">0</span>
+                            </div>
+                            <div class="data-item error">
+                                <span class="data-label">Error:</span>
+                                <span class="data-value" id="check2faError">0</span>
+                            </div>
+                            <div class="data-item checked">
+                                <span class="data-label">Mail Đã Check:</span>
+                                <span class="data-value" id="check2faChecked">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Email:Password Input -->
+                    <div class="input-section">
+                        <h4><i class="fas fa-envelope"></i> Email:Password Input</h4>
+                        <textarea 
+                            id="check2faInput" 
+                            rows="8" 
+                            placeholder="email1@gmail.com:password123&#10;email2@yahoo.com:pass456&#10;email3@hotmail.com:mypass789"
+                        ></textarea>
+                        <div class="input-actions">
+                            <button class="btn btn-sm" onclick="check2faLoadFile()">
+                                <i class="fas fa-upload"></i> Load File
+                            </button>
+                            <button class="btn btn-sm" onclick="check2faClearInput()">
+                                <i class="fas fa-trash"></i> Clear
+                            </button>
+                        </div>
+                        <input type="file" id="check2faFileInput" accept=".txt" style="display: none" onchange="check2faHandleFile(event)">
+                    </div>
+
+                    <!-- SETTING CHECK PASS -->
+                    <div class="settings-group">
+                        <h4><i class="fas fa-key"></i> SETTING CHECK PASS</h4>
+                        
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="check2faValidatePattern">
+                                Nếu sai pass, thử kí tự vào cuối:
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Kí Tự Đuôi Pass:</label>
+                            <input 
+                                type="text" 
+                                id="check2faPasswordPattern" 
+                                placeholder="1|@|.|#|*|5|*|!|?"
+                                value="1|@|.|#|*|5|*|!|?"
+                            >
+                            <small>Separate with | (pipe)</small>
+                        </div>
+                    </div>
+
+                    <!-- SETTING -->
+                    <div class="settings-group">
+                        <h4><i class="fas fa-sliders-h"></i> SETTING</h4>
+                        
+                        <div class="form-group">
+                            <label>Chọn Loại Api:</label>
+                            <select id="check2faApiType" class="form-control">
+                                <option value="api1">Api 1 (Check được LK ẩn, hiện)</option>
+                                <option value="api2">Api 2 (Check được LK ẩn, hiện)</option>
+                                <option value="random">Random Api</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Loại Proxy:</label>
+                            <select id="check2faProxyType" class="form-control">
+                                <option value="http">Http</option>
+                                <option value="socks5">Socks5</option>
+                                <option value="socks4">Socks4</option>
+                                <option value="tinsoft">Tinsoft</option>
+                                <option value="tmproxy">TMproxy</option>
+                                <option value="shoplike">Shoplike</option>
+                                <option value="proxyfb">Proxyfb.com</option>
+                                <option value="wwproxy">WWProxy.com</option>
+                                <option value="tinproxy">Tinproxy.com</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Proxy List:</label>
+                            <textarea id="check2faProxyList" rows="3" placeholder="host:port:user:pass"></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Check Từ Mail Số:</label>
+                                <input type="number" id="check2faStartFrom" value="1" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label>Số luồng:</label>
+                                <input type="number" id="check2faThreads" value="200" min="1" max="10000">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CONTROL -->
+                    <div class="control-section">
+                        <h4><i class="fas fa-play-circle"></i> CONTROL</h4>
+                        
+                        <div class="status-display">
+                            <span class="status-label">STATUS CHECK:</span>
+                            <span class="status-value" id="check2faStatus">READY</span>
+                        </div>
+
+                        <div class="control-buttons">
+                            <button class="btn btn-success btn-block" onclick="check2faRun()" id="check2faRunBtn">
+                                <i class="fas fa-play"></i> RUN
+                            </button>
+                            <button class="btn btn-danger btn-block" onclick="check2faStop()" id="check2faStopBtn" disabled>
+                                <i class="fas fa-stop"></i> STOP
+                            </button>
+                        </div>
+
+                        <button class="btn btn-primary btn-block" onclick="check2faExport()">
+                            <i class="fas fa-file-export"></i> File Output
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Check 2FA Modal Styles */
+.modal-check-2fa {
+    max-width: 90vw;
+    width: 1400px;
+    height: 85vh;
+    padding: 20px;
+}
+
+.check2fa-layout {
+    display: grid;
+    grid-template-columns: 1fr 450px;
+    gap: 20px;
+    height: calc(85vh - 80px);
+    margin-top: 15px;
+}
+
+/* Panel Styles */
+.check2fa-panel {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.check2fa-panel .panel-header {
+    background: linear-gradient(135deg, #f39c12 0%, #e74c3c 100%);
+    color: white;
+    padding: 12px 15px;
+    font-weight: bold;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.check2fa-panel .panel-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+/* Results Display */
+.results-display {
+    background: #0a0a0a;
+    border: 1px solid #333;
+    border-radius: 4px;
+    min-height: 500px;
+    padding: 15px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    overflow-y: auto;
+}
+
+.result-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #666;
+    text-align: center;
+}
+
+.result-placeholder i {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.result-entry {
+    padding: 6px 0;
+    border-bottom: 1px solid #222;
+    color: #aaa;
+}
+
+.result-entry:last-child {
+    border-bottom: none;
+}
+
+.result-entry.hit-2fa { color: #2ecc71; }
+.result-entry.has-page { color: #3498db; }
+.result-entry.not-hit { color: #7f8c8d; }
+.result-entry.error { color: #e74c3c; }
+
+/* Data Section */
+.data-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #252525;
+    border-radius: 6px;
+    border: 1px solid #333;
+}
+
+.data-section h4 {
+    margin: 0 0 12px 0;
+    color: #f39c12;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.data-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.data-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 10px;
+    background: #1a1a1a;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.data-label {
+    color: #888;
+}
+
+.data-value {
+    color: #fff;
+    font-weight: bold;
+}
+
+.data-item.hit-2fa .data-value { color: #2ecc71; }
+.data-item.has-page .data-value { color: #3498db; }
+.data-item.not-hit .data-value { color: #7f8c8d; }
+.data-item.error .data-value { color: #e74c3c; }
+.data-item.checked .data-value { color: #f39c12; }
+
+/* Input Section */
+.input-section {
+    margin-bottom: 20px;
+}
+
+.input-section h4 {
+    margin: 0 0 10px 0;
+    color: #f39c12;
+    font-size: 13px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.input-section textarea {
+    width: 100%;
+    padding: 10px;
+    background: #0a0a0a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: #fff;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    resize: vertical;
+}
+
+.input-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+/* Settings Group */
+.settings-group {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #252525;
+    border-radius: 6px;
+    border-left: 3px solid #f39c12;
+}
+
+.settings-group h4 {
+    margin: 0 0 12px 0;
+    color: #f39c12;
+    font-size: 13px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-group {
+    margin-bottom: 12px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #aaa;
+    font-size: 12px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 12px;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 4px;
+    color: #666;
+    font-size: 11px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+/* Control Section */
+.control-section {
+    padding: 15px;
+    background: #252525;
+    border-radius: 6px;
+    border: 1px solid #333;
+}
+
+.control-section h4 {
+    margin: 0 0 12px 0;
+    color: #f39c12;
+    font-size: 13px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-display {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background: #1a1a1a;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    font-size: 13px;
+}
+
+.status-label {
+    color: #888;
+}
+
+.status-value {
+    color: #2ecc71;
+    font-weight: bold;
+}
+
+.status-value.running {
+    color: #f39c12;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.control-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+/* Scrollbar */
+.check2fa-panel .panel-content::-webkit-scrollbar,
+.results-display::-webkit-scrollbar {
+    width: 6px;
+}
+
+.check2fa-panel .panel-content::-webkit-scrollbar-track,
+.results-display::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+.check2fa-panel .panel-content::-webkit-scrollbar-thumb,
+.results-display::-webkit-scrollbar-thumb {
+    background: #f39c12;
+    border-radius: 3px;
+}
+</style>

@@ -6,6 +6,54 @@
 const API_BASE = '/api';
 
 /**
+ * Ensure showNotification exists (fallback if not loaded from dashboard.js)
+ */
+if (typeof showNotification === 'undefined') {
+    window.showNotification = function(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.textContent = message;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: ${type === 'success' ? '#2ecc71' : type === 'error' ? '#e74c3c' : type === 'warning' ? '#f39c12' : '#3498db'};
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 10000;
+            font-weight: 600;
+            animation: slideInRight 0.3s;
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    };
+    
+    // Add animation styles if not exist
+    if (!document.getElementById('notification-animations')) {
+        const style = document.createElement('style');
+        style.id = 'notification-animations';
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(400px); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(400px); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
+
+/**
  * Run Email Validator
  */
 async function runValidator() {
@@ -113,11 +161,34 @@ function displayValidationResult(containerId, data) {
  * Generate Emails
  */
 async function generateEmails() {
+    const domainMode = document.getElementById('domainMode').value;
+    let domains = [];
+    
+    if (domainMode === 'single') {
+        const singleDomain = document.getElementById('generatorDomain').value.trim();
+        if (!singleDomain) {
+            showNotification('Vui lòng nhập domain', 'warning');
+            return;
+        }
+        domains = [singleDomain];
+    } else {
+        // Multiple domains mode
+        const domainsText = document.getElementById('generatorDomains').value;
+        domains = domainsText.split('\n')
+            .map(d => d.trim())
+            .filter(d => d.length > 0);
+        
+        if (domains.length === 0) {
+            showNotification('Vui lòng nhập ít nhất 1 domain', 'warning');
+            return;
+        }
+    }
+    
     const params = {
         email_type: document.getElementById('emailType').value,
         text: document.getElementById('generatorText').value,
         total: parseInt(document.getElementById('generatorTotal').value),
-        domain: document.getElementById('generatorDomain').value,
+        domains: domains, // Changed from single 'domain' to array 'domains'
         char_type: document.getElementById('charType').value,
         number_type: document.getElementById('numberType').value
     };
@@ -125,10 +196,6 @@ async function generateEmails() {
     if (params.total < 1 || params.total > 10000) {
         showNotification('Số lượng phải từ 1 đến 10,000', 'warning');
         return;
-    }
-    
-    if (!params.domain || params.domain.trim() === '') {
-        params.domain = 'gmail.com';
     }
     
     const outputDiv = document.getElementById('generatorOutput');
@@ -166,6 +233,56 @@ async function generateEmails() {
 }
 
 /**
+ * Toggle domain mode (single or multiple)
+ */
+function toggleDomainMode() {
+    const mode = document.getElementById('domainMode').value;
+    const singleGroup = document.getElementById('singleDomainGroup');
+    const multiGroup = document.getElementById('multiDomainGroup');
+    const quickGroup = document.getElementById('quickDomainGroup');
+    
+    if (mode === 'single') {
+        singleGroup.style.display = 'block';
+        multiGroup.style.display = 'none';
+        quickGroup.style.display = 'none';
+    } else {
+        singleGroup.style.display = 'none';
+        multiGroup.style.display = 'block';
+        quickGroup.style.display = 'block';
+    }
+}
+
+/**
+ * Toggle domain in multi-domain mode
+ */
+function toggleDomain(domain) {
+    const textarea = document.getElementById('generatorDomains');
+    const currentDomains = textarea.value.split('\n').map(d => d.trim()).filter(d => d);
+    const domainIndex = currentDomains.indexOf(domain);
+    
+    // Find the button
+    const buttons = document.querySelectorAll('.btn-domain');
+    let targetButton = null;
+    buttons.forEach(btn => {
+        if (btn.textContent.toLowerCase() === domain.split('.')[0].toLowerCase()) {
+            targetButton = btn;
+        }
+    });
+    
+    if (domainIndex === -1) {
+        // Add domain
+        currentDomains.push(domain);
+        if (targetButton) targetButton.classList.add('active');
+    } else {
+        // Remove domain
+        currentDomains.splice(domainIndex, 1);
+        if (targetButton) targetButton.classList.remove('active');
+    }
+    
+    textarea.value = currentDomains.join('\n');
+}
+
+/**
  * Copy generated list
  */
 function copyGeneratedList() {
@@ -191,22 +308,110 @@ function copyGeneratedList() {
 }
 
 /**
- * Extract Emails
+ * Email Extractor Pro - Advanced Functions
  */
-async function extractEmails() {
-    const text = document.getElementById('extractorText').value;
-    
-    if (!text.trim()) {
-        showNotification('Vui lòng nhập văn bản', 'warning');
+
+// Global state for extractor
+const extractorState = {
+    isRunning: false,
+    isPaused: false,
+    allEmails: [],
+    liveEmails: [],
+    dieEmails: [],
+    currentTab: 'all'
+};
+
+/**
+ * Toggle input source
+ */
+function toggleExtractorSource() {
+    const source = document.getElementById('extractorSource').value;
+    document.getElementById('extractorTextInput').style.display = source === 'text' ? 'block' : 'none';
+    document.getElementById('extractorFileInput').style.display = source === 'file' ? 'block' : 'none';
+    document.getElementById('extractorUrlInput').style.display = source === 'url' ? 'block' : 'none';
+}
+
+/**
+ * Handle file upload
+ */
+function handleFileUpload(input) {
+    const file = input.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('extractorText').value = e.target.result;
+            document.getElementById('fileInfo').innerHTML = `
+                <i class="fas fa-file-check"></i> File loaded: ${file.name} (${(file.size / 1024).toFixed(2)} KB)
+            `;
+            updateExtractorInputCount();
+        };
+        reader.readAsText(file);
+    }
+}
+
+/**
+ * Fetch content from URL
+ */
+async function fetchFromUrl() {
+    const url = document.getElementById('extractorUrl').value;
+    if (!url.trim()) {
+        showNotification('Vui lòng nhập URL', 'warning');
         return;
     }
     
+    addExtractorLog('Đang fetch content từ URL...', 'info');
+    
+    try {
+        // Note: This needs CORS proxy or backend endpoint
+        showNotification('Feature đang phát triển - sử dụng paste text thay thế', 'warning');
+    } catch (error) {
+        addExtractorLog('Lỗi fetch URL: ' + error.message, 'error');
+    }
+}
+
+/**
+ * Update input count
+ */
+function updateExtractorInputCount() {
+    const text = document.getElementById('extractorText').value;
+    const lines = text.split('\n').filter(l => l.trim()).length;
+    document.getElementById('extractorInputCount').textContent = lines;
+}
+
+/**
+ * Main extraction function
+ */
+async function runExtractor() {
+    const text = document.getElementById('extractorText').value;
+    
+    if (!text.trim()) {
+        showNotification('Vui lòng nhập dữ liệu', 'warning');
+        return;
+    }
+    
+    extractorState.isRunning = true;
+    extractorState.isPaused = false;
+    extractorState.allEmails = [];
+    extractorState.liveEmails = [];
+    extractorState.dieEmails = [];
+    
+    // Enable control buttons
+    document.getElementById('extractorPauseBtn').disabled = false;
+    document.getElementById('extractorStopBtn').disabled = false;
+    
+    addExtractorLog('Bắt đầu trích xuất emails...', 'info');
+    updateExtractorProgress(10, 'Đang phân tích văn bản...');
+    
+    // Step 1: Extract emails
     const options = {
         remove_dups: document.getElementById('extractorRemoveDups').checked,
-        case_insensitive: document.getElementById('extractorCaseInsensitive').checked
+        validate_format: document.getElementById('extractorValidateFormat').checked
     };
     
-    toggleLoading(true, 'extractorResult', 'Đang trích xuất...');
+    const domainFilter = document.getElementById('extractorDomainFilter').value;
+    if (domainFilter.trim()) {
+        options.filter_domains = domainFilter.split(',').map(d => d.trim());
+    }
     
     try {
         const response = await fetch(`${API_BASE}/extract`, {
@@ -217,19 +422,270 @@ async function extractEmails() {
         
         const data = await response.json();
         
-        if (data.success) {
-            displayResult('extractorResult', data, 'success');
-            showNotification(`Trích xuất được ${data.total_emails} emails`, 'success');
+        if (data.success && data.emails) {
+            extractorState.allEmails = data.emails;
+            
+            addExtractorLog(`Tìm thấy ${data.emails.length} emails`, 'success');
+            updateExtractorProgress(40, 'Đã trích xuất emails');
+            updateExtractorStats(data.emails.length, data.emails.length, 0);
+            
+            // Display all emails first
+            displayExtractorResults('all', data.emails);
+            
+            // Step 2: Auto-detect LIVE/DIE if enabled
+            const autoDetect = document.getElementById('extractorAutoDetectLive').checked;
+            if (autoDetect && data.emails.length > 0) {
+                await autoDetectLiveDie(data.emails);
+            } else {
+                updateExtractorProgress(100, 'Hoàn tất!');
+                addExtractorLog('Trích xuất hoàn tất', 'success');
+            }
+            
+            showNotification(`Trích xuất thành công ${data.emails.length} emails`, 'success');
         } else {
-            displayResult('extractorResult', data, 'error');
-            showNotification('Có lỗi xảy ra', 'error');
+            addExtractorLog('Không tìm thấy email nào', 'warning');
+            updateExtractorProgress(100, 'Không có kết quả');
         }
     } catch (error) {
         console.error('Extract error:', error);
-        displayResult('extractorResult', { message: error.message }, 'error');
-        showNotification('Lỗi kết nối API', 'error');
+        addExtractorLog('Lỗi: ' + error.message, 'error');
+        showNotification('Lỗi trích xuất', 'error');
+    } finally {
+        extractorState.isRunning = false;
+        document.getElementById('extractorPauseBtn').disabled = true;
+        document.getElementById('extractorStopBtn').disabled = true;
     }
 }
+
+/**
+ * Auto-detect LIVE/DIE status
+ */
+async function autoDetectLiveDie(emails) {
+    addExtractorLog('Bắt đầu kiểm tra LIVE/DIE...', 'info');
+    updateExtractorProgress(50, 'Đang kiểm tra emails...');
+    
+    try {
+        const response = await fetch(`${API_BASE}/validate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                emails: emails,
+                options: {
+                    check_mx: true,
+                    check_smtp: false, // Skip SMTP for speed
+                    max_workers: 10
+                }
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            extractorState.liveEmails = data.results.live || [];
+            extractorState.dieEmails = data.results.die || [];
+            
+            addExtractorLog(`LIVE: ${extractorState.liveEmails.length}, DIE: ${extractorState.dieEmails.length}`, 'success');
+            
+            // Update displays
+            displayExtractorResults('live', extractorState.liveEmails.map(e => e.email));
+            displayExtractorResults('die', extractorState.dieEmails.map(e => e.email));
+            
+            // Update counts
+            document.getElementById('extractorLiveCount').textContent = extractorState.liveEmails.length;
+            document.getElementById('extractorDieCount').textContent = extractorState.dieEmails.length;
+            
+            updateExtractorProgress(100, 'Hoàn tất!');
+        }
+    } catch (error) {
+        addExtractorLog('Lỗi kiểm tra LIVE/DIE: ' + error.message, 'error');
+        updateExtractorProgress(100, 'Hoàn tất (không check LIVE/DIE)');
+    }
+}
+
+/**
+ * Update progress bar
+ */
+function updateExtractorProgress(percent, text) {
+    document.getElementById('extractorProgress').style.width = percent + '%';
+    document.getElementById('extractorProgressText').textContent = text;
+}
+
+/**
+ * Update stats
+ */
+function updateExtractorStats(scanned, found, checking) {
+    document.getElementById('extractorScanned').textContent = scanned;
+    document.getElementById('extractorFound').textContent = found;
+    document.getElementById('extractorValid').textContent = found;
+    document.getElementById('extractorChecking').textContent = checking;
+}
+
+/**
+ * Add log entry
+ */
+function addExtractorLog(message, type = 'info') {
+    const logDiv = document.getElementById('extractorLog');
+    const entry = document.createElement('div');
+    entry.className = `log-entry ${type}`;
+    
+    const icon = type === 'success' ? 'check-circle' : 
+                 type === 'error' ? 'exclamation-circle' : 
+                 type === 'warning' ? 'exclamation-triangle' : 'info-circle';
+    
+    entry.innerHTML = `<i class="fas fa-${icon}"></i> [${new Date().toLocaleTimeString()}] ${message}`;
+    logDiv.appendChild(entry);
+    logDiv.scrollTop = logDiv.scrollHeight;
+}
+
+/**
+ * Display results in appropriate tab
+ */
+function displayExtractorResults(tab, emails) {
+    const listId = tab === 'all' ? 'extractorAllList' : 
+                   tab === 'live' ? 'extractorLiveList' : 'extractorDieList';
+    const list = document.getElementById(listId);
+    
+    if (!emails || emails.length === 0) {
+        list.innerHTML = '<p class="empty-state">Chưa có dữ liệu</p>';
+        return;
+    }
+    
+    const html = emails.map((email, index) => {
+        const emailStr = typeof email === 'object' ? email.email : email;
+        const status = typeof email === 'object' ? email.status : null;
+        
+        return `
+            <div class="result-item">
+                <span>${index + 1}. ${emailStr}</span>
+                ${status ? `<span class="status-badge ${status.toLowerCase()}">${status}</span>` : ''}
+            </div>
+        `;
+    }).join('');
+    
+    list.innerHTML = html;
+    
+    // Update count
+    const countId = tab === 'all' ? 'extractorAllCount' : 
+                    tab === 'live' ? 'extractorLiveCount' : 'extractorDieCount';
+    document.getElementById(countId).textContent = emails.length;
+}
+
+/**
+ * Switch tabs
+ */
+function switchExtractorTab(tab) {
+    // Update buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Update tabs
+    document.querySelectorAll('.result-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(`extractorTab${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('active');
+    
+    extractorState.currentTab = tab;
+}
+
+/**
+ * Copy results
+ */
+function copyExtractorResults(tab) {
+    let emails = [];
+    
+    if (tab === 'all') {
+        emails = extractorState.allEmails;
+    } else if (tab === 'live') {
+        emails = extractorState.liveEmails.map(e => e.email || e);
+    } else if (tab === 'die') {
+        emails = extractorState.dieEmails.map(e => e.email || e);
+    }
+    
+    if (emails.length === 0) {
+        showNotification('Không có dữ liệu để copy', 'warning');
+        return;
+    }
+    
+    const text = Array.isArray(emails) ? emails.join('\n') : emails;
+    navigator.clipboard.writeText(text).then(() => {
+        showNotification(`Đã copy ${emails.length} emails`, 'success');
+    }).catch(() => {
+        showNotification('Lỗi khi copy', 'error');
+    });
+}
+
+/**
+ * Export results
+ */
+function exportExtractorResults(format) {
+    const emails = extractorState.currentTab === 'all' ? extractorState.allEmails :
+                   extractorState.currentTab === 'live' ? extractorState.liveEmails.map(e => e.email || e) :
+                   extractorState.dieEmails.map(e => e.email || e);
+    
+    if (emails.length === 0) {
+        showNotification('Không có dữ liệu để export', 'warning');
+        return;
+    }
+    
+    let content = '';
+    let filename = '';
+    
+    if (format === 'txt') {
+        content = emails.join('\n');
+        filename = `emails_${extractorState.currentTab}_${Date.now()}.txt`;
+    } else if (format === 'csv') {
+        content = 'Email,Status\n' + emails.map((e, i) => {
+            const email = typeof e === 'object' ? e.email : e;
+            const status = typeof e === 'object' ? e.status : 'UNKNOWN';
+            return `${email},${status}`;
+        }).join('\n');
+        filename = `emails_${extractorState.currentTab}_${Date.now()}.csv`;
+    }
+    
+    // Create download
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    showNotification(`Đã export ${emails.length} emails`, 'success');
+}
+
+/**
+ * Pause extractor
+ */
+function pauseExtractor() {
+    extractorState.isPaused = !extractorState.isPaused;
+    const btn = document.getElementById('extractorPauseBtn');
+    btn.innerHTML = extractorState.isPaused ? 
+        '<i class="fas fa-play"></i> Resume' : 
+        '<i class="fas fa-pause"></i> Pause';
+    
+    addExtractorLog(extractorState.isPaused ? 'Đã tạm dừng' : 'Tiếp tục xử lý', 'warning');
+}
+
+/**
+ * Stop extractor
+ */
+function stopExtractor() {
+    extractorState.isRunning = false;
+    extractorState.isPaused = false;
+    
+    document.getElementById('extractorPauseBtn').disabled = true;
+    document.getElementById('extractorStopBtn').disabled = true;
+    
+    addExtractorLog('Đã dừng xử lý', 'error');
+    showNotification('Đã dừng trích xuất', 'warning');
+}
+
+// Add event listener for input count
+document.addEventListener('DOMContentLoaded', function() {
+    const textArea = document.getElementById('extractorText');
+    if (textArea) {
+        textArea.addEventListener('input', updateExtractorInputCount);
+    }
+});
 
 /**
  * Format Emails

@@ -17,6 +17,9 @@ from .email_combiner import EmailCombiner
 from .email_analyzer import EmailAnalyzer
 from .email_deduplicator import EmailDeduplicator
 from .email_batch_processor import EmailBatchProcessor
+from .fb_linked_checker import FBLinkedChecker
+from .email_pass_2fa_checker import EmailPass2FAChecker
+from .page_mining import PageMining
 
 __all__ = [
     'EmailValidator',
@@ -28,5 +31,8 @@ __all__ = [
     'EmailCombiner',
     'EmailAnalyzer',
     'EmailDeduplicator',
-    'EmailBatchProcessor'
+    'EmailBatchProcessor',
+    'FBLinkedChecker',
+    'EmailPass2FAChecker',
+    'PageMining'
 ]

@@ -1,29 +1,486 @@
-<!-- Email Extractor Modal -->
+<!-- Email Extractor Pro Modal - Advanced 3-Column Layout -->
 <div id="extractorModal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content modal-extractor">
         <div class="modal-header">
-            <h2><i class="fas fa-search"></i> Email Extractor</h2>
+            <h2><i class="fas fa-search"></i> Email Extractor Pro - Trích xuất & Phân loại</h2>
             <span class="modal-close" onclick="closeModal('extractorModal')">&times;</span>
         </div>
         <div class="modal-body">
-            <div class="form-group">
-                <label><i class="fas fa-file-alt"></i> Văn bản chứa email</label>
-                <textarea id="extractorText" rows="10" placeholder="Paste văn bản chứa email vào đây..."></textarea>
+            <div class="extractor-layout">
+                <!-- Column 1: INPUT -->
+                <div class="extractor-column">
+                    <div class="column-header">
+                        <h3><i class="fas fa-file-import"></i> INPUT</h3>
+                        <span class="badge" id="extractorInputCount">0</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Nguồn dữ liệu:</label>
+                        <select id="extractorSource" onchange="toggleExtractorSource()">
+                            <option value="text">Paste Text</option>
+                            <option value="file">Upload File (.txt)</option>
+                            <option value="url">Từ URL/Website</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Text Input -->
+                    <div id="extractorTextInput" class="input-method">
+                        <textarea id="extractorText" rows="15" placeholder="Paste text chứa email vào đây...
+Example:
+Contact us: support@company.com
+Email: admin@example.com
+User: john.doe@gmail.com"></textarea>
+                    </div>
+                    
+                    <!-- File Upload -->
+                    <div id="extractorFileInput" class="input-method" style="display:none;">
+                        <div class="file-upload-area" onclick="document.getElementById('extractorFile').click()">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Click để upload file .txt</p>
+                            <input type="file" id="extractorFile" accept=".txt" style="display:none;" onchange="handleFileUpload(this)">
+                        </div>
+                        <div id="fileInfo" class="file-info"></div>
+                    </div>
+                    
+                    <!-- URL Input -->
+                    <div id="extractorUrlInput" class="input-method" style="display:none;">
+                        <input type="url" id="extractorUrl" placeholder="https://example.com/page-with-emails">
+                        <button onclick="fetchFromUrl()" class="btn btn-sm btn-secondary">
+                            <i class="fas fa-download"></i> Fetch Content
+                        </button>
+                    </div>
+                    
+                    <div class="extraction-options">
+                        <h4><i class="fas fa-cog"></i> Options</h4>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="extractorRemoveDups" checked>
+                            <span>Loại bỏ trùng lặp</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="extractorValidateFormat" checked>
+                            <span>Validate email format</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="extractorAutoDetectLive" checked>
+                            <span>Tự động check LIVE/DIE</span>
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Filter Domain:</label>
+                        <input type="text" id="extractorDomainFilter" placeholder="gmail.com, yahoo.com (để trống = all)">
+                    </div>
+                    
+                    <button onclick="runExtractor()" class="btn btn-success btn-large">
+                        <i class="fas fa-play"></i> Bắt đầu trích xuất
+                    </button>
+                </div>
+                
+                <!-- Column 2: PROCESSING -->
+                <div class="extractor-column">
+                    <div class="column-header">
+                        <h3><i class="fas fa-cogs"></i> PROCESSING</h3>
+                        <span class="badge badge-processing" id="extractorProcessCount">0</span>
+                    </div>
+                    
+                    <div class="processing-stats">
+                        <div class="stat-row">
+                            <span>Đã quét:</span>
+                            <strong id="extractorScanned">0</strong>
+                        </div>
+                        <div class="stat-row">
+                            <span>Tìm thấy:</span>
+                            <strong id="extractorFound">0</strong>
+                        </div>
+                        <div class="stat-row">
+                            <span>Hợp lệ:</span>
+                            <strong id="extractorValid">0</strong>
+                        </div>
+                        <div class="stat-row">
+                            <span>Đang check:</span>
+                            <strong id="extractorChecking">0</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-section">
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" id="extractorProgress" style="width: 0%"></div>
+                        </div>
+                        <p class="progress-text" id="extractorProgressText">Chưa bắt đầu</p>
+                    </div>
+                    
+                    <div class="processing-log" id="extractorLog">
+                        <div class="log-entry"><i class="fas fa-info-circle"></i> Sẵn sàng xử lý...</div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button onclick="pauseExtractor()" class="btn btn-warning" id="extractorPauseBtn" disabled>
+                            <i class="fas fa-pause"></i> Pause
+                        </button>
+                        <button onclick="stopExtractor()" class="btn btn-danger" id="extractorStopBtn" disabled>
+                            <i class="fas fa-stop"></i> Stop
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Column 3: RESULTS (LIVE/DIE) -->
+                <div class="extractor-column">
+                    <div class="results-tabs">
+                        <button class="tab-btn active" onclick="switchExtractorTab('all')">
+                            ALL <span class="badge" id="extractorAllCount">0</span>
+                        </button>
+                        <button class="tab-btn" onclick="switchExtractorTab('live')">
+                            LIVE <span class="badge badge-live" id="extractorLiveCount">0</span>
+                        </button>
+                        <button class="tab-btn" onclick="switchExtractorTab('die')">
+                            DIE <span class="badge badge-die" id="extractorDieCount">0</span>
+                        </button>
+                    </div>
+                    
+                    <!-- All Emails Tab -->
+                    <div id="extractorTabAll" class="result-tab active">
+                        <div class="result-header">
+                            <h4>Tất cả Emails</h4>
+                            <button onclick="copyExtractorResults('all')" class="btn btn-sm btn-primary">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                        </div>
+                        <div class="result-list" id="extractorAllList">
+                            <p class="empty-state">Chưa có dữ liệu</p>
+                        </div>
+                    </div>
+                    
+                    <!-- LIVE Emails Tab -->
+                    <div id="extractorTabLive" class="result-tab">
+                        <div class="result-header">
+                            <h4>LIVE Emails</h4>
+                            <button onclick="copyExtractorResults('live')" class="btn btn-sm btn-success">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                        </div>
+                        <div class="result-list" id="extractorLiveList">
+                            <p class="empty-state">Chưa có email LIVE</p>
+                        </div>
+                    </div>
+                    
+                    <!-- DIE Emails Tab -->
+                    <div id="extractorTabDie" class="result-tab">
+                        <div class="result-header">
+                            <h4>DIE Emails</h4>
+                            <button onclick="copyExtractorResults('die')" class="btn btn-sm btn-danger">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                        </div>
+                        <div class="result-list" id="extractorDieList">
+                            <p class="empty-state">Chưa có email DIE</p>
+                        </div>
+                    </div>
+                    
+                    <div class="export-actions">
+                        <button onclick="exportExtractorResults('txt')" class="btn btn-secondary">
+                            <i class="fas fa-file-download"></i> Export TXT
+                        </button>
+                        <button onclick="exportExtractorResults('csv')" class="btn btn-secondary">
+                            <i class="fas fa-file-csv"></i> Export CSV
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="form-row">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="extractorRemoveDups" checked>
-                    <span>Loại bỏ trùng lặp</span>
-                </label>
-                <label class="checkbox-label">
-                    <input type="checkbox" id="extractorCaseInsensitive" checked>
-                    <span>Không phân biệt hoa thường</span>
-                </label>
-            </div>
-            <button onclick="extractEmails()" class="btn btn-primary btn-large">
-                <i class="fas fa-search"></i> Trích xuất
-            </button>
-            <div id="extractorResult" class="result-container"></div>
         </div>
     </div>
 </div>
+
+<style>
+.modal-extractor {
+    max-width: 95vw;
+    width: 1400px;
+    height: 90vh;
+}
+
+.extractor-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    height: calc(90vh - 100px);
+}
+
+.extractor-column {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 15px;
+    background: #f8f9fa;
+    overflow: hidden;
+}
+
+.column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #667eea;
+}
+
+.column-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #2c3e50;
+}
+
+.input-method textarea {
+    width: 100%;
+    min-height: 300px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    resize: vertical;
+}
+
+.file-upload-area {
+    border: 2px dashed #667eea;
+    border-radius: 10px;
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.file-upload-area:hover {
+    background: #f0f4ff;
+    border-color: #5568d3;
+}
+
+.file-upload-area i {
+    font-size: 3rem;
+    color: #667eea;
+    margin-bottom: 10px;
+}
+
+.extraction-options {
+    margin: 15px 0;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+}
+
+.extraction-options h4 {
+    margin: 0 0 10px 0;
+    font-size: 0.95rem;
+    color: #666;
+}
+
+.processing-stats {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.stat-row:last-child {
+    border-bottom: none;
+}
+
+.stat-row strong {
+    color: #667eea;
+    font-size: 1.1rem;
+}
+
+.progress-section {
+    margin: 15px 0;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.3s;
+}
+
+.progress-text {
+    text-align: center;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.processing-log {
+    flex: 1;
+    background: white;
+    border-radius: 8px;
+    padding: 10px;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    margin: 15px 0;
+}
+
+.log-entry {
+    padding: 5px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #555;
+}
+
+.log-entry i {
+    margin-right: 8px;
+}
+
+.log-entry.success { color: #2ecc71; }
+.log-entry.error { color: #e74c3c; }
+.log-entry.warning { color: #f39c12; }
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.action-buttons button {
+    flex: 1;
+}
+
+.results-tabs {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 15px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: white;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.tab-btn:hover:not(.active) {
+    background: #f0f0f0;
+}
+
+.result-tab {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+}
+
+.result-tab.active {
+    display: flex;
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: white;
+    border-radius: 8px;
+}
+
+.result-header h4 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.result-list {
+    flex: 1;
+    background: white;
+    border-radius: 8px;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.result-item {
+    padding: 8px;
+    border-bottom: 1px solid #f0f0f0;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.result-item:hover {
+    background: #f8f9fa;
+}
+
+.result-item .status-badge {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.status-badge.live {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-badge.die {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.export-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.export-actions button {
+    flex: 1;
+}
+
+.badge {
+    background: #667eea;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-processing {
+    background: #f39c12;
+}
+
+.badge-live {
+    background: #2ecc71;
+}
+
+.badge-die {
+    background: #e74c3c;
+}
+
+.empty-state {
+    text-align: center;
+    color: #999;
+    padding: 40px 20px;
+    font-style: italic;
+}
+</style>

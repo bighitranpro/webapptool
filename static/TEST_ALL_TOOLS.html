@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Tool - Test All Features</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .tool-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        
+        .tool-card h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .result h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .email-item {
+            padding: 8px;
+            border-bottom: 1px solid #e0e0e0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        
+        .email-item:last-child {
+            border-bottom: none;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            z-index: 10000;
+            animation: slideIn 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        
+        .notification.success { background: #2ecc71; }
+        .notification.error { background: #e74c3c; }
+        .notification.warning { background: #f39c12; }
+        .notification.info { background: #3498db; }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .copy-btn {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .copy-btn:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📧 Email Tool Pro - Test Suite</h1>
+            <p>Test tất cả chức năng của hệ thống</p>
+        </div>
+        
+        <div class="tools-grid">
+            <!-- Email Generator -->
+            <div class="tool-card">
+                <h2>🎲 Email Generator</h2>
+                <div class="form-group">
+                    <label>Type:</label>
+                    <select id="gen_type">
+                        <option value="random">Random</option>
+                        <option value="name_based">Name Based</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Text:</label>
+                    <input type="text" id="gen_text" value="user" placeholder="Base text">
+                </div>
+                <div class="form-group">
+                    <label>Total:</label>
+                    <input type="number" id="gen_total" value="10" min="1" max="100">
+                </div>
+                <div class="form-group">
+                    <label>Domain:</label>
+                    <input type="text" id="gen_domain" value="gmail.com">
+                </div>
+                <div class="form-group">
+                    <label>Char Type:</label>
+                    <select id="gen_char">
+                        <option value="lowercase">Lowercase</option>
+                        <option value="uppercase">Uppercase</option>
+                        <option value="mixed">Mixed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Number Position:</label>
+                    <select id="gen_number">
+                        <option value="suffix">Suffix</option>
+                        <option value="prefix">Prefix</option>
+                        <option value="middle">Middle</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="testGenerator()">Generate</button>
+                <div id="gen_result" class="result" style="display:none;"></div>
+            </div>
+            
+            <!-- Email Validator -->
+            <div class="tool-card">
+                <h2>✅ Email Validator</h2>
+                <div class="form-group">
+                    <label>Emails (one per line):</label>
+                    <textarea id="val_emails" placeholder="test@gmail.com&#10;invalid@fake.com">test@gmail.com
+user@yahoo.com</textarea>
+                </div>
+                <label><input type="checkbox" id="val_mx" checked> Check MX</label><br>
+                <label><input type="checkbox" id="val_smtp" checked> Check SMTP</label><br>
+                <label><input type="checkbox" id="val_disp" checked> Check Disposable</label>
+                <button class="btn" onclick="testValidator()" style="margin-top: 10px;">Validate</button>
+                <div id="val_result" class="result" style="display:none;"></div>
+            </div>
+            
+            <!-- Email Extractor -->
+            <div class="tool-card">
+                <h2>🔍 Email Extractor</h2>
+                <div class="form-group">
+                    <label>Text containing emails:</label>
+                    <textarea id="ext_text" placeholder="Contact: test@gmail.com or user@example.com">Please email us at support@company.com
+Also try admin@test.com for help</textarea>
+                </div>
+                <label><input type="checkbox" id="ext_dedup" checked> Remove duplicates</label>
+                <button class="btn" onclick="testExtractor()" style="margin-top: 10px;">Extract</button>
+                <div id="ext_result" class="result" style="display:none;"></div>
+            </div>
+        </div>
+        
+        <!-- Dashboard Stats -->
+        <div class="tool-card" style="margin-top: 20px;">
+            <h2>📊 Dashboard Statistics</h2>
+            <button class="btn" onclick="loadDashboard()">Load Dashboard Data</button>
+            <div id="dashboard_stats" class="stats" style="display:none; margin-top: 20px;"></div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = '/api';
+        
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+        
+        async function testGenerator() {
+            const btn = event.target;
+            const resultDiv = document.getElementById('gen_result');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span>Generating...';
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p>⏳ Processing...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email_type: document.getElementById('gen_type').value,
+                        text: document.getElementById('gen_text').value,
+                        total: parseInt(document.getElementById('gen_total').value),
+                        domain: document.getElementById('gen_domain').value,
+                        char_type: document.getElementById('gen_char').value,
+                        number_type: document.getElementById('gen_number').value
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const html = `
+                        <h4>✅ Generated ${data.emails.length} emails</h4>
+                        <p><strong>Saved to DB:</strong> ${data.db_saved ? '✓' : '✗'}</p>
+                        ${data.emails.map((e, i) => `<div class="email-item">${i+1}. ${e}</div>`).join('')}
+                        <button class="copy-btn" onclick="copyToClipboard('${data.emails.join('\\n')}')">📋 Copy All</button>
+                    `;
+                    resultDiv.innerHTML = html;
+                    showNotification(`Generated ${data.emails.length} emails!`, 'success');
+                } else {
+                    resultDiv.innerHTML = `<p style="color: red;">❌ Error: ${data.message}</p>`;
+                    showNotification('Generation failed', 'error');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;">❌ Error: ${error.message}</p>`;
+                showNotification('API Error', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Generate';
+            }
+        }
+        
+        async function testValidator() {
+            const btn = event.target;
+            const resultDiv = document.getElementById('val_result');
+            const emails = document.getElementById('val_emails').value.split('\n').filter(e => e.trim());
+            
+            if (emails.length === 0) {
+                showNotification('Please enter emails', 'warning');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span>Validating...';
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p>⏳ Checking emails...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/validate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        emails: emails,
+                        options: {
+                            check_mx: document.getElementById('val_mx').checked,
+                            check_smtp: document.getElementById('val_smtp').checked,
+                            check_disposable: document.getElementById('val_disp').checked
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const stats = data.stats;
+                    const html = `
+                        <h4>✅ Validation Complete</h4>
+                        <div class="stats">
+                            <div class="stat-item">
+                                <div class="stat-value">${stats.live || 0}</div>
+                                <div class="stat-label">LIVE</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${stats.die || 0}</div>
+                                <div class="stat-label">DIE</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${stats.unknown || 0}</div>
+                                <div class="stat-label">UNKNOWN</div>
+                            </div>
+                        </div>
+                        <p><strong>Processing time:</strong> ${stats.processing_time?.toFixed(2)}s</p>
+                    `;
+                    resultDiv.innerHTML = html;
+                    showNotification(`Validated ${stats.total} emails`, 'success');
+                } else {
+                    resultDiv.innerHTML = `<p style="color: red;">❌ Error: ${data.message}</p>`;
+                    showNotification('Validation failed', 'error');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;">❌ Error: ${error.message}</p>`;
+                showNotification('API Error', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Validate';
+            }
+        }
+        
+        async function testExtractor() {
+            const btn = event.target;
+            const resultDiv = document.getElementById('ext_result');
+            const text = document.getElementById('ext_text').value;
+            
+            if (!text.trim()) {
+                showNotification('Please enter text', 'warning');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span>Extracting...';
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p>⏳ Processing...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/extract`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: text,
+                        options: {
+                            remove_dups: document.getElementById('ext_dedup').checked
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.emails) {
+                    const html = `
+                        <h4>✅ Extracted ${data.emails.length} emails</h4>
+                        ${data.emails.map((e, i) => `<div class="email-item">${i+1}. ${e}</div>`).join('')}
+                        <button class="copy-btn" onclick="copyToClipboard('${data.emails.join('\\n')}')">📋 Copy All</button>
+                    `;
+                    resultDiv.innerHTML = html;
+                    showNotification(`Found ${data.emails.length} emails`, 'success');
+                } else {
+                    resultDiv.innerHTML = `<p style="color: red;">❌ Error: ${data.message || 'No emails found'}</p>`;
+                    showNotification('Extraction failed', 'error');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;">❌ Error: ${error.message}</p>`;
+                showNotification('API Error', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Extract';
+            }
+        }
+        
+        async function loadDashboard() {
+            const statsDiv = document.getElementById('dashboard_stats');
+            
+            try {
+                const response = await fetch(`${API_BASE}/db/stats`);
+                const data = await response.json();
+                
+                if (data.success && data.stats) {
+                    const s = data.stats;
+                    statsDiv.innerHTML = `
+                        <div class="stat-item">
+                            <div class="stat-value">${s.total}</div>
+                            <div class="stat-label">Total Emails</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${s.live}</div>
+                            <div class="stat-label">LIVE (${s.live_rate}%)</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${s.die}</div>
+                            <div class="stat-label">DIE (${s.die_rate}%)</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${s.can_receive_code}</div>
+                            <div class="stat-label">Can Receive Code</div>
+                        </div>
+                    `;
+                    statsDiv.style.display = 'grid';
+                    showNotification('Dashboard loaded', 'success');
+                } else {
+                    showNotification('Failed to load dashboard', 'error');
+                }
+            } catch (error) {
+                showNotification('API Error', 'error');
+            }
+        }
+        
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification('Copied to clipboard!', 'success');
+            }).catch(() => {
+                showNotification('Copy failed', 'error');
+            });
+        }
+        
+        // Auto-load dashboard on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadDashboard();
+        });
+    </script>
+</body>
+</html>

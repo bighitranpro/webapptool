@@ -36,10 +36,49 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="generatorDomain">
-                                <i class="fas fa-globe"></i> Domain
+                            <label for="domainMode">
+                                <i class="fas fa-globe"></i> Domain Mode
                             </label>
-                            <input type="text" id="generatorDomain" value="gmail.com" placeholder="gmail.com">
+                            <select id="domainMode" onchange="toggleDomainMode()">
+                                <option value="single">Single Domain</option>
+                                <option value="multiple">Multiple Domains (Random)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Single Domain Input -->
+                    <div class="form-group" id="singleDomainGroup">
+                        <label for="generatorDomain">
+                            <i class="fas fa-at"></i> Domain
+                        </label>
+                        <input type="text" id="generatorDomain" value="gmail.com" placeholder="gmail.com">
+                    </div>
+
+                    <!-- Multiple Domains Input -->
+                    <div class="form-group" id="multiDomainGroup" style="display: none;">
+                        <label for="generatorDomains">
+                            <i class="fas fa-list"></i> Domains List (1 domain per line)
+                        </label>
+                        <textarea id="generatorDomains" rows="6" placeholder="gmail.com&#10;yahoo.com&#10;hotmail.com&#10;outlook.com&#10;icloud.com"></textarea>
+                        <small style="color: #7f8c8d; display: block; margin-top: 5px;">
+                            <i class="fas fa-info-circle"></i> Nhập nhiều domain, mỗi domain 1 dòng. Hệ thống sẽ random domain cho mỗi email.
+                        </small>
+                    </div>
+
+                    <!-- Quick Domain Selection -->
+                    <div class="form-group" id="quickDomainGroup" style="display: none;">
+                        <label>
+                            <i class="fas fa-mouse-pointer"></i> Quick Select Domains
+                        </label>
+                        <div class="domain-buttons">
+                            <button type="button" class="btn-domain" onclick="toggleDomain('gmail.com')">Gmail</button>
+                            <button type="button" class="btn-domain" onclick="toggleDomain('yahoo.com')">Yahoo</button>
+                            <button type="button" class="btn-domain" onclick="toggleDomain('hotmail.com')">Hotmail</button>
+                            <button type="button" class="btn-domain" onclick="toggleDomain('outlook.com')">Outlook</button>
+                            <button type="button" class="btn-domain" onclick="toggleDomain('icloud.com')">iCloud</button>
+                            <button type="button" class="btn-domain" onclick="toggleDomain('protonmail.com')">ProtonMail</button>
+                            <button type="button" class="btn-domain" onclick="toggleDomain('aol.com')">AOL</button>
+                            <button type="button" class="btn-domain" onclick="toggleDomain('zoho.com')">Zoho</button>
                         </div>
                     </div>
 

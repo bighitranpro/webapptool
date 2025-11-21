@@ -63,6 +63,61 @@ class EmailValidator:
         except:
             return False
     
+    def is_trusted_provider(self, domain: str) -> bool:
+        """Check if domain is from trusted email provider"""
+        trusted_providers = [
+            # Major providers
+            'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com',
+            'icloud.com', 'protonmail.com', 'mail.com', 'aol.com',
+            # Business providers
+            'zoho.com', 'gmx.com', 'yandex.com', 'mail.ru',
+            # Regional providers
+            'qq.com', '163.com', '126.com', 'sina.com',
+            'naver.com', 'daum.net', 'hanmail.net'
+        ]
+        domain_lower = domain.lower()
+        return any(domain_lower == provider or domain_lower.endswith('.' + provider) 
+                  for provider in trusted_providers)
+    
+    def check_domain_reputation(self, domain: str) -> Dict:
+        """Check domain reputation and trustworthiness"""
+        result = {
+            'is_trusted': False,
+            'has_valid_mx': False,
+            'mx_count': 0,
+            'smtp_reachable': False,
+            'is_disposable': False,
+            'reputation_score': 0
+        }
+        
+        # Check if trusted provider
+        result['is_trusted'] = self.is_trusted_provider(domain)
+        if result['is_trusted']:
+            result['reputation_score'] += 40
+        
+        # Check MX records
+        has_mx, mx_records = self.check_mx_record(domain)
+        result['has_valid_mx'] = has_mx
+        result['mx_count'] = len(mx_records) if has_mx else 0
+        
+        if has_mx:
+            result['reputation_score'] += 30
+            # Bonus for multiple MX records (redundancy)
+            if result['mx_count'] >= 3:
+                result['reputation_score'] += 10
+        
+        # Check disposable
+        result['is_disposable'] = self.check_disposable_email(domain)
+        if result['is_disposable']:
+            result['reputation_score'] -= 50
+        
+        # Try SMTP (but don't penalize if fails - many providers block)
+        result['smtp_reachable'] = self.check_smtp_connection(domain, timeout=3)
+        if result['smtp_reachable']:
+            result['reputation_score'] += 20
+        
+        return result
+    
     def check_disposable_email(self, domain: str) -> bool:
         """Check if email is from disposable/temporary service"""
         disposable_domains = [
@@ -82,7 +137,7 @@ class EmailValidator:
         return domain.lower() in trusted_providers
     
     def validate_email_deep(self, email: str) -> Dict:
-        """Deep validation with LIVE/DIE detection"""
+        """Deep validation with LIVE/DIE detection (Enhanced Algorithm)"""
         result = {
             'email': email,
             'timestamp': datetime.now().isoformat(),
@@ -91,80 +146,118 @@ class EmailValidator:
             'mx_records': [],
             'smtp_reachable': False,
             'is_disposable': False,
+            'is_trusted': False,
             'fb_compatible': False,
             'can_receive_code': False,
             'status': 'UNKNOWN',
             'confidence': 0,
+            'reputation_score': 0,
             'details': []
         }
         
         # Format validation
         if not self.validate_format(email):
             result['status'] = 'DIE'
-            result['details'].append('Invalid format')
+            result['confidence'] = 0
+            result['details'].append('❌ Invalid email format')
             return result
         
         result['format_valid'] = True
+        result['details'].append('✓ Valid format')
         
         # Extract domain
         try:
             local, domain = email.split('@')
         except:
             result['status'] = 'DIE'
-            result['details'].append('Cannot extract domain')
+            result['confidence'] = 0
+            result['details'].append('❌ Cannot parse email')
             return result
         
-        # MX Record check
+        # Check domain reputation (comprehensive)
+        reputation = self.check_domain_reputation(domain)
+        
+        result['has_mx'] = reputation['has_valid_mx']
+        result['is_trusted'] = reputation['is_trusted']
+        result['is_disposable'] = reputation['is_disposable']
+        result['smtp_reachable'] = reputation['smtp_reachable']
+        result['reputation_score'] = reputation['reputation_score']
+        
+        # MX Records
+        if not reputation['has_valid_mx']:
+            result['status'] = 'DIE'
+            result['confidence'] = 0
+            result['details'].append('❌ No MX records found')
+            return result
+        
         has_mx, mx_records = self.check_mx_record(domain)
-        result['has_mx'] = has_mx
         result['mx_records'] = mx_records
+        result['details'].append(f'✓ {len(mx_records)} MX record(s) found')
         
-        if not has_mx:
+        # Disposable email check
+        if reputation['is_disposable']:
             result['status'] = 'DIE'
-            result['details'].append('No MX records')
+            result['confidence'] = 0
+            result['details'].append('❌ Disposable/temporary email service')
             return result
         
-        result['details'].append(f'{len(mx_records)} MX records found')
+        # Trusted provider bonus
+        if reputation['is_trusted']:
+            result['details'].append('✓ Trusted email provider')
         
-        # SMTP connection check
-        result['smtp_reachable'] = self.check_smtp_connection(domain)
-        if result['smtp_reachable']:
-            result['details'].append('SMTP server reachable')
+        # SMTP check (informational only - not critical)
+        if reputation['smtp_reachable']:
+            result['details'].append('✓ SMTP server reachable')
         else:
-            result['details'].append('SMTP server unreachable')
-        
-        # Disposable check
-        result['is_disposable'] = self.check_disposable_email(domain)
-        if result['is_disposable']:
-            result['status'] = 'DIE'
-            result['details'].append('Disposable email service')
-            return result
+            result['details'].append('⚠ SMTP check failed (may be blocked)')
         
         # Facebook compatibility
         result['fb_compatible'] = self.check_facebook_compatible(domain)
         
-        # Determine if can receive Facebook code
-        if result['fb_compatible'] and result['smtp_reachable']:
+        # Can receive code logic (more lenient)
+        if result['fb_compatible'] and result['has_mx']:
+            # Trusted provider with MX = can likely receive code
             result['can_receive_code'] = True
-            result['details'].append('Can receive Facebook code')
+            result['details'].append('✓ Can receive verification codes')
         else:
-            result['details'].append('Cannot receive Facebook code')
+            result['details'].append('⚠ May not receive verification codes')
         
-        # Determine LIVE/DIE status
+        # ============================================================
+        # ENHANCED LIVE/DIE DETERMINATION ALGORITHM
+        # ============================================================
         confidence = 0
-        if result['format_valid']: confidence += 20
-        if result['has_mx']: confidence += 30
-        if result['smtp_reachable']: confidence += 30
-        if result['fb_compatible']: confidence += 20
         
-        result['confidence'] = confidence
+        # Base checks
+        if result['format_valid']: 
+            confidence += 10
         
-        if confidence >= 80:
+        if result['has_mx']: 
+            confidence += 40  # Critical factor
+        
+        # Trusted provider = high confidence
+        if result['is_trusted']: 
+            confidence += 35  # Gmail/Yahoo/Outlook etc.
+        
+        # Multiple MX records = professional setup
+        if len(result['mx_records']) >= 3:
+            confidence += 10
+        
+        # SMTP reachable (bonus, but not required)
+        if result['smtp_reachable']:
+            confidence += 5
+        
+        result['confidence'] = min(confidence, 100)
+        
+        # Status determination
+        if confidence >= 75:
             result['status'] = 'LIVE'
+            result['details'].append(f'✅ LIVE - {confidence}% confidence')
         elif confidence >= 50:
             result['status'] = 'UNKNOWN'
+            result['details'].append(f'❓ UNKNOWN - {confidence}% confidence')
         else:
             result['status'] = 'DIE'
+            result['details'].append(f'❌ DIE - {confidence}% confidence')
         
         return result
     
