@@ -919,3 +919,136 @@ def dashboard_stats():
         }), 500
 
 
+
+# ==================== ADMIN THEME SETTINGS API ====================
+
+@api_bp.route('/api/admin/theme/settings', methods=['GET'])
+def get_theme_settings():
+    """Get current theme settings for logged-in user"""
+    try:
+        user_id = session.get('user_id', 1)  # Default to admin
+        
+        conn = sqlite3.connect('email_tool.db')
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT theme_config FROM admin_settings
+            WHERE user_id = ?
+            ORDER BY updated_at DESC
+            LIMIT 1
+        ''', (user_id,))
+        
+        row = cursor.fetchone()
+        conn.close()
+        
+        if row:
+            theme_config = json.loads(row['theme_config'])
+            return jsonify({
+                'success': True,
+                'theme': theme_config
+            })
+        else:
+            # Return default theme
+            default_theme = {
+                "theme_mode": "dark",
+                "primary_color": "#ffd700",
+                "secondary_color": "#00d9ff",
+                "accent_color": "#ff6b35",
+                "background_color": "#0a0e27",
+                "text_color": "#ffffff",
+                "font_family": "Inter",
+                "font_size_base": "16px",
+                "sidebar_width": "280px",
+                "border_radius": "12px",
+                "animation_speed": "0.3s"
+            }
+            return jsonify({
+                'success': True,
+                'theme': default_theme
+            })
+            
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api_bp.route('/api/admin/theme/settings', methods=['POST'])
+def save_theme_settings():
+    """Save theme settings for logged-in user"""
+    try:
+        user_id = session.get('user_id', 1)
+        theme_config = request.json.get('theme', {})
+        
+        conn = sqlite3.connect('email_tool.db')
+        cursor = conn.cursor()
+        
+        # Check if settings exist
+        cursor.execute('SELECT id FROM admin_settings WHERE user_id = ?', (user_id,))
+        existing = cursor.fetchone()
+        
+        if existing:
+            # Update
+            cursor.execute('''
+                UPDATE admin_settings 
+                SET theme_config = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE user_id = ?
+            ''', (json.dumps(theme_config), user_id))
+        else:
+            # Insert
+            cursor.execute('''
+                INSERT INTO admin_settings (user_id, theme_config)
+                VALUES (?, ?)
+            ''', (user_id, json.dumps(theme_config)))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Theme settings saved successfully'
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api_bp.route('/api/admin/theme/reset', methods=['PUT'])
+def reset_theme_settings():
+    """Reset theme to default"""
+    try:
+        user_id = session.get('user_id', 1)
+        
+        default_theme = {
+            "theme_mode": "dark",
+            "primary_color": "#ffd700",
+            "secondary_color": "#00d9ff",
+            "accent_color": "#ff6b35",
+            "background_color": "#0a0e27",
+            "text_color": "#ffffff",
+            "font_family": "Inter",
+            "font_size_base": "16px",
+            "sidebar_width": "280px",
+            "border_radius": "12px",
+            "animation_speed": "0.3s"
+        }
+        
+        conn = sqlite3.connect('email_tool.db')
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            UPDATE admin_settings 
+            SET theme_config = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE user_id = ?
+        ''', (json.dumps(default_theme), user_id))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Theme reset to default',
+            'theme': default_theme
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
