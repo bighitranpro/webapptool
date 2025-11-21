@@ -18,7 +18,7 @@ const dashboardState = {
 /**
  * Update dashboard statistics
  */
-function updateDashboard Stats(data) {
+function updateDashboardStats(data) {
     if (data.stats) {
         dashboardState.stats = {
             total: data.stats.total || 0,
@@ -228,3 +228,33 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+/**
+ * Load dashboard data from database on page load
+ */
+async function loadDashboardData() {
+    try {
+        const response = await fetch('/api/db/stats');
+        const data = await response.json();
+        
+        if (data.success && data.stats) {
+            // Update dashboard stats
+            updateDashboardStats({ stats: data.stats });
+            
+            // Update LIVE table
+            if (data.live_emails && data.live_emails.length > 0) {
+                updateLiveEmailsTable(data.live_emails);
+            }
+            
+            // Update DIE table
+            if (data.die_emails && data.die_emails.length > 0) {
+                updateDieEmailsTable(data.die_emails);
+            }
+            
+            console.log('Dashboard data loaded successfully');
+        }
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        // Silent fail - don't show notification on initial load
+    }
+}

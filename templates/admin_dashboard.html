@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - BI GHI TOOL MMO</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_pro.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_tools.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/i18n.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.css">
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="logo-text">
+                    <h2>BI GHI TOOL</h2>
+                    <span>ADMIN PANEL</span>
+                </div>
+            </div>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <span class="nav-section-title">QUẢN TRỊ</span>
+                <a href="#overview" class="nav-item active" data-page="overview">
+                    <i class="fas fa-th-large"></i>
+                    <span>Tổng quan</span>
+                </a>
+                <a href="#analytics" class="nav-item" data-page="analytics">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analytics</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <span class="nav-section-title">USER MANAGEMENT</span>
+                <a href="#users" class="nav-item" data-page="users">
+                    <i class="fas fa-users"></i>
+                    <span>Quản lý Users</span>
+                </a>
+                <a href="#vip" class="nav-item" data-page="vip">
+                    <i class="fas fa-crown"></i>
+                    <span>Quản lý VIP</span>
+                </a>
+                <a href="#permissions" class="nav-item" data-page="permissions">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Permissions</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <span class="nav-section-title">SYSTEM</span>
+                <a href="#settings" class="nav-item" data-page="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Cài đặt</span>
+                </a>
+                <a href="#logs" class="nav-item" data-page="logs">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Activity Logs</span>
+                </a>
+                <a href="#payments" class="nav-item" data-page="payments">
+                    <i class="fas fa-dollar-sign"></i>
+                    <span>Payments</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <span class="nav-section-title">TOOLS CONTROL</span>
+                <a href="#validator" class="nav-item" data-page="validator">
+                    <i class="fas fa-shield-check"></i>
+                    <span>Email Validator</span>
+                </a>
+                <a href="#generator" class="nav-item" data-page="generator">
+                    <i class="fas fa-random"></i>
+                    <span>Email Generator</span>
+                </a>
+                <a href="#fb-checker" class="nav-item" data-page="fb-checker">
+                    <i class="fab fa-facebook"></i>
+                    <span>FB Linked Checker</span>
+                </a>
+                <a href="#2fa-checker" class="nav-item" data-page="2fa-checker">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>2FA & Page Check</span>
+                </a>
+                <a href="#mining" class="nav-item" data-page="mining">
+                    <i class="fas fa-search-dollar"></i>
+                    <span>Page Mining</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <span class="nav-section-title">QUICK ACCESS</span>
+                <a href="/dashboard" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>User Dashboard</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="admin-badge">
+                <i class="fas fa-user-shield"></i>
+                <div>
+                    <span>{{ user.username }}</span>
+                    <small>Administrator</small>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <h1 class="page-title" id="pageTitle">Tổng quan</h1>
+            </div>
+
+            <div class="header-right">
+                <button class="header-btn" title="Refresh" onclick="refreshData()">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                
+                <button class="header-btn" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge"></span>
+                </button>
+
+                <div class="user-menu" onclick="toggleUserMenu()">
+                    <div class="user-avatar">
+                        {{ user.username[0]|upper }}
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">{{ user.username }}</span>
+                        <span class="user-role">Admin</span>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="admin-content" id="adminContent">
+            <!-- Overview Page -->
+            <div class="admin-page active" id="page-overview">
+                <!-- System Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-icon blue">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> +5%
+                            </div>
+                        </div>
+                        <div class="stat-label">Tổng Users</div>
+                        <div class="stat-value" id="totalUsers">0</div>
+                        <div class="stat-progress">
+                            <div class="stat-progress-bar blue" style="width: 75%"></div>
+                        </div>
+                        <div class="stat-footer">
+                            <span class="stat-footer-text">Active users</span>
+                            <span class="stat-footer-value" id="activeUsers">0</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-icon purple">
+                                <i class="fas fa-crown"></i>
+                            </div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> +12%
+                            </div>
+                        </div>
+                        <div class="stat-label">VIP Users</div>
+                        <div class="stat-value" id="vipUsers">0</div>
+                        <div class="stat-progress">
+                            <div class="stat-progress-bar purple" style="width: 45%"></div>
+                        </div>
+                        <div class="stat-footer">
+                            <span class="stat-footer-text">Revenue</span>
+                            <span class="stat-footer-value" id="totalRevenue">0đ</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-icon green">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> +28%
+                            </div>
+                        </div>
+                        <div class="stat-label">Total Operations</div>
+                        <div class="stat-value" id="totalOps">0</div>
+                        <div class="stat-progress">
+                            <div class="stat-progress-bar green" style="width: 85%"></div>
+                        </div>
+                        <div class="stat-footer">
+                            <span class="stat-footer-text">Today</span>
+                            <span class="stat-footer-value" id="todayOps">0</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-icon red">
+                                <i class="fas fa-server"></i>
+                            </div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-check"></i> Online
+                            </div>
+                        </div>
+                        <div class="stat-label">System Status</div>
+                        <div class="stat-value">100%</div>
+                        <div class="stat-progress">
+                            <div class="stat-progress-bar green" style="width: 100%"></div>
+                        </div>
+                        <div class="stat-footer">
+                            <span class="stat-footer-text">Uptime</span>
+                            <span class="stat-footer-value">99.9%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-section">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3><i class="fas fa-chart-line"></i> User Growth</h3>
+                            <select id="chartPeriod" class="chart-select">
+                                <option value="7">7 Days</option>
+                                <option value="30" selected>30 Days</option>
+                                <option value="90">90 Days</option>
+                            </select>
+                        </div>
+                        <canvas id="userGrowthChart"></canvas>
+                    </div>
+
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3><i class="fas fa-chart-pie"></i> VIP Distribution</h3>
+                        </div>
+                        <canvas id="vipDistributionChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="activity-section mt-4">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-history"></i>
+                            Recent Activities
+                        </h2>
+                        <button class="view-all-btn" onclick="loadPage('logs')">View All</button>
+                    </div>
+
+                    <div class="activity-list" id="recentActivities">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Management Page -->
+            <div class="admin-page" id="page-users">
+                <div class="page-header">
+                    <h2><i class="fas fa-users"></i> Quản lý Users</h2>
+                    <button class="btn-primary" onclick="showAddUserModal()">
+                        <i class="fas fa-plus"></i> Thêm User
+                    </button>
+                </div>
+
+                <!-- Users Table -->
+                <div class="table-container">
+                    <div class="table-controls">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="userSearch" placeholder="Tìm kiếm user..." onkeyup="searchUsers()">
+                        </div>
+                        <div class="filter-controls">
+                            <select id="userRoleFilter" onchange="filterUsers()">
+                                <option value="">All Roles</option>
+                                <option value="admin">Admin</option>
+                                <option value="user">User</option>
+                            </select>
+                            <select id="userVipFilter" onchange="filterUsers()">
+                                <option value="">All VIP</option>
+                                <option value="0">Free</option>
+                                <option value="1">Basic</option>
+                                <option value="2">Pro</option>
+                                <option value="3">Enterprise</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <table class="data-table" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>VIP Level</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+
+                    <div class="table-pagination">
+                        <button class="btn-secondary" onclick="previousPage()">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </button>
+                        <span id="paginationInfo">Page 1 of 1</span>
+                        <button class="btn-secondary" onclick="nextPage()">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIP Management Page -->
+            <div class="admin-page" id="page-vip">
+                <div class="page-header">
+                    <h2><i class="fas fa-crown"></i> Quản lý VIP</h2>
+                </div>
+
+                <!-- VIP Plans -->
+                <div class="vip-plans-grid">
+                    <div class="vip-plan-card free">
+                        <div class="vip-badge">🆓 FREE</div>
+                        <h3>Free Plan</h3>
+                        <div class="vip-price">0đ<span>/tháng</span></div>
+                        <ul class="vip-features">
+                            <li><i class="fas fa-check"></i> Email Validator</li>
+                            <li><i class="fas fa-check"></i> Email Generator</li>
+                            <li><i class="fas fa-times"></i> Email Extractor</li>
+                            <li><i class="fas fa-times"></i> FB Tools</li>
+                            <li class="feature-limit">100 validations/day</li>
+                            <li class="feature-limit">50 generations/day</li>
+                        </ul>
+                        <div class="vip-stats">
+                            <span id="freeUsers">0</span> users
+                        </div>
+                    </div>
+
+                    <div class="vip-plan-card basic">
+                        <div class="vip-badge">⭐ BASIC</div>
+                        <h3>Basic Plan</h3>
+                        <div class="vip-price">99,000đ<span>/tháng</span></div>
+                        <ul class="vip-features">
+                            <li><i class="fas fa-check"></i> All Free features</li>
+                            <li><i class="fas fa-check"></i> Email Extractor</li>
+                            <li><i class="fas fa-check"></i> FB Linked Checker</li>
+                            <li><i class="fas fa-times"></i> 2FA Tools</li>
+                            <li class="feature-limit">1,000 validations/day</li>
+                            <li class="feature-limit">500 generations/day</li>
+                        </ul>
+                        <div class="vip-stats">
+                            <span id="basicUsers">0</span> users
+                        </div>
+                    </div>
+
+                    <div class="vip-plan-card pro featured">
+                        <div class="vip-badge">👑 PRO</div>
+                        <div class="featured-label">Most Popular</div>
+                        <h3>Pro Plan</h3>
+                        <div class="vip-price">299,000đ<span>/tháng</span></div>
+                        <ul class="vip-features">
+                            <li><i class="fas fa-check"></i> All Basic features</li>
+                            <li><i class="fas fa-check"></i> Check 2FA FB</li>
+                            <li><i class="fas fa-check"></i> Page Mining</li>
+                            <li><i class="fas fa-check"></i> API Access</li>
+                            <li class="feature-limit">10,000 validations/day</li>
+                            <li class="feature-limit">5,000 generations/day</li>
+                        </ul>
+                        <div class="vip-stats">
+                            <span id="proUsers">0</span> users
+                        </div>
+                    </div>
+
+                    <div class="vip-plan-card enterprise">
+                        <div class="vip-badge">💎 ENTERPRISE</div>
+                        <h3>Enterprise Plan</h3>
+                        <div class="vip-price">999,000đ<span>/tháng</span></div>
+                        <ul class="vip-features">
+                            <li><i class="fas fa-check"></i> All Pro features</li>
+                            <li><i class="fas fa-check"></i> Unlimited usage</li>
+                            <li><i class="fas fa-check"></i> Priority support</li>
+                            <li><i class="fas fa-check"></i> Custom integration</li>
+                            <li class="feature-limit">Unlimited validations</li>
+                            <li class="feature-limit">Unlimited generations</li>
+                        </ul>
+                        <div class="vip-stats">
+                            <span id="enterpriseUsers">0</span> users
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIP Subscriptions Table -->
+                <div class="table-container mt-4">
+                    <h3><i class="fas fa-list"></i> Active Subscriptions</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>VIP Level</th>
+                                <th>Started</th>
+                                <th>Expires</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subscriptionsTableBody">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div class="admin-page" id="page-settings">
+                <div class="page-header">
+                    <h2><i class="fas fa-cog"></i> System Settings</h2>
+                    <button class="btn-primary" onclick="saveSettings()">
+                        <i class="fas fa-save"></i> Save Settings
+                    </button>
+                </div>
+
+                <div class="settings-grid">
+                    <div class="settings-section">
+                        <h3><i class="fas fa-globe"></i> General Settings</h3>
+                        <div class="setting-item">
+                            <label>Site Name</label>
+                            <input type="text" id="siteName" value="BI GHI TOOL MMO" class="form-control">
+                        </div>
+                        <div class="setting-item">
+                            <label>Site Description</label>
+                            <textarea id="siteDescription" class="form-control" rows="3">Professional MMO Tools Suite</textarea>
+                        </div>
+                        <div class="setting-item">
+                            <label>Maintenance Mode</label>
+                            <label class="switch">
+                                <input type="checkbox" id="maintenanceMode">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3><i class="fas fa-lock"></i> Security Settings</h3>
+                        <div class="setting-item">
+                            <label>Session Timeout (hours)</label>
+                            <input type="number" id="sessionTimeout" value="24" class="form-control">
+                        </div>
+                        <div class="setting-item">
+                            <label>Max Login Attempts</label>
+                            <input type="number" id="maxLoginAttempts" value="5" class="form-control">
+                        </div>
+                        <div class="setting-item">
+                            <label>Require Email Verification</label>
+                            <label class="switch">
+                                <input type="checkbox" id="requireEmailVerify">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3><i class="fas fa-envelope"></i> Email Settings</h3>
+                        <div class="setting-item">
+                            <label>SMTP Host</label>
+                            <input type="text" id="smtpHost" placeholder="smtp.gmail.com" class="form-control">
+                        </div>
+                        <div class="setting-item">
+                            <label>SMTP Port</label>
+                            <input type="number" id="smtpPort" value="587" class="form-control">
+                        </div>
+                        <div class="setting-item">
+                            <label>From Email</label>
+                            <input type="email" id="fromEmail" placeholder="noreply@bighitool.com" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3><i class="fas fa-dollar-sign"></i> Payment Settings</h3>
+                        <div class="setting-item">
+                            <label>Currency</label>
+                            <select id="currency" class="form-control">
+                                <option value="VND" selected>VND - Vietnamese Dong</option>
+                                <option value="USD">USD - US Dollar</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label>Enable Momo Payment</label>
+                            <label class="switch">
+                                <input type="checkbox" id="enableMomo" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label>Enable Banking Payment</label>
+                            <label class="switch">
+                                <input type="checkbox" id="enableBanking" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logs Page -->
+            <div class="admin-page" id="page-logs">
+                <div class="page-header">
+                    <h2><i class="fas fa-file-alt"></i> Activity Logs</h2>
+                    <div class="log-controls">
+                        <select id="logTypeFilter" onchange="filterLogs()">
+                            <option value="">All Types</option>
+                            <option value="login">Login</option>
+                            <option value="logout">Logout</option>
+                            <option value="vip_upgrade">VIP Upgrade</option>
+                            <option value="user_created">User Created</option>
+                        </select>
+                        <button class="btn-secondary" onclick="exportLogs()">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>User</th>
+                                <th>Action</th>
+                                <th>Details</th>
+                                <th>IP Address</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logsTableBody">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TOOLS CONTROL PAGES -->
+            {% include 'admin_tools_control.html' %}
+
+        </div>
+    </main>
+
+    <!-- Add User Modal -->
+    <div class="modal" id="addUserModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> Add New User</h3>
+                <button class="modal-close" onclick="closeModal('addUserModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addUserForm">
+                    <div class="form-group">
+                        <label>Username *</label>
+                        <input type="text" name="username" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password *</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" name="full_name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Role</label>
+                        <select name="role" class="form-control">
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>VIP Level</label>
+                        <select name="vip_level" class="form-control">
+                            <option value="0">Free</option>
+                            <option value="1">Basic</option>
+                            <option value="2">Pro</option>
+                            <option value="3">Enterprise</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('addUserModal')">Cancel</button>
+                <button class="btn-primary" onclick="submitAddUser()">
+                    <i class="fas fa-save"></i> Create User
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        window.API_BASE = '/api';
+        window.currentUser = {
+            username: '{{ user.username }}',
+            role: '{{ user.role }}'
+        };
+    </script>
+
+    <!-- I18N Scripts -->
+    <script src="{{ url_for('static', filename='js/translations/vi.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/translations/en.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/admin_tools.js') }}"></script>
+</body>
+</html>

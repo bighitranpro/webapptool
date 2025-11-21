@@ -1,0 +1,633 @@
+<!-- FB Email Linked Checker Modal -->
+<div id="fbLinkedModal" class="modal">
+    <div class="modal-content modal-fb-linked">
+        <span class="close" onclick="closeModal('fbLinkedModal')">&times;</span>
+        <h2 class="modal-title">
+            <i class="fab fa-facebook"></i> FB Email Linked Checker
+            <span class="badge badge-info">6 API Methods</span>
+        </h2>
+        
+        <div class="fb-checker-layout">
+            <!-- LEFT PANEL: Input Area -->
+            <div class="fb-panel fb-panel-input">
+                <div class="panel-header">
+                    <i class="fas fa-keyboard"></i> INPUT EMAIL
+                </div>
+                
+                <div class="panel-content">
+                    <!-- Email Input -->
+                    <div class="form-group">
+                        <label>Danh sách Email:</label>
+                        <textarea 
+                            id="fbEmailInput" 
+                            rows="12" 
+                            placeholder="Nhập danh sách email (mỗi email 1 dòng)&#10;test@gmail.com&#10;admin@yahoo.com&#10;user@hotmail.com"
+                        ></textarea>
+                        <div class="input-actions">
+                            <button class="btn btn-sm" onclick="fbLoadFromFile()">
+                                <i class="fas fa-upload"></i> Load File
+                            </button>
+                            <button class="btn btn-sm" onclick="fbClearInput()">
+                                <i class="fas fa-trash"></i> Clear
+                            </button>
+                        </div>
+                        <input type="file" id="fbFileInput" accept=".txt" style="display: none" onchange="fbHandleFileUpload(event)">
+                    </div>
+
+                    <!-- Proxy Settings -->
+                    <div class="settings-group">
+                        <h4><i class="fas fa-network-wired"></i> SETTING PROXY</h4>
+                        
+                        <div class="form-group">
+                            <label>Loại Proxy:</label>
+                            <select id="fbProxyType" class="form-control">
+                                <option value="http">Http</option>
+                                <option value="socks5">Socks5</option>
+                                <option value="socks4">Socks4</option>
+                                <option value="tinsoft">Tinsoftproxy.com</option>
+                                <option value="tmproxy">Tmproxy.com</option>
+                                <option value="shoplike">Proxy.shoplike.vn</option>
+                                <option value="proxyv6">Proxyv6.net</option>
+                                <option value="proxyfb">Proxyfb.com</option>
+                                <option value="wwproxy">WWProxy.com</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Proxy List:</label>
+                            <textarea id="fbProxyList" rows="4" placeholder="host:port:user:pass&#10;hoặc host:port"></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group" style="flex: 1;">
+                                <label>Số mail check/1 IP:</label>
+                                <input type="number" id="fbMailsPerProxy" value="50" min="1" max="1000">
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>Cách dùng Proxy:</label>
+                                <select id="fbProxyUsage" class="form-control">
+                                    <option value="rotate">Lần lượt</option>
+                                    <option value="random">Ngẫu nhiên</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- API Settings -->
+                    <div class="settings-group">
+                        <h4><i class="fas fa-cog"></i> SETTING CHECK</h4>
+                        
+                        <div class="form-group">
+                            <label>Chọn API:</label>
+                            <select id="fbApiType" class="form-control">
+                                <option value="api1">Check Valid Api 1 (Check được LK ẩn, hiện)</option>
+                                <option value="api2">Check Valid Api 2 (Check được LK ẩn, hiện)</option>
+                                <option value="api3">Check Valid Api 3 (Ko Check được LK ẩn)</option>
+                                <option value="api4">Check Valid Api 4 (Ko Check được LK ẩn)</option>
+                                <option value="api5">Check Valid Api 5 (Check được LK ẩn, hiện)</option>
+                                <option value="api6">Check Valid Api 6 (Ko Check được LK ẩn)</option>
+                                <option value="random">Random Api</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Control Settings -->
+                    <div class="settings-group">
+                        <h4><i class="fas fa-sliders-h"></i> CONTROL TAB</h4>
+                        
+                        <div class="form-row">
+                            <div class="form-group" style="flex: 1;">
+                                <label>Chạy từ mail số:</label>
+                                <input type="number" id="fbStartFrom" value="1" min="1">
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>Số luồng chạy:</label>
+                                <input type="number" id="fbThreads" value="100" min="1" max="10000">
+                            </div>
+                        </div>
+
+                        <div class="control-buttons">
+                            <button class="btn btn-success btn-block" onclick="fbStartChecking()" id="fbRunBtn">
+                                <i class="fas fa-play"></i> CHẠY
+                            </button>
+                            <button class="btn btn-warning btn-block" onclick="fbPauseChecking()" id="fbPauseBtn" disabled>
+                                <i class="fas fa-pause"></i> TẠM DỪNG
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CENTER PANEL: Processing Logs -->
+            <div class="fb-panel fb-panel-processing">
+                <div class="panel-header">
+                    <i class="fas fa-terminal"></i> PROCESSING LOG
+                </div>
+                
+                <div class="panel-content">
+                    <!-- Real-time Stats -->
+                    <div class="processing-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Đã chạy:</span>
+                            <span class="stat-value" id="fbProcessed">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Còn lại:</span>
+                            <span class="stat-value" id="fbRemaining">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Tốc độ:</span>
+                            <span class="stat-value" id="fbSpeed">0/s</span>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="fbProgressBar" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-text" id="fbProgressText">0%</div>
+                    </div>
+
+                    <!-- Log Display -->
+                    <div class="log-display" id="fbLogDisplay">
+                        <div class="log-entry log-info">
+                            <span class="log-time">00:00:00</span>
+                            <span class="log-message">Sẵn sàng kiểm tra...</span>
+                        </div>
+                    </div>
+
+                    <!-- Running Timer -->
+                    <div class="running-timer">
+                        <i class="fas fa-clock"></i> 
+                        <span id="fbRunningTime">00:00:00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: Results & Data -->
+            <div class="fb-panel fb-panel-results">
+                <div class="panel-header">
+                    <i class="fas fa-chart-bar"></i> RESULTS & DATA
+                </div>
+                
+                <div class="panel-content">
+                    <!-- Data Summary -->
+                    <div class="data-summary">
+                        <h4>DATA</h4>
+                        <div class="data-row">
+                            <span>EMAIL:</span>
+                            <span class="data-value" id="fbTotalEmails">0</span>
+                        </div>
+                        <div class="data-row">
+                            <span>PROXY:</span>
+                            <span class="data-value" id="fbTotalProxies">0</span>
+                        </div>
+                        <div class="data-row">
+                            <span>ĐÃ CHẠY:</span>
+                            <span class="data-value" id="fbDataProcessed">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Results Categories -->
+                    <div class="results-categories">
+                        <h4>RESULTS</h4>
+                        
+                        <div class="result-item result-linked">
+                            <div class="result-header">
+                                <i class="fas fa-link"></i> LINKED:
+                                <span class="result-count" id="fbLinkedCount">0</span>
+                            </div>
+                            <div class="result-actions">
+                                <button class="btn btn-xs" onclick="fbViewResults('linked')">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                                <button class="btn btn-xs" onclick="fbCopyResults('linked')">
+                                    <i class="fas fa-copy"></i> Copy
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="result-item result-hidden">
+                            <div class="result-header">
+                                <i class="fas fa-eye-slash"></i> HIDDEN LINKED:
+                                <span class="result-count" id="fbHiddenCount">0</span>
+                            </div>
+                            <div class="result-actions">
+                                <button class="btn btn-xs" onclick="fbViewResults('hidden_linked')">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                                <button class="btn btn-xs" onclick="fbCopyResults('hidden_linked')">
+                                    <i class="fas fa-copy"></i> Copy
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="result-item result-not-linked">
+                            <div class="result-header">
+                                <i class="fas fa-unlink"></i> NOT LINKED:
+                                <span class="result-count" id="fbNotLinkedCount">0</span>
+                            </div>
+                            <div class="result-actions">
+                                <button class="btn btn-xs" onclick="fbViewResults('not_linked')">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                                <button class="btn btn-xs" onclick="fbCopyResults('not_linked')">
+                                    <i class="fas fa-copy"></i> Copy
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="result-item result-error">
+                            <div class="result-header">
+                                <i class="fas fa-exclamation-triangle"></i> ERROR:
+                                <span class="result-count" id="fbErrorCount">0</span>
+                            </div>
+                            <div class="result-actions">
+                                <button class="btn btn-xs" onclick="fbViewResults('error')">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Code Statistics -->
+                    <div class="code-stats">
+                        <h4>CODE STATISTICS</h4>
+                        <div class="code-row">
+                            <span>CODE 6:</span>
+                            <span class="code-value" id="fbCode6Count">0</span>
+                        </div>
+                        <div class="code-row">
+                            <span>CODE 8:</span>
+                            <span class="code-value" id="fbCode8Count">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Active Threads -->
+                    <div class="active-threads">
+                        <span>ACTIVE THREADS:</span>
+                        <span class="threads-value" id="fbActiveThreads">0</span>
+                    </div>
+
+                    <!-- Export Options -->
+                    <div class="export-options">
+                        <button class="btn btn-primary btn-block" onclick="fbExportResults()">
+                            <i class="fas fa-file-export"></i> FileOutput
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* FB Linked Checker Modal Styles */
+.modal-fb-linked {
+    max-width: 95vw;
+    width: 1600px;
+    height: 90vh;
+    padding: 20px;
+}
+
+.fb-checker-layout {
+    display: grid;
+    grid-template-columns: 400px 1fr 350px;
+    gap: 15px;
+    height: calc(90vh - 100px);
+    margin-top: 15px;
+}
+
+/* Panel Styles */
+.fb-panel {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 12px 15px;
+    font-weight: bold;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.panel-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+/* Input Panel */
+.fb-panel-input .form-group {
+    margin-bottom: 15px;
+}
+
+.fb-panel-input label {
+    display: block;
+    margin-bottom: 5px;
+    color: #aaa;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.fb-panel-input textarea,
+.fb-panel-input input[type="number"],
+.fb-panel-input select {
+    width: 100%;
+    padding: 8px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 13px;
+}
+
+.fb-panel-input textarea {
+    resize: vertical;
+    font-family: 'Courier New', monospace;
+}
+
+.fb-panel-input textarea:focus,
+.fb-panel-input input:focus,
+.fb-panel-input select:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.input-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.settings-group {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #252525;
+    border-radius: 6px;
+    border-left: 3px solid #667eea;
+}
+
+.settings-group h4 {
+    margin: 0 0 12px 0;
+    color: #667eea;
+    font-size: 13px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-row {
+    display: flex;
+    gap: 10px;
+}
+
+.control-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn-block {
+    width: 100%;
+    padding: 12px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* Processing Panel */
+.processing-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.stat-item {
+    background: #252525;
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+    border: 1px solid #333;
+}
+
+.stat-label {
+    display: block;
+    color: #888;
+    font-size: 11px;
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    display: block;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.progress-container {
+    margin-bottom: 15px;
+}
+
+.progress-bar {
+    height: 30px;
+    background: #2a2a2a;
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #444;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.3s ease;
+    border-radius: 15px;
+}
+
+.progress-text {
+    text-align: center;
+    margin-top: 5px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.log-display {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 4px;
+    height: calc(100% - 200px);
+    overflow-y: auto;
+    padding: 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+}
+
+.log-entry {
+    padding: 4px 0;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.log-time {
+    color: #888;
+    min-width: 70px;
+}
+
+.log-message {
+    flex: 1;
+}
+
+.log-info { color: #3498db; }
+.log-success { color: #2ecc71; }
+.log-warning { color: #f39c12; }
+.log-error { color: #e74c3c; }
+
+.running-timer {
+    margin-top: 15px;
+    text-align: center;
+    padding: 10px;
+    background: #252525;
+    border-radius: 4px;
+    color: #f39c12;
+    font-size: 18px;
+    font-weight: bold;
+    border: 1px solid #444;
+}
+
+/* Results Panel */
+.data-summary,
+.results-categories,
+.code-stats {
+    margin-bottom: 20px;
+    padding: 12px;
+    background: #252525;
+    border-radius: 6px;
+    border: 1px solid #333;
+}
+
+.data-summary h4,
+.results-categories h4,
+.code-stats h4 {
+    margin: 0 0 10px 0;
+    color: #667eea;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.data-row,
+.code-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid #333;
+    color: #aaa;
+    font-size: 13px;
+}
+
+.data-row:last-child,
+.code-row:last-child {
+    border-bottom: none;
+}
+
+.data-value,
+.code-value {
+    color: #fff;
+    font-weight: bold;
+}
+
+.result-item {
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #2a2a2a;
+    border-radius: 4px;
+    border-left: 3px solid;
+}
+
+.result-item.result-linked { border-left-color: #2ecc71; }
+.result-item.result-hidden { border-left-color: #f39c12; }
+.result-item.result-not-linked { border-left-color: #95a5a6; }
+.result-item.result-error { border-left-color: #e74c3c; }
+
+.result-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.result-count {
+    margin-left: auto;
+    background: rgba(255,255,255,0.1);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+.result-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.btn-xs {
+    padding: 4px 8px;
+    font-size: 11px;
+}
+
+.active-threads {
+    margin: 15px 0;
+    padding: 10px;
+    background: #252525;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #aaa;
+    font-size: 13px;
+    border: 1px solid #444;
+}
+
+.threads-value {
+    color: #667eea;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* Scrollbar Styling */
+.panel-content::-webkit-scrollbar,
+.log-display::-webkit-scrollbar {
+    width: 6px;
+}
+
+.panel-content::-webkit-scrollbar-track,
+.log-display::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+.panel-content::-webkit-scrollbar-thumb,
+.log-display::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 3px;
+}
+
+.panel-content::-webkit-scrollbar-thumb:hover,
+.log-display::-webkit-scrollbar-thumb:hover {
+    background: #764ba2;
+}
+</style>

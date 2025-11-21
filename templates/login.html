@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BI GHI TOOL MMO - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/i18n.css') }}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0a0e27;
+            --secondary: #1a1f3a;
+            --accent: #f39c12;
+            --accent-hover: #e67e22;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --text: #ecf0f1;
+            --text-secondary: #95a5a6;
+            --border: #2c3e50;
+            --shadow: rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1419 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(243, 156, 18, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(52, 152, 219, 0.1) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(10px, 10px) rotate(90deg); }
+            50% { transform: translate(0, 20px) rotate(180deg); }
+            75% { transform: translate(-10px, 10px) rotate(270deg); }
+        }
+
+        /* Grid pattern overlay */
+        body::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(243, 156, 18, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(243, 156, 18, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 0;
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: rgba(26, 31, 58, 0.95);
+            border-radius: 20px;
+            padding: 50px 40px;
+            box-shadow: 
+                0 20px 60px var(--shadow),
+                0 0 0 1px rgba(243, 156, 18, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(243, 156, 18, 0.1);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-hover), var(--accent));
+            background-size: 200% 100%;
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+            box-shadow: 
+                0 10px 30px rgba(243, 156, 18, 0.3),
+                0 0 0 10px rgba(243, 156, 18, 0.1);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .brand-name {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, var(--accent), #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .brand-tagline {
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--text);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .form-group:focus-within label {
+            color: var(--accent);
+            transform: translateX(2px);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent);
+            font-size: 18px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .form-control:focus + .input-icon,
+        .input-wrapper:focus-within .input-icon {
+            color: var(--accent-hover);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 16px 18px 16px 55px;
+            background: rgba(10, 14, 39, 0.5);
+            border: 2px solid rgba(243, 156, 18, 0.1);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 15px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform, box-shadow;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(10, 14, 39, 0.7);
+            box-shadow: 0 0 0 4px rgba(243, 156, 18, 0.1), 0 4px 12px rgba(243, 156, 18, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .form-control:active {
+            transform: translateY(0);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            font-size: 13px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .remember-me:hover {
+            color: var(--text);
+        }
+
+        .remember-me input[type="checkbox"] {
+            margin-right: 8px;
+            cursor: pointer;
+            transform: scale(1);
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .remember-me input[type="checkbox"]:active {
+            transform: scale(0.9);
+        }
+
+        .forgot-password {
+            color: var(--accent);
+            text-decoration: none;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-block;
+        }
+
+        .forgot-password:hover {
+            color: var(--accent-hover);
+            transform: translateX(3px);
+        }
+        
+        .forgot-password:active {
+            transform: scale(0.98);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 25px rgba(243, 156, 18, 0.3);
+            position: relative;
+            overflow: hidden;
+            will-change: transform, box-shadow;
+        }
+
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-login:hover::before {
+            left: 100%;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 15px 35px rgba(243, 156, 18, 0.4);
+        }
+
+        .btn-login:active {
+            transform: translateY(0) scale(0.98);
+            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Mobile touch feedback */
+        @media (hover: none) and (pointer: coarse) {
+            .btn-login:active {
+                transform: scale(0.97);
+                box-shadow: 0 8px 20px rgba(243, 156, 18, 0.35);
+            }
+        }
+
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: rgba(243, 156, 18, 0.1);
+        }
+
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+
+        .divider-text {
+            color: var(--text-secondary);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .quick-login {
+            text-align: center;
+        }
+
+        .quick-login-btn {
+            padding: 12px 30px;
+            background: rgba(243, 156, 18, 0.1);
+            border: 2px solid rgba(243, 156, 18, 0.2);
+            border-radius: 10px;
+            color: var(--accent);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: inline-block;
+            will-change: transform;
+        }
+
+        .quick-login-btn:hover {
+            background: rgba(243, 156, 18, 0.2);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.2);
+        }
+        
+        .quick-login-btn:active {
+            transform: translateY(0) scale(0.98);
+            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 14px;
+            display: none;
+            animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .alert-error {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            color: #e74c3c;
+        }
+
+        .alert-success {
+            background: rgba(39, 174, 96, 0.1);
+            border: 1px solid rgba(39, 174, 96, 0.3);
+            color: #27ae60;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading .spinner {
+            display: inline-block;
+        }
+
+        .loading .btn-text {
+            display: none;
+        }
+
+        /* Language Selector for Login Page */
+        .language-selector-login {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            z-index: 100;
+        }
+
+        @media (max-width: 768px) {
+            .language-selector-login {
+                top: 15px;
+                right: 15px;
+            }
+        }
+
+        /* Comprehensive Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                min-height: 100vh;
+            }
+
+            .login-container {
+                max-width: 100%;
+                padding: 10px;
+            }
+
+            .login-card {
+                padding: 30px 20px;
+                border-radius: 15px;
+                margin: 0 auto;
+            }
+
+            .logo-section {
+                margin-bottom: 25px;
+            }
+
+            .logo {
+                width: 60px;
+                height: 60px;
+                font-size: 24px;
+            }
+
+            .brand-name {
+                font-size: 24px;
+                margin: 15px 0 5px;
+            }
+
+            .brand-tagline {
+                font-size: 12px;
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            .form-group label {
+                font-size: 13px;
+                margin-bottom: 6px;
+            }
+
+            .form-group input {
+                padding: 12px 15px;
+                font-size: 15px;
+            }
+
+            .login-btn {
+                padding: 14px;
+                font-size: 15px;
+                margin-top: 10px;
+            }
+
+            .remember-forgot {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+
+            .forgot-password {
+                margin-top: 5px;
+            }
+
+            .divider {
+                margin: 20px 0;
+            }
+
+            .footer-text {
+                font-size: 12px;
+                margin-top: 20px;
+                padding: 0 10px;
+            }
+
+            .alert {
+                padding: 12px 15px;
+                font-size: 13px;
+                margin-bottom: 20px;
+            }
+
+            /* Language selector mobile adjustments */
+            .language-selector-login .current-language {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+
+            .language-selector-login .lang-name {
+                display: none; /* Hide text on mobile, show only flag */
+            }
+
+            .language-selector-login .current-language .flag {
+                font-size: 20px;
+                margin-right: 5px;
+            }
+
+            .language-selector-login .current-language i {
+                font-size: 10px;
+            }
+
+            .language-dropdown {
+                right: 0;
+                left: auto;
+                min-width: 160px;
+            }
+
+            .lang-option {
+                padding: 10px 12px;
+            }
+
+            .lang-option .flag {
+                font-size: 18px;
+            }
+
+            .lang-info .lang-name {
+                font-size: 13px;
+            }
+
+            .lang-info .lang-code {
+                font-size: 10px;
+            }
+        }
+
+        /* Extra small devices (phones in portrait, less than 375px) */
+        @media (max-width: 375px) {
+            .login-card {
+                padding: 25px 15px;
+            }
+
+            .logo {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+
+            .brand-name {
+                font-size: 20px;
+            }
+
+            .form-group input {
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+
+            .login-btn {
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            .language-selector-login {
+                top: 10px;
+                right: 10px;
+            }
+        }
+
+        /* Landscape orientation on mobile */
+        @media (max-height: 600px) and (orientation: landscape) {
+            body {
+                padding: 10px 20px;
+            }
+
+            .login-card {
+                padding: 20px;
+            }
+
+            .logo-section {
+                margin-bottom: 15px;
+            }
+
+            .logo {
+                width: 50px;
+                height: 50px;
+            }
+
+            .brand-name {
+                font-size: 20px;
+                margin: 10px 0 5px;
+            }
+
+            .form-group {
+                margin-bottom: 10px;
+            }
+
+            .form-group input {
+                padding: 10px 12px;
+            }
+
+            .login-btn {
+                padding: 10px;
+                margin-top: 5px;
+            }
+
+            .divider {
+                margin: 10px 0;
+            }
+
+            .footer-text {
+                margin-top: 10px;
+            }
+        }
+
+        /* Tablet adjustments */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .login-container {
+                max-width: 500px;
+            }
+
+            .login-card {
+                padding: 40px 35px;
+            }
+        }
+
+        /* Touch device optimization */
+        @media (hover: none) and (pointer: coarse) {
+            .form-group input,
+            .login-btn,
+            .forgot-password,
+            .quick-login-btn {
+                min-height: 44px; /* iOS minimum touch target */
+            }
+
+            .remember-forgot label {
+                padding: 8px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Language Selector -->
+    <div class="language-selector language-selector-login">
+        <button class="current-language">
+            <span class="flag">🇻🇳</span>
+            <span class="lang-name">Tiếng Việt</span>
+            <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="language-dropdown">
+            <a href="#" class="lang-option active" data-lang="vi">
+                <span class="flag">🇻🇳</span>
+                <div class="lang-info">
+                    <div class="lang-name">Tiếng Việt</div>
+                    <div class="lang-code">VI</div>
+                </div>
+            </a>
+            <a href="#" class="lang-option" data-lang="en">
+                <span class="flag">🇬🇧</span>
+                <div class="lang-info">
+                    <div class="lang-name">English</div>
+                    <div class="lang-code">EN</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo-section">
+                <div class="logo">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <h1 class="brand-name">BI GHI TOOL</h1>
+                <p class="brand-tagline" data-i18n="login.subtitle">MMO Professional Suite</p>
+            </div>
+
+            <div class="alert alert-error" id="alertBox"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username" data-i18n="login.username">Username</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user input-icon"></i>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            class="form-control" 
+                            data-i18n-placeholder="login.username_placeholder"
+                            placeholder="Enter your username"
+                            required
+                            autocomplete="username"
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" data-i18n="login.password">Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            class="form-control" 
+                            data-i18n-placeholder="login.password_placeholder"
+                            placeholder="Enter your password"
+                            required
+                            autocomplete="current-password"
+                        >
+                    </div>
+                </div>
+
+                <div class="remember-forgot">
+                    <label class="remember-me">
+                        <input type="checkbox" id="remember">
+                        <span data-i18n="login.remember_me">Remember me</span>
+                    </label>
+                    <a href="#" class="forgot-password" data-i18n="login.forgot_password">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn-login" id="loginBtn">
+                    <span class="spinner" style="display: none;"></span>
+                    <span class="btn-text" data-i18n="login.login_button">Login to Dashboard</span>
+                </button>
+            </form>
+
+            <div class="divider">
+                <span class="divider-text" data-i18n="login.quick_access">Quick Access</span>
+            </div>
+
+            <div class="quick-login">
+                <button class="quick-login-btn" onclick="quickLogin()">
+                    <i class="fas fa-rocket"></i> <span data-i18n="login.demo_login">Demo Login</span>
+                </button>
+            </div>
+
+            <p class="footer-text" style="margin-top: 20px;">
+                <span data-i18n="login.no_account">Chưa có tài khoản?</span>
+                <a href="/register" style="color: #f39c12; text-decoration: none; font-weight: 600; margin-left: 5px;" data-i18n="login.register">Đăng ký ngay</a>
+            </p>
+
+            <p class="footer-text" style="margin-top: 15px; font-size: 12px;">
+                © 2024 BI GHI TOOL MMO. All rights reserved.
+            </p>
+        </div>
+    </div>
+
+    <!-- Translation Scripts -->
+    <script src="{{ url_for('static', filename='js/translations/vi.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/translations/en.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
+
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const alertBox = document.getElementById('alertBox');
+
+        // Show alert with i18n support
+        function showAlert(message, type = 'error') {
+            alertBox.textContent = message;
+            alertBox.className = `alert alert-${type}`;
+            alertBox.style.display = 'block';
+            setTimeout(() => {
+                alertBox.style.display = 'none';
+            }, 5000);
+        }
+
+        // Translate alert messages
+        function getTranslatedMessage(key) {
+            return window.i18n ? window.i18n.t(key) : key;
+        }
+
+        // Quick demo login
+        function quickLogin() {
+            document.getElementById('username').value = 'admin';
+            document.getElementById('password').value = 'admin123';
+            const message = getTranslatedMessage('login.demo_loaded') || 'Demo credentials loaded. Click Login to continue.';
+            showAlert(message, 'success');
+        }
+
+        // Handle form submission
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+
+            if (!username || !password) {
+                const message = getTranslatedMessage('login.enter_credentials') || 'Please enter username and password';
+                showAlert(message);
+                return;
+            }
+
+            // Show loading
+            loginBtn.classList.add('loading');
+            loginBtn.disabled = true;
+            const spinner = loginBtn.querySelector('.spinner');
+            spinner.style.display = 'inline-block';
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password,
+                        remember: remember
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const message = getTranslatedMessage('login.success') || 'Login successful! Redirecting...';
+                    showAlert(message, 'success');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1000);
+                } else {
+                    const errorMsg = getTranslatedMessage('login.invalid_credentials') || 'Login failed. Please check your credentials.';
+                    showAlert(data.message || errorMsg);
+                }
+            } catch (error) {
+                const message = getTranslatedMessage('login.network_error') || 'Connection error. Please try again.';
+                showAlert(message);
+                console.error('Login error:', error);
+            } finally {
+                loginBtn.classList.remove('loading');
+                loginBtn.disabled = false;
+                spinner.style.display = 'none';
+            }
+        });
+
+        // Enter key support
+        document.getElementById('password').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                loginForm.dispatchEvent(new Event('submit'));
+            }
+        });
+    </script>
+</body>
+</html>

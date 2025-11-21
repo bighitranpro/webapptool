@@ -99,7 +99,7 @@ class EmailGenerator:
         return local
     
     def generate_emails(self, email_type: str, text: str, total: int, 
-                       domain: str, char_type: str, number_type: str) -> Dict:
+                       domains: List[str], char_type: str, number_type: str) -> Dict:
         """
         Generate emails based on parameters
         
@@ -107,7 +107,7 @@ class EmailGenerator:
             email_type: Type of email generation
             text: Base text for generation
             total: Number of emails to generate
-            domain: Email domain
+            domains: List of email domains (will randomly choose from this list)
             char_type: Character type (lowercase, uppercase, mixed, alphanumeric)
             number_type: Number position type
         
@@ -116,20 +116,27 @@ class EmailGenerator:
         """
         generated_emails = []
         
-        # Validate domain
-        if not domain:
-            domain = random.choice(self.common_domains)
+        # Validate domains
+        if not domains or len(domains) == 0:
+            domains = [random.choice(self.common_domains)]
         
-        # Ensure domain doesn't have @ symbol
-        domain = domain.replace('@', '')
+        # Clean domains (remove @ symbol)
+        domains = [d.replace('@', '').strip() for d in domains if d.strip()]
+        
+        # Domain usage statistics
+        domain_stats = {domain: 0 for domain in domains}
         
         for i in range(total):
             try:
+                # Randomly select a domain from the list
+                selected_domain = random.choice(domains)
+                domain_stats[selected_domain] += 1
+                
                 local_part = self.generate_local_part(
                     text, char_type, number_type
                 )
                 
-                email = f"{local_part}@{domain}"
+                email = f"{local_part}@{selected_domain}"
                 generated_emails.append(email)
                 
             except Exception as e:
@@ -144,10 +151,12 @@ class EmailGenerator:
             'parameters': {
                 'email_type': email_type,
                 'text': text,
-                'domain': domain,
+                'domains': domains,
+                'domains_count': len(domains),
                 'char_type': char_type,
                 'number_type': number_type
             },
+            'domain_statistics': domain_stats,
             'timestamp': datetime.now().isoformat()
         }
     

@@ -561,3 +561,57 @@ textarea {
         text-align: center;
     }
 }
+
+/* Domain Selection Buttons */
+.domain-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.btn-domain {
+    padding: 8px 16px;
+    background: #ecf0f1;
+    border: 2px solid #bdc3c7;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2c3e50;
+    transition: all 0.3s;
+}
+
+.btn-domain:hover {
+    background: #d5dbdb;
+    border-color: #95a5a6;
+}
+
+.btn-domain.active {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    border-color: #2980b9;
+    color: white;
+}
+
+.btn-domain.active:hover {
+    background: linear-gradient(135deg, #2980b9, #21618c);
+}
+
+/* Multiple Domain Textarea */
+#generatorDomains {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    resize: vertical;
+    background: #fff;
+    transition: border-color 0.3s;
+}
+
+#generatorDomains:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}

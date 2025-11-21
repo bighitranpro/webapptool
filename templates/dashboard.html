@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BI GHI TOOL MMO - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_pro.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/i18n.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="logo-text">
+                    <h2>BI GHI TOOL</h2>
+                    <span>MMO Suite</span>
+                </div>
+            </div>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <span class="nav-section-title">MAIN</span>
+                <a href="#dashboard" class="nav-item active" data-page="dashboard">
+                    <i class="fas fa-th-large"></i>
+                    <span data-i18n="dashboard.title">Bảng điều khiển</span>
+                    <span class="nav-badge" data-i18n="common.new">Mới</span>
+                </a>
+                <a href="#analytics" class="nav-item" data-page="analytics">
+                    <i class="fas fa-chart-line"></i>
+                    <span data-i18n="dashboard.analytics">Thống kê</span>
+                </a>
+            </div>
+
+            <div class="nav-section collapsible" data-section="email-tools">
+                <div class="nav-section-header" onclick="toggleSection('email-tools')">
+                    <span class="nav-section-title" data-i18n="sidebar.email_tools">CÔNG CỤ EMAIL</span>
+                    <i class="fas fa-chevron-down collapse-icon"></i>
+                </div>
+                <div class="nav-section-content">
+                    <a href="#validator" class="nav-item" onclick="openModal('validatorModal')">
+                        <i class="fas fa-shield-check"></i>
+                        <span data-i18n="dashboard.email_validator.title">Kiểm tra Email</span>
+                    </a>
+                    <a href="#generator" class="nav-item" onclick="openModal('generatorModal')">
+                        <i class="fas fa-random"></i>
+                        <span data-i18n="dashboard.email_generator.title">Tạo Email</span>
+                    </a>
+                    <a href="#extractor" class="nav-item" onclick="openModal('extractorModal')">
+                        <i class="fas fa-search"></i>
+                        <span data-i18n="dashboard.email_extractor.title">Trích xuất Email</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="nav-section collapsible" data-section="facebook-tools">
+                <div class="nav-section-header" onclick="toggleSection('facebook-tools')">
+                    <span class="nav-section-title" data-i18n="sidebar.facebook_tools">CÔNG CỤ FACEBOOK</span>
+                    <i class="fas fa-chevron-down collapse-icon"></i>
+                </div>
+                <div class="nav-section-content">
+                    <a href="#fb-linked" class="nav-item" onclick="openModal('fbLinkedModal')">
+                        <i class="fab fa-facebook"></i>
+                        <span data-i18n="dashboard.fb_checker.title">Kiểm tra Facebook</span>
+                    </a>
+                    <a href="#check-2fa" class="nav-item" onclick="openModal('check2faModal')">
+                        <i class="fas fa-shield-alt"></i>
+                        <span data-i18n="dashboard.pass_2fa_checker.title">Kiểm tra 2FA</span>
+                    </a>
+                    <a href="#page-mining" class="nav-item" onclick="openModal('miningModal')">
+                        <i class="fas fa-search-dollar"></i>
+                        <span data-i18n="dashboard.page_mining.title">Mining Page</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="nav-section collapsible" data-section="advanced-tools">
+                <div class="nav-section-header" onclick="toggleSection('advanced-tools')">
+                    <span class="nav-section-title" data-i18n="sidebar.advanced">NÂNG CAO</span>
+                    <i class="fas fa-chevron-down collapse-icon"></i>
+                </div>
+                <div class="nav-section-content">
+                    <a href="#filter" class="nav-item" onclick="openModal('filterModal')">
+                        <i class="fas fa-filter"></i>
+                        <span data-i18n="sidebar.filter">Lọc</span>
+                    </a>
+                    <a href="#analyzer" class="nav-item" onclick="openModal('analyzerModal')">
+                        <i class="fas fa-chart-bar"></i>
+                        <span data-i18n="dashboard.email_analyzer.title">Phân tích Email</span>
+                    </a>
+                    <a href="#dedup" class="nav-item" onclick="openModal('deduplicatorModal')">
+                        <i class="fas fa-clone"></i>
+                        <span data-i18n="sidebar.deduplicator">Loại bỏ trùng</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-plan">
+                <i class="fas fa-crown"></i>
+                <div>
+                    <span data-i18n="vip.pro.name">Gói PRO</span>
+                    <small data-i18n="vip.unlimited">Không giới hạn</small>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="breadcrumb">
+                    <i class="fas fa-home"></i>
+                    <span data-i18n="dashboard.title">Bảng điều khiển</span>
+                </div>
+            </div>
+
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" data-i18n-placeholder="dashboard.search_placeholder" placeholder="Tìm kiếm công cụ, lệnh hoặc trợ giúp...">
+                <span class="search-shortcut">Ctrl+K</span>
+            </div>
+
+            <div class="header-right">
+                <!-- Language Selector -->
+                <div class="language-selector compact">
+                    <button class="current-language">
+                        <span class="flag">🇻🇳</span>
+                        <span class="lang-name">Tiếng Việt</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="language-dropdown">
+                        <a href="#" class="lang-option active" data-lang="vi">
+                            <span class="flag">🇻🇳</span>
+                            <div class="lang-info">
+                                <div class="lang-name">Tiếng Việt</div>
+                                <div class="lang-code">VI</div>
+                            </div>
+                        </a>
+                        <a href="#" class="lang-option" data-lang="en">
+                            <span class="flag">🇬🇧</span>
+                            <div class="lang-info">
+                                <div class="lang-name">English</div>
+                                <div class="lang-code">EN</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <button class="header-btn" title="Notifications" onclick="openNotificationsPanel()">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notificationCount">3</span>
+                </button>
+                
+                <button class="header-btn" title="Settings" onclick="openSettingsModal()">
+                    <i class="fas fa-cog"></i>
+                </button>
+
+                <div class="user-menu" onclick="toggleUserMenu()">
+                    <div class="user-avatar">
+                        {{ user.username[0]|upper }}
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">{{ user.full_name or user.username }}</span>
+                        <span class="user-role">{{ user.role|capitalize }}</span>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- Welcome Section -->
+            <section class="welcome-section">
+                <h1><span data-i18n="dashboard.welcome">Chào mừng trở lại</span>, <span class="highlight">{{ user.full_name or user.username }}</span>! 👋</h1>
+                <div class="welcome-stats">
+                    <div class="stat-mini">
+                        <i class="fas fa-envelope"></i> {{ stats.total_activities or 0 }} <span data-i18n="dashboard.total_actions">Hành động</span>
+                    </div>
+                    <div class="stat-mini">
+                        <i class="fas fa-clock"></i> {{ stats.login_count or 0 }} <span data-i18n="dashboard.logins">Đăng nhập</span>
+                    </div>
+                    <div class="stat-mini">
+                        <i class="fas fa-calendar"></i> <span data-i18n="dashboard.member_since">Thành viên từ</span> {{ stats.created_at.split()[0] if stats.created_at else 'N/A' }}
+                    </div>
+                </div>
+            </section>
+
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-icon green">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> +12%
+                        </div>
+                    </div>
+                    <div class="stat-label" data-i18n="dashboard.live_emails">Email LIVE</div>
+                    <div class="stat-value" id="liveEmails">0</div>
+                    <div class="stat-progress">
+                        <div class="stat-progress-bar green" id="liveProgress" style="width: 0%"></div>
+                    </div>
+                    <div class="stat-footer">
+                        <span class="stat-footer-text" data-i18n="dashboard.success_rate">Tỷ lệ thành công</span>
+                        <span class="stat-footer-value">92%</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-icon red">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <div class="stat-change negative">
+                            <i class="fas fa-arrow-down"></i> -8%
+                        </div>
+                    </div>
+                    <div class="stat-label" data-i18n="dashboard.die_emails">Email DIE</div>
+                    <div class="stat-value" id="dieEmails">0</div>
+                    <div class="stat-progress">
+                        <div class="stat-progress-bar red" id="dieProgress" style="width: 0%"></div>
+                    </div>
+                    <div class="stat-footer">
+                        <span class="stat-footer-text" data-i18n="dashboard.failure_rate">Tỷ lệ thất bại</span>
+                        <span class="stat-footer-value">8%</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-equals"></i> Stable
+                        </div>
+                    </div>
+                    <div class="stat-label" data-i18n="dashboard.total_processed">Tổng đã xử lý</div>
+                    <div class="stat-value" id="totalEmails">0</div>
+                    <div class="stat-progress">
+                        <div class="stat-progress-bar blue" id="totalProgress" style="width: 0%"></div>
+                    </div>
+                    <div class="stat-footer">
+                        <span class="stat-footer-text" data-i18n="dashboard.last_7_days">7 ngày qua</span>
+                        <span class="stat-footer-value">1,250</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-icon purple">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> +15%
+                        </div>
+                    </div>
+                    <div class="stat-label" data-i18n="dashboard.can_receive_code">Nhận được mã</div>
+                    <div class="stat-value" id="canReceiveCode">0</div>
+                    <div class="stat-progress">
+                        <div class="stat-progress-bar purple" id="codeProgress" style="width: 0%"></div>
+                    </div>
+                    <div class="stat-footer">
+                        <span class="stat-footer-text" data-i18n="dashboard.2fa_ready">Sẵn sàng 2FA</span>
+                        <span class="stat-footer-value">85%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tools Grid -->
+            <div class="tools-grid">
+                <!-- Email Validator -->
+                <div class="tool-card" onclick="openModal('validatorModal')">
+                    <div class="tool-card-header">
+                        <div class="tool-icon gradient-blue">
+                            <i class="fas fa-shield-check"></i>
+                        </div>
+                        <div class="tool-info">
+                            <h3 data-i18n="dashboard.email_validator.title">Kiểm tra Email</h3>
+                        </div>
+                    </div>
+                    <p class="tool-description" data-i18n="dashboard.email_validator.description">Kiểm tra tính hợp lệ của email, phân loại LIVE/DIE</p>
+                    <div class="tool-stats">
+                        <span class="tool-stat"><i class="fas fa-check"></i> 95% <span data-i18n="dashboard.accuracy">Chính xác</span></span>
+                        <span class="tool-stat"><i class="fas fa-bolt"></i> <span data-i18n="dashboard.fast">Nhanh</span></span>
+                    </div>
+                    <div class="tool-card-footer">
+                        <span class="tool-badge popular" data-i18n="dashboard.popular">Phổ biến</span>
+                        <div class="tool-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Generator -->
+                <div class="tool-card" onclick="openModal('generatorModal')">
+                    <div class="tool-card-header">
+                        <div class="tool-icon gradient-green">
+                            <i class="fas fa-random"></i>
+                        </div>
+                        <div class="tool-info">
+                            <h3 data-i18n="dashboard.email_generator.title">Tạo Email</h3>
+                        </div>
+                    </div>
+                    <p class="tool-description" data-i18n="dashboard.email_generator.description">Tạo danh sách email ngẫu nhiên hoặc theo mẫu</p>
+                    <div class="tool-stats">
+                        <span class="tool-stat"><i class="fas fa-infinity"></i> <span data-i18n="dashboard.unlimited">Không giới hạn</span></span>
+                        <span class="tool-stat"><i class="fas fa-globe"></i> <span data-i18n="dashboard.multi_domain">Nhiều tên miền</span></span>
+                    </div>
+                    <div class="tool-card-footer">
+                        <span class="tool-badge new" data-i18n="common.new">Mới</span>
+                        <div class="tool-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FB Linked Checker -->
+                <div class="tool-card" onclick="openModal('fbLinkedModal')">
+                    <div class="tool-card-header">
+                        <div class="tool-icon gradient-purple">
+                            <i class="fab fa-facebook"></i>
+                        </div>
+                        <div class="tool-info">
+                            <h3 data-i18n="dashboard.fb_checker.title">Kiểm tra Facebook</h3>
+                        </div>
+                    </div>
+                    <p class="tool-description" data-i18n="dashboard.fb_checker.description">Kiểm tra email có liên kết với Facebook</p>
+                    <div class="tool-stats">
+                        <span class="tool-stat"><i class="fas fa-link"></i> 6 APIs</span>
+                        <span class="tool-stat"><i class="fas fa-shield-alt"></i> <span data-i18n="dashboard.secure">Bảo mật</span></span>
+                    </div>
+                    <div class="tool-card-footer">
+                        <span class="tool-badge pro" data-i18n="vip.pro.short">Pro</span>
+                        <div class="tool-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Check 2FA -->
+                <div class="tool-card" onclick="openModal('check2faModal')">
+                    <div class="tool-card-header">
+                        <div class="tool-icon gradient-orange">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="tool-info">
+                            <h3 data-i18n="dashboard.pass_2fa_checker.title">Kiểm tra 2FA</h3>
+                        </div>
+                    </div>
+                    <p class="tool-description" data-i18n="dashboard.pass_2fa_checker.description">Kiểm tra email:password có 2FA và Page</p>
+                    <div class="tool-stats">
+                        <span class="tool-stat"><i class="fas fa-lock"></i> 2FA</span>
+                        <span class="tool-stat"><i class="fas fa-pager"></i> <span data-i18n="dashboard.pages">Trang</span></span>
+                    </div>
+                    <div class="tool-card-footer">
+                        <span class="tool-badge hot" data-i18n="dashboard.hot">Nóng</span>
+                        <div class="tool-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Page Mining -->
+                <div class="tool-card" onclick="openModal('miningModal')">
+                    <div class="tool-card-header">
+                        <div class="tool-icon gradient-teal">
+                            <i class="fas fa-search-dollar"></i>
+                        </div>
+                        <div class="tool-info">
+                            <h3 data-i18n="dashboard.page_mining.title">Mining Page</h3>
+                        </div>
+                    </div>
+                    <p class="tool-description" data-i18n="dashboard.page_mining.description">Khai thác thông tin Page từ UID Facebook</p>
+                    <div class="tool-stats">
+                        <span class="tool-stat"><i class="fas fa-database"></i> <span data-i18n="dashboard.advanced_tool">Nâng cao</span></span>
+                        <span class="tool-stat"><i class="fas fa-filter"></i> <span data-i18n="common.filter">Lọc</span></span>
+                    </div>
+                    <div class="tool-card-footer">
+                        <span class="tool-badge pro" data-i18n="vip.pro.short">Pro</span>
+                        <div class="tool-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Extractor -->
+                <div class="tool-card" onclick="openModal('extractorModal')">
+                    <div class="tool-card-header">
+                        <div class="tool-icon gradient-red">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="tool-info">
+                            <h3 data-i18n="dashboard.email_extractor.title">Trích xuất Email</h3>
+                        </div>
+                    </div>
+                    <p class="tool-description" data-i18n="dashboard.email_extractor.description">Trích xuất email từ văn bản, file hoặc URL</p>
+                    <div class="tool-stats">
+                        <span class="tool-stat"><i class="fas fa-file"></i> <span data-i18n="dashboard.multi_source">Nhiều nguồn</span></span>
+                        <span class="tool-stat"><i class="fas fa-magic"></i> <span data-i18n="dashboard.smart">Thông minh</span></span>
+                    </div>
+                    <div class="tool-card-footer">
+                        <span class="tool-badge popular" data-i18n="dashboard.popular">Phổ biến</span>
+                        <div class="tool-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="activity-section mt-4">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-history"></i>
+                        <span data-i18n="dashboard.recent_activity">Hoạt động gần đây</span>
+                    </h2>
+                    <button class="view-all-btn" data-i18n="dashboard.view_all">Xem tất cả</button>
+                </div>
+
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon blue">
+                            <i class="fas fa-shield-check"></i>
+                        </div>
+                        <div class="activity-details">
+                            <div class="activity-title" data-i18n="dashboard.activity.validation_completed">Hoàn thành kiểm tra Email</div>
+                            <div class="activity-time" data-i18n="dashboard.activity.validation_details">Đã kiểm tra 150 email với 92% LIVE • 2 phút trước</div>
+                        </div>
+                        <span class="activity-status success" data-i18n="common.success">Thành công</span>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon green">
+                            <i class="fas fa-random"></i>
+                        </div>
+                        <div class="activity-details">
+                            <div class="activity-title" data-i18n="dashboard.activity.emails_generated">Đã tạo Email</div>
+                            <div class="activity-time" data-i18n="dashboard.activity.generation_details">Tạo 500 email ngẫu nhiên trên 4 tên miền • 15 phút trước</div>
+                        </div>
+                        <span class="activity-status success" data-i18n="common.success">Thành công</span>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon purple">
+                            <i class="fab fa-facebook"></i>
+                        </div>
+                        <div class="activity-details">
+                            <div class="activity-title" data-i18n="dashboard.activity.fb_check">Kiểm tra liên kết FB</div>
+                            <div class="activity-time" data-i18n="dashboard.activity.fb_check_details">Đã kiểm tra 80 email, tìm thấy 25 tài khoản liên kết • 1 giờ trước</div>
+                        </div>
+                        <span class="activity-status success" data-i18n="common.success">Thành công</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Info Sections Grid -->
+            <div class="info-sections-grid">
+                <!-- Usage Notes -->
+                <div class="info-card usage-notes">
+                    <div class="info-card-header">
+                        <div class="info-icon yellow">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h3>Important Usage Notes</h3>
+                    </div>
+                    <div class="info-card-body">
+                        <ul class="notes-list">
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <div>
+                                    <strong>Email Validation:</strong>
+                                    <span>Results are 95% accurate. Always verify critical emails manually.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-clock"></i>
+                                <div>
+                                    <strong>Rate Limits:</strong>
+                                    <span>FREE: 50/day, BASIC: 500/day, PRO: Unlimited validations.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-shield-alt"></i>
+                                <div>
+                                    <strong>Data Privacy:</strong>
+                                    <span>All data is encrypted and stored securely. We never share your information.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-bolt"></i>
+                                <div>
+                                    <strong>Best Performance:</strong>
+                                    <span>Use batch processing for large lists (1000+ emails) for faster results.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Quick Start Guide -->
+                <div class="info-card usage-guide">
+                    <div class="info-card-header">
+                        <div class="info-icon blue">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <h3>Quick Start Guide</h3>
+                    </div>
+                    <div class="info-card-body">
+                        <div class="guide-steps">
+                            <div class="guide-step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <h4>Choose Your Tool</h4>
+                                    <p>Select from Email Validator, Generator, or Facebook Tools based on your needs.</p>
+                                </div>
+                            </div>
+                            <div class="guide-step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <h4>Input Your Data</h4>
+                                    <p>Paste emails or enter parameters. Supports bulk input (one per line).</p>
+                                </div>
+                            </div>
+                            <div class="guide-step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <h4>Process & Download</h4>
+                                    <p>Click "Process" and download results in TXT, CSV, or JSON format.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="#" class="guide-link" onclick="showFullGuide()">
+                            <i class="fas fa-external-link-alt"></i> View Full Documentation
+                        </a>
+                    </div>
+                </div>
+
+                <!-- VIP Package Details -->
+                <div class="info-card vip-package">
+                    <div class="info-card-header">
+                        <div class="info-icon gold">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <h3>VIP Packages</h3>
+                    </div>
+                    <div class="info-card-body">
+                        <div class="vip-plans">
+                            <div class="vip-plan free">
+                                <div class="plan-badge">FREE</div>
+                                <div class="plan-price">$0<span>/month</span></div>
+                                <ul class="plan-features">
+                                    <li><i class="fas fa-check"></i> 50 validations/day</li>
+                                    <li><i class="fas fa-check"></i> Basic email tools</li>
+                                    <li><i class="fas fa-check"></i> Standard support</li>
+                                    <li><i class="fas fa-times"></i> No Facebook tools</li>
+                                </ul>
+                            </div>
+                            <div class="vip-plan basic">
+                                <div class="plan-badge">BASIC</div>
+                                <div class="plan-price">$9<span>/month</span></div>
+                                <ul class="plan-features">
+                                    <li><i class="fas fa-check"></i> 500 validations/day</li>
+                                    <li><i class="fas fa-check"></i> All email tools</li>
+                                    <li><i class="fas fa-check"></i> Facebook basic</li>
+                                    <li><i class="fas fa-check"></i> Priority support</li>
+                                </ul>
+                            </div>
+                            <div class="vip-plan pro highlighted">
+                                <div class="plan-badge popular">PRO</div>
+                                <div class="plan-price">$29<span>/month</span></div>
+                                <ul class="plan-features">
+                                    <li><i class="fas fa-check"></i> Unlimited validations</li>
+                                    <li><i class="fas fa-check"></i> All tools unlocked</li>
+                                    <li><i class="fas fa-check"></i> Facebook advanced</li>
+                                    <li><i class="fas fa-check"></i> 24/7 VIP support</li>
+                                    <li><i class="fas fa-check"></i> API access</li>
+                                </ul>
+                                <button class="upgrade-btn" onclick="upgradeVIP('pro')">
+                                    <i class="fas fa-arrow-up"></i> Upgrade to PRO
+                                </button>
+                            </div>
+                            <div class="vip-plan enterprise">
+                                <div class="plan-badge">ENTERPRISE</div>
+                                <div class="plan-price">$99<span>/month</span></div>
+                                <ul class="plan-features">
+                                    <li><i class="fas fa-check"></i> Everything in PRO</li>
+                                    <li><i class="fas fa-check"></i> Dedicated server</li>
+                                    <li><i class="fas fa-check"></i> Custom integrations</li>
+                                    <li><i class="fas fa-check"></i> White-label option</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Notifications Panel -->
+    <div class="notifications-panel" id="notificationsPanel">
+        <div class="notifications-header">
+            <h3><i class="fas fa-bell"></i> Notifications</h3>
+            <button class="close-panel-btn" onclick="closeNotificationsPanel()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="notifications-body">
+            <div class="notification-item unread">
+                <div class="notification-icon success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">Validation Complete</div>
+                    <div class="notification-message">Successfully validated 150 emails with 95% LIVE rate</div>
+                    <div class="notification-time">5 minutes ago</div>
+                </div>
+            </div>
+            <div class="notification-item unread">
+                <div class="notification-icon info">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">System Update</div>
+                    <div class="notification-message">New features added: Enhanced Facebook checker with 6 APIs</div>
+                    <div class="notification-time">2 hours ago</div>
+                </div>
+            </div>
+            <div class="notification-item unread">
+                <div class="notification-icon warning">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">Upgrade to PRO</div>
+                    <div class="notification-message">Get unlimited validations and unlock all advanced features</div>
+                    <div class="notification-time">1 day ago</div>
+                </div>
+            </div>
+            <div class="notification-item read">
+                <div class="notification-icon success">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">Welcome!</div>
+                    <div class="notification-message">Your account has been successfully created</div>
+                    <div class="notification-time">3 days ago</div>
+                </div>
+            </div>
+        </div>
+        <div class="notifications-footer">
+            <button class="mark-all-read-btn" onclick="markAllAsRead()">
+                <i class="fas fa-check-double"></i> Mark all as read
+            </button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content settings-modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-cog"></i> Settings</h2>
+                <button class="close-modal" onclick="closeModal('settingsModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-tabs">
+                    <button class="settings-tab active" data-tab="profile">
+                        <i class="fas fa-user"></i> Profile
+                    </button>
+                    <button class="settings-tab" data-tab="preferences">
+                        <i class="fas fa-sliders-h"></i> Preferences
+                    </button>
+                    <button class="settings-tab" data-tab="api">
+                        <i class="fas fa-code"></i> API Keys
+                    </button>
+                    <button class="settings-tab" data-tab="security">
+                        <i class="fas fa-shield-alt"></i> Security
+                    </button>
+                </div>
+
+                <div class="settings-content">
+                    <!-- Profile Tab -->
+                    <div class="settings-tab-content active" id="profileTab">
+                        <h3>Profile Information</h3>
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" class="form-control" value="{{ user.full_name or user.username }}" placeholder="Enter your full name">
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" class="form-control" value="{{ user.email or '' }}" placeholder="your@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" class="form-control" value="{{ user.username }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>VIP Level</label>
+                            <div class="vip-display">
+                                <span class="vip-badge {{ user.role }}">{{ user.role|upper }}</span>
+                                <button class="upgrade-link-btn" onclick="upgradeVIP('pro')">
+                                    <i class="fas fa-arrow-up"></i> Upgrade
+                                </button>
+                            </div>
+                        </div>
+                        <button class="btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+                    </div>
+
+                    <!-- Preferences Tab -->
+                    <div class="settings-tab-content" id="preferencesTab">
+                        <h3>Application Preferences</h3>
+                        <div class="form-group">
+                            <label>Language</label>
+                            <select class="form-control">
+                                <option value="vi">Tiếng Việt</option>
+                                <option value="en">English</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Theme</label>
+                            <select class="form-control">
+                                <option value="dark" selected>Dark (Default)</option>
+                                <option value="light">Light</option>
+                                <option value="auto">Auto (System)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" checked> Enable desktop notifications
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" checked> Auto-save validation results
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox"> Enable sound effects
+                            </label>
+                        </div>
+                        <button class="btn-primary"><i class="fas fa-save"></i> Save Preferences</button>
+                    </div>
+
+                    <!-- API Keys Tab -->
+                    <div class="settings-tab-content" id="apiTab">
+                        <h3>API Access</h3>
+                        <div class="api-info-box">
+                            <i class="fas fa-info-circle"></i>
+                            <p>API access is available for PRO and ENTERPRISE users. Generate API keys to integrate our services into your applications.</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Your API Key</label>
+                            <div class="api-key-display">
+                                <input type="password" class="form-control" value="sk_live_xxxxxxxxxxxxxxxxxxxx" readonly>
+                                <button class="toggle-visibility-btn" onclick="toggleAPIKeyVisibility()">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="copy-btn" onclick="copyAPIKey()">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button class="btn-secondary"><i class="fas fa-sync"></i> Regenerate API Key</button>
+                        <button class="btn-link"><i class="fas fa-book"></i> View API Documentation</button>
+                    </div>
+
+                    <!-- Security Tab -->
+                    <div class="settings-tab-content" id="securityTab">
+                        <h3>Security Settings</h3>
+                        <div class="form-group">
+                            <label>Current Password</label>
+                            <input type="password" class="form-control" placeholder="Enter current password">
+                        </div>
+                        <div class="form-group">
+                            <label>New Password</label>
+                            <input type="password" class="form-control" placeholder="Enter new password">
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm New Password</label>
+                            <input type="password" class="form-control" placeholder="Confirm new password">
+                        </div>
+                        <button class="btn-primary"><i class="fas fa-key"></i> Change Password</button>
+                        <hr>
+                        <h3>Two-Factor Authentication</h3>
+                        <p class="text-secondary">Add an extra layer of security to your account</p>
+                        <button class="btn-secondary"><i class="fas fa-shield-alt"></i> Enable 2FA</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Modal Templates -->
+    {% include 'modals/validator_modal.html' %}
+    {% include 'modals/generator_modal.html' %}
+    {% include 'modals/extractor_modal.html' %}
+    {% include 'modals/fb_linked_checker_modal.html' %}
+    {% include 'modals/check_2fa_modal.html' %}
+    {% include 'modals/page_mining_modal.html' %}
+    {% include 'modals/filter_modal.html' %}
+    {% include 'modals/analyzer_modal.html' %}
+    {% include 'modals/deduplicator_modal.html' %}
+
+    <!-- Scripts -->
+    <script>
+        // Global configuration
+        window.API_BASE = '/api';
+        window.currentUser = {
+            username: '{{ user.username }}',
+            role: '{{ user.role }}',
+            fullName: '{{ user.full_name or user.username }}'
+        };
+    </script>
+
+    <!-- Core Scripts (Load first) -->
+    <script src="{{ url_for('static', filename='js/modals.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/api.js') }}"></script>
+    
+    <!-- I18N Scripts -->
+    <script src="{{ url_for('static', filename='js/translations/vi.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/translations/en.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
+    
+    <!-- Dashboard Scripts -->
+    <script src="{{ url_for('static', filename='js/dashboard_pro.js') }}"></script>
+    
+    <!-- Tool-specific Scripts (No duplicates) -->
+    <script src="{{ url_for('static', filename='js/fb_linked_checker.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/check_2fa.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/page_mining.js') }}"></script>
+</body>
+</html>

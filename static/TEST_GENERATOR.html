@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Email Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #34495e;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .btn {
+            background: #2ecc71;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .btn:hover {
+            background: #27ae60;
+        }
+        #result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #ecf0f1;
+            border-radius: 5px;
+            min-height: 100px;
+        }
+        .email-list {
+            list-style: none;
+            padding: 0;
+        }
+        .email-list li {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            animation: slideIn 0.3s;
+        }
+        .notification.success { background: #2ecc71; }
+        .notification.error { background: #e74c3c; }
+        .notification.warning { background: #f39c12; }
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Test Email Generator</h1>
+        
+        <div class="form-group">
+            <label>Type Email:</label>
+            <select id="emailType">
+                <option value="random">Random Email</option>
+                <option value="name_based">Name Based</option>
+                <option value="number_based">Number Based</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Text (base):</label>
+            <input type="text" id="text" value="testuser" placeholder="Nhập text cơ sở">
+        </div>
+
+        <div class="form-group">
+            <label>Total:</label>
+            <input type="number" id="total" value="10" min="1" max="10000">
+        </div>
+
+        <div class="form-group">
+            <label>Domain:</label>
+            <input type="text" id="domain" value="gmail.com">
+        </div>
+
+        <div class="form-group">
+            <label>Ký Tự (Character Type):</label>
+            <select id="charType">
+                <option value="lowercase">Chữ thường (a-z)</option>
+                <option value="uppercase">Chữ hoa (A-Z)</option>
+                <option value="mixed">Hỗn hợp</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Number:</label>
+            <select id="numberType">
+                <option value="suffix">Số cuối</option>
+                <option value="prefix">Số đầu</option>
+                <option value="middle">Số giữa</option>
+            </select>
+        </div>
+
+        <button class="btn" onclick="generateEmails()">Generate Emails</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        async function generateEmails() {
+            const params = {
+                email_type: document.getElementById('emailType').value,
+                text: document.getElementById('text').value,
+                total: parseInt(document.getElementById('total').value),
+                domain: document.getElementById('domain').value,
+                char_type: document.getElementById('charType').value,
+                number_type: document.getElementById('numberType').value
+            };
+
+            if (params.total < 1 || params.total > 10000) {
+                showNotification('Số lượng phải từ 1 đến 10,000', 'warning');
+                return;
+            }
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>⏳ Đang tạo emails...</p>';
+
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(params)
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.emails) {
+                    const emailsHtml = data.emails.map((email, i) => 
+                        `<li>${i + 1}. ${email}</li>`
+                    ).join('');
+
+                    resultDiv.innerHTML = `
+                        <h3>✅ Đã tạo ${data.emails.length} emails</h3>
+                        <p><strong>Lưu vào DB:</strong> ${data.db_saved ? 'Có ✓' : 'Không ✗'}</p>
+                        <ul class="email-list">${emailsHtml}</ul>
+                        <button class="btn" onclick="copyEmails()">📋 Copy All</button>
+                    `;
+
+                    // Store emails globally for copy function
+                    window.generatedEmails = data.emails;
+
+                    showNotification(`Tạo thành công ${data.emails.length} emails!`, 'success');
+                } else {
+                    resultDiv.innerHTML = `<p style="color: red;">❌ Lỗi: ${data.message || 'Unknown error'}</p>`;
+                    showNotification('Có lỗi xảy ra', 'error');
+                }
+            } catch (error) {
+                console.error('Generation error:', error);
+                resultDiv.innerHTML = `<p style="color: red;">❌ Lỗi: ${error.message}</p>`;
+                showNotification('Lỗi kết nối API', 'error');
+            }
+        }
+
+        function copyEmails() {
+            if (window.generatedEmails) {
+                navigator.clipboard.writeText(window.generatedEmails.join('\n')).then(() => {
+                    showNotification(`Đã copy ${window.generatedEmails.length} emails`, 'success');
+                }).catch(err => {
+                    console.error('Copy error:', err);
+                    showNotification('Lỗi khi copy', 'error');
+                });
+            }
+        }
+    </script>
+</body>
+</html>
