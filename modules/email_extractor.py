@@ -12,7 +12,8 @@ class EmailExtractor:
     """Extract and filter emails from text"""
     
     def __init__(self):
-        self.email_pattern = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
+        # Word boundary prevents trailing punctuation capture
+        self.email_pattern = r'\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b'
         self.stats = {
             'total_extracted': 0,
             'unique_emails': 0,
@@ -25,9 +26,10 @@ class EmailExtractor:
         return emails
     
     def extract_unique_emails(self, text: str) -> List[str]:
-        """Extract unique emails from text"""
+        """Extract unique emails from text (case-insensitive)"""
         emails = self.extract_emails(text)
-        unique_emails = list(set(emails))
+        # Case-insensitive deduplication
+        unique_emails = self.remove_duplicates(emails)
         
         self.stats['total_extracted'] = len(emails)
         self.stats['unique_emails'] = len(unique_emails)
@@ -36,13 +38,18 @@ class EmailExtractor:
         return unique_emails
     
     def filter_by_domain(self, emails: List[str], domains: List[str]) -> List[str]:
-        """Filter emails by domain"""
+        """Filter emails by domain (exact match or ends with)"""
         filtered = []
         for email in emails:
             try:
                 local, domain = email.split('@')
-                if any(d.lower() in domain.lower() for d in domains):
-                    filtered.append(email)
+                domain_lower = domain.lower()
+                # Exact match or domain ends with filter (e.g., "gmail.com" matches "mail.gmail.com")
+                for d in domains:
+                    d_lower = d.lower()
+                    if domain_lower == d_lower or domain_lower.endswith('.' + d_lower):
+                        filtered.append(email)
+                        break
             except:
                 continue
         return filtered

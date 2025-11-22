@@ -1,0 +1,5 @@
+{
+  "text": "Contact us: John@Example.COM, JOHN@EXAMPLE.COM, support@gmail.com, info@COMPANY.ORG. Visit website.com, or email sales@website.com. Bad: user@domain.",
+  "remove_duplicates": true,
+  "filter_domains": ["gmail.com", "company.org"]
+}
