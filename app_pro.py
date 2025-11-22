@@ -43,9 +43,20 @@ app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB
 app.config['SECRET_KEY'] = 'email-validator-pro-secret-key-2024'
+app.config['SERVER_NAME'] = None  # Allow any domain
 
 # Initialize SocketIO for realtime updates
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='gevent')
+# Allow multiple origins including the custom domain
+allowed_origins = [
+    "*",  # Allow all for development
+    "http://mochiphoto.click",
+    "https://mochiphoto.click",
+    "http://www.mochiphoto.click",
+    "https://www.mochiphoto.click",
+    "http://14.225.210.195:5000",
+    "http://localhost:5000"
+]
+socketio = SocketIO(app, cors_allowed_origins=allowed_origins, async_mode='gevent')
 
 # Initialize database
 db = Database()
