@@ -1,0 +1,64 @@
+# Git
+.git
+.gitignore
+.github
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db-journal
+
+# Documentation
+*.md
+!README.md
+DEMO_SCRIPT.md
+DEPLOYMENT.md
+FINAL_REPORT.md
+*.txt
+!requirements.txt
+
+# Test files
+test_*.py
+*_test.py
+tests/
+
+# Backup files
+*_backup.py
+*_old.py
+*.bak
+
+# Email validator pro project (separate)
+email-validator-pro/
+
+# Deployment files
+deploy.sh
+*.service
+
+# Nginx config
+nginx/
