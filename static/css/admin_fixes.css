@@ -1,0 +1,346 @@
+/**
+ * Admin Dashboard Fixes
+ * - Chart display issues
+ * - Mobile navigation
+ * - Responsive improvements
+ */
+
+/* ========================================
+   CHART FIXES
+   ======================================== */
+
+/* Fix chart container heights */
+.chart-container {
+    position: relative;
+    height: 350px !important;
+    min-height: 350px !important;
+    padding: 20px !important;
+    margin-bottom: 24px !important;
+}
+
+.chart-container canvas {
+    max-height: 280px !important;
+    height: 280px !important;
+}
+
+.charts-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+/* Ensure charts render properly */
+#userGrowthChart,
+#vipDistributionChart {
+    width: 100% !important;
+    height: 280px !important;
+    max-height: 280px !important;
+}
+
+/* Chart headers */
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.chart-header h3 {
+    font-size: 18px !important;
+    margin: 0 !important;
+}
+
+.chart-select {
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #fff;
+    font-size: 13px;
+}
+
+/* ========================================
+   MOBILE NAVIGATION FIXES
+   ======================================== */
+
+/* Mobile menu toggle button */
+.mobile-menu-btn {
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    width: 44px;
+    height: 44px;
+    background: var(--accent-gold, #ffd700);
+    border: none;
+    border-radius: 8px;
+    color: #0a0e27;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+/* Sidebar mobile behavior */
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Hide sidebar by default on mobile */
+    .sidebar {
+        position: fixed;
+        left: -100%;
+        top: 0;
+        height: 100vh;
+        width: 280px;
+        z-index: 1000;
+        transition: left 0.3s ease;
+        box-shadow: 2px 0 12px rgba(0, 0, 0, 0.5);
+    }
+    
+    /* Show sidebar when active */
+    .sidebar.active {
+        left: 0;
+    }
+    
+    /* Overlay when sidebar is open */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+    
+    .sidebar-overlay.active {
+        display: block;
+    }
+    
+    /* Adjust main content on mobile */
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 80px 16px 16px !important;
+    }
+    
+    /* Top header adjustments */
+    .top-header {
+        padding-left: 70px !important;
+    }
+    
+    .header-left {
+        margin-left: 0 !important;
+    }
+    
+    /* Charts responsive */
+    .charts-section {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .chart-container {
+        height: 300px !important;
+        padding: 16px !important;
+    }
+    
+    .chart-container canvas {
+        max-height: 240px !important;
+        height: 240px !important;
+    }
+    
+    /* Stats grid on mobile */
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+    }
+    
+    .stat-card {
+        padding: 16px !important;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .chart-container {
+        height: 250px !important;
+        padding: 12px !important;
+    }
+    
+    .chart-container canvas {
+        max-height: 200px !important;
+        height: 200px !important;
+    }
+    
+    .mobile-menu-btn {
+        top: 16px;
+        left: 16px;
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+}
+
+/* ========================================
+   PAGE HEADER IMPROVEMENTS
+   ======================================== */
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.page-header h2 {
+    margin: 0;
+    font-size: 24px !important;
+}
+
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .page-header h2 {
+        font-size: 20px !important;
+    }
+}
+
+/* ========================================
+   TABLE IMPROVEMENTS
+   ======================================== */
+
+.table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.data-table {
+    width: 100%;
+    min-width: 600px; /* Prevent squishing */
+}
+
+@media (max-width: 768px) {
+    .table-container {
+        margin: 0 -16px;
+        padding: 0 16px;
+    }
+}
+
+/* ========================================
+   ACTIVITY SECTION
+   ======================================== */
+
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.activity-icon.blue { background: rgba(52, 152, 219, 0.2); color: #3498db; }
+.activity-icon.green { background: rgba(46, 204, 113, 0.2); color: #2ecc71; }
+.activity-icon.orange { background: rgba(230, 126, 34, 0.2); color: #e67e22; }
+.activity-icon.red { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
+
+.activity-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.activity-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+
+.activity-time {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+@media (max-width: 768px) {
+    .activity-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
+
+/* ========================================
+   LOADING STATES
+   ======================================== */
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--accent-gold, #ffd700);
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.skeleton-loader {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.03) 0%,
+        rgba(255, 255, 255, 0.08) 50%,
+        rgba(255, 255, 255, 0.03) 100%
+    );
+    background-size: 200% 100%;
+    animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ========================================
+   UTILITIES
+   ======================================== */
+
+.overflow-hidden { overflow: hidden !important; }
+.position-relative { position: relative !important; }
+.d-none { display: none !important; }
+.d-block { display: block !important; }
+.d-flex { display: flex !important; }
