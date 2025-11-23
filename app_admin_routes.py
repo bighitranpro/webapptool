@@ -572,6 +572,7 @@ def api_admin_search():
 from backup_manager import backup_manager
 from werkzeug.utils import secure_filename
 from security_utils import rate_limit
+from cache_manager import cache, query_cache
 import os
 
 @admin_bp.route('/api/backup/create', methods=['POST'])
@@ -891,6 +892,75 @@ def api_import_table(table_name):
             )
         
         return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+# ==========================================
+# CACHE MANAGEMENT ENDPOINTS
+# ==========================================
+
+@admin_bp.route('/api/cache/stats')
+@admin_required
+def api_cache_stats():
+    """Get cache statistics"""
+    try:
+        stats = cache.get_stats()
+        
+        return jsonify({
+            'success': True,
+            'stats': stats
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@admin_bp.route('/api/cache/clear', methods=['POST'])
+@admin_required
+def api_cache_clear():
+    """Clear all cache"""
+    try:
+        cache.clear()
+        
+        # Log activity
+        auth_system.log_activity(
+            user_id=session.get('user_id'),
+            action='clear_cache',
+            details='Cleared all cache entries'
+        )
+        
+        return jsonify({
+            'success': True,
+            'message': 'Cache cleared successfully'
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@admin_bp.route('/api/cache/cleanup', methods=['POST'])
+@admin_required
+def api_cache_cleanup():
+    """Cleanup expired cache entries"""
+    try:
+        expired_count = cache.cleanup_expired()
+        
+        return jsonify({
+            'success': True,
+            'message': f'Removed {expired_count} expired entries',
+            'expired_count': expired_count
+        })
         
     except Exception as e:
         return jsonify({

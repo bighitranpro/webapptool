@@ -15,6 +15,9 @@ from security_utils import (
     rate_limiter
 )
 
+# Import cache manager
+from cache_manager import cache, start_cache_cleanup_scheduler
+
 # Initialize Flask app
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'bi_tool_mochiphoto_secret_2024_secure')
@@ -221,6 +224,9 @@ def handle_exception(error):
 
 
 if __name__ == '__main__':
+    # Start cache cleanup scheduler
+    start_cache_cleanup_scheduler(interval=300)  # Cleanup every 5 minutes
+    
     # Check if running in production mode
     port = 80 if len(sys.argv) > 1 and sys.argv[1] == 'production' else 5003
     debug_mode = port == 5000
