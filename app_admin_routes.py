@@ -565,5 +565,339 @@ def api_admin_search():
         return jsonify({'error': str(e)}), 500
 
 
+# ==========================================
+# BACKUP & RESTORE ENDPOINTS
+# ==========================================
+
+from backup_manager import backup_manager
+from werkzeug.utils import secure_filename
+from security_utils import rate_limit
+import os
+
+@admin_bp.route('/api/backup/create', methods=['POST'])
+@admin_required
+@rate_limit(max_requests=5, window_seconds=300)  # 5 backups per 5 minutes
+def api_create_backup():
+    """Create a full database backup"""
+    try:
+        result = backup_manager.create_full_backup()
+        
+        if result['success']:
+            # Log activity
+            auth_system.log_activity(
+                user_id=session.get('user_id'),
+                action='create_backup',
+                details=f"Created backup: {result['backup_name']}"
+            )
+            
+            return jsonify({
+                'success': True,
+                'message': 'Backup created successfully',
+                'backup_info': {
+                    'name': result['backup_name'],
+                    'size': result['file_size'],
+                    'table_count': result['table_count'],
+                    'timestamp': result['timestamp']
+                }
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': result.get('error', 'Unknown error')
+            }), 500
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@admin_bp.route('/api/backup/list')
+@admin_required
+def api_list_backups():
+    """List all available backups"""
+    try:
+        backups = backup_manager.list_backups()
+        
+        return jsonify({
+            'success': True,
+            'backups': backups,
+            'count': len(backups)
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@admin_bp.route('/api/backup/download/<filename>')
+@admin_required
+def api_download_backup(filename):
+    """Download a backup file"""
+    try:
+        from flask import send_file
+        
+        # Validate filename (security)
+        filename = secure_filename(filename)
+        file_path = os.path.join(backup_manager.backup_dir, filename)
+        
+        if not os.path.exists(file_path):
+            return jsonify({
+                'success': False,
+                'error': 'Backup file not found'
+            }), 404
+        
+        # Log activity
+        auth_system.log_activity(
+            user_id=session.get('user_id'),
+            action='download_backup',
+            details=f"Downloaded backup: {filename}"
+        )
+        
+        return send_file(
+            file_path,
+            as_attachment=True,
+            download_name=filename
+        )
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@admin_bp.route('/api/backup/delete/<filename>', methods=['DELETE'])
+@admin_required
+def api_delete_backup(filename):
+    """Delete a backup file"""
+    try:
+        # Validate filename (security)
+        filename = secure_filename(filename)
+        
+        success = backup_manager.delete_backup(filename)
+        
+        if success:
+            # Log activity
+            auth_system.log_activity(
+                user_id=session.get('user_id'),
+                action='delete_backup',
+                details=f"Deleted backup: {filename}"
+            )
+            
+            return jsonify({
+                'success': True,
+                'message': 'Backup deleted successfully'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Backup file not found'
+            }), 404
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@admin_bp.route('/api/backup/restore', methods=['POST'])
+@admin_required
+@rate_limit(max_requests=3, window_seconds=600)  # 3 restores per 10 minutes
+def api_restore_backup():
+    """Restore database from backup"""
+    try:
+        # Check if file was uploaded
+        if 'backup_file' not in request.files:
+            return jsonify({
+                'success': False,
+                'error': 'No backup file provided'
+            }), 400
+        
+        file = request.files['backup_file']
+        
+        if file.filename == '':
+            return jsonify({
+                'success': False,
+                'error': 'No file selected'
+            }), 400
+        
+        # Get restore mode
+        restore_mode = request.form.get('restore_mode', 'replace')  # replace, merge, append
+        
+        # Validate restore mode
+        if restore_mode not in ['replace', 'merge', 'append']:
+            return jsonify({
+                'success': False,
+                'error': 'Invalid restore mode'
+            }), 400
+        
+        # Save uploaded file temporarily
+        filename = secure_filename(file.filename)
+        temp_path = os.path.join(backup_manager.backup_dir, f"temp_{filename}")
+        file.save(temp_path)
+        
+        # Restore from backup
+        result = backup_manager.restore_from_backup(temp_path, restore_mode)
+        
+        # Clean up temp file
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+        
+        if result['success']:
+            # Log activity
+            auth_system.log_activity(
+                user_id=session.get('user_id'),
+                action='restore_backup',
+                details=f"Restored backup: {filename} (mode: {restore_mode})"
+            )
+            
+            return jsonify({
+                'success': True,
+                'message': 'Database restored successfully',
+                'restore_info': {
+                    'restored_tables': result['restored_tables'],
+                    'restore_mode': result['restore_mode']
+                }
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': result.get('error', 'Unknown error')
+            }), 500
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@admin_bp.route('/api/database/stats')
+@admin_required
+def api_database_stats():
+    """Get database statistics"""
+    try:
+        stats = backup_manager.get_database_stats()
+        
+        if 'error' in stats:
+            return jsonify({
+                'success': False,
+                'error': stats['error']
+            }), 500
+        
+        return jsonify({
+            'success': True,
+            'stats': stats
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@admin_bp.route('/api/export/<table_name>')
+@admin_required
+def api_export_table(table_name):
+    """Export specific table as JSON"""
+    try:
+        from security_utils import InputSanitizer
+        
+        # Validate table name (security)
+        if not InputSanitizer.SAFE_STRING_PATTERN.match(table_name):
+            return jsonify({
+                'success': False,
+                'error': 'Invalid table name'
+            }), 400
+        
+        export_data = backup_manager.export_as_json([table_name])
+        
+        # Log activity
+        auth_system.log_activity(
+            user_id=session.get('user_id'),
+            action='export_table',
+            details=f"Exported table: {table_name}"
+        )
+        
+        return jsonify({
+            'success': True,
+            'export_data': export_data
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@admin_bp.route('/api/import/<table_name>', methods=['POST'])
+@admin_required
+@rate_limit(max_requests=10, window_seconds=300)  # 10 imports per 5 minutes
+def api_import_table(table_name):
+    """Import data into specific table"""
+    try:
+        from security_utils import InputSanitizer
+        
+        # Validate table name (security)
+        if not InputSanitizer.SAFE_STRING_PATTERN.match(table_name):
+            return jsonify({
+                'success': False,
+                'error': 'Invalid table name'
+            }), 400
+        
+        # Get JSON data
+        data = request.get_json()
+        
+        if not data or 'rows' not in data:
+            return jsonify({
+                'success': False,
+                'error': 'Invalid data format'
+            }), 400
+        
+        import_mode = data.get('mode', 'append')  # append, replace, merge
+        
+        # Validate import mode
+        if import_mode not in ['append', 'replace', 'merge']:
+            return jsonify({
+                'success': False,
+                'error': 'Invalid import mode'
+            }), 400
+        
+        # Sanitize data
+        sanitized_rows = [
+            InputSanitizer.sanitize_dict(row) for row in data['rows']
+        ]
+        
+        # Import data
+        result = backup_manager.import_from_json(
+            sanitized_rows,
+            table_name,
+            import_mode
+        )
+        
+        if result['success']:
+            # Log activity
+            auth_system.log_activity(
+                user_id=session.get('user_id'),
+                action='import_table',
+                details=f"Imported {result['rows_inserted']} rows into {table_name}"
+            )
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
 # Export blueprint
 __all__ = ['admin_bp']
