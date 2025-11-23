@@ -1390,7 +1390,177 @@
         </div>
     </div>
 
+    <!-- Email Filter Modal -->
+    <div class="modal" id="filterModal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-filter"></i> Lọc Email</h2>
+                <button class="modal-close" onclick="closeModal('filterModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="tool-description">
+                    <p>Lọc email theo domain, status, hoặc pattern cụ thể.</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="filterEmails">
+                        <i class="fas fa-envelope"></i> Danh sách Email
+                        <span class="label-hint">(Mỗi email một dòng)</span>
+                    </label>
+                    <textarea id="filterEmails" rows="10" placeholder="email1@gmail.com&#10;email2@yahoo.com"></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="filterDomain">
+                            <i class="fas fa-globe"></i> Lọc theo Domain
+                        </label>
+                        <input type="text" id="filterDomain" placeholder="gmail.com, yahoo.com (phân cách bằng dấu phẩy)">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="filterPattern">
+                            <i class="fas fa-search"></i> Pattern (Regex)
+                        </label>
+                        <input type="text" id="filterPattern" placeholder="^[a-z]+@.*\.com$">
+                    </div>
+                </div>
+                
+                <div class="options-grid">
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="filterInclude" checked>
+                        <span>Include (bao gồm)</span>
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="filterExclude">
+                        <span>Exclude (loại trừ)</span>
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="filterCaseSensitive">
+                        <span>Case sensitive</span>
+                    </label>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn btn-primary" onclick="runEmailFilter()">
+                        <i class="fas fa-filter"></i> Lọc
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearFilterResults()">
+                        <i class="fas fa-eraser"></i> Xóa
+                    </button>
+                </div>
+                
+                <div id="filterResults" class="results-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Analyzer Modal -->
+    <div class="modal" id="analyzerModal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-chart-bar"></i> Phân tích Email</h2>
+                <button class="modal-close" onclick="closeModal('analyzerModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="tool-description">
+                    <p>Phân tích thống kê chi tiết về danh sách email: domains, patterns, quality score.</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="analyzerEmails">
+                        <i class="fas fa-envelope"></i> Danh sách Email
+                        <span class="label-hint">(Mỗi email một dòng)</span>
+                    </label>
+                    <textarea id="analyzerEmails" rows="10" placeholder="email1@gmail.com&#10;email2@yahoo.com"></textarea>
+                </div>
+                
+                <div class="options-grid">
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="analyzeDomains" checked>
+                        <span>Domain statistics</span>
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="analyzePatterns" checked>
+                        <span>Pattern analysis</span>
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="analyzeQuality" checked>
+                        <span>Quality score</span>
+                    </label>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn btn-primary" onclick="runEmailAnalyzer()">
+                        <i class="fas fa-chart-line"></i> Phân tích
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearAnalyzerResults()">
+                        <i class="fas fa-eraser"></i> Xóa
+                    </button>
+                </div>
+                
+                <div id="analyzerResults" class="results-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Deduplicator Modal -->
+    <div class="modal" id="deduplicatorModal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-clone"></i> Loại bỏ Email trùng lặp</h2>
+                <button class="modal-close" onclick="closeModal('deduplicatorModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="tool-description">
+                    <p>Loại bỏ các email trùng lặp, chỉ giữ lại email unique.</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dedupEmails">
+                        <i class="fas fa-envelope"></i> Danh sách Email
+                        <span class="label-hint">(Mỗi email một dòng, có thể có trùng lặp)</span>
+                    </label>
+                    <textarea id="dedupEmails" rows="10" placeholder="email1@gmail.com&#10;email2@yahoo.com&#10;email1@gmail.com (trùng)"></textarea>
+                </div>
+                
+                <div class="options-grid">
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="dedupCaseInsensitive" checked>
+                        <span>Case insensitive</span>
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="dedupKeepFirst" checked>
+                        <span>Giữ email đầu tiên</span>
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="dedupSortOutput">
+                        <span>Sắp xếp kết quả</span>
+                    </label>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn btn-primary" onclick="runDeduplicator()">
+                        <i class="fas fa-check-double"></i> Loại bỏ trùng
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearDedupResults()">
+                        <i class="fas fa-eraser"></i> Xóa
+                    </button>
+                </div>
+                
+                <div id="dedupResults" class="results-container"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Core Scripts (Load first) -->
+    <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
     <script src="{{ url_for('static', filename='js/modals.js') }}"></script>
     <script src="{{ url_for('static', filename='js/api.js') }}"></script>
     <script src="{{ url_for('static', filename='js/tool_handlers.js') }}"></script>

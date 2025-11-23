@@ -775,4 +775,402 @@ function showNotification(message, type = 'info') {
     }
 }
 
-console.log('✅ Tool Handlers loaded successfully');
+// ============================================
+// EMAIL FILTER TOOL
+// ============================================
+
+function runEmailFilter() {
+    const emailsText = document.getElementById('filterEmails').value.trim();
+    const domains = document.getElementById('filterDomain').value.trim();
+    const pattern = document.getElementById('filterPattern').value.trim();
+    const include = document.getElementById('filterInclude').checked;
+    const exclude = document.getElementById('filterExclude').checked;
+    const caseSensitive = document.getElementById('filterCaseSensitive').checked;
+    
+    if (!emailsText) {
+        showNotification('Vui lòng nhập danh sách email', 'error');
+        return;
+    }
+    
+    const emails = parseEmails(emailsText);
+    
+    if (emails.length === 0) {
+        showNotification('Không tìm thấy email hợp lệ', 'error');
+        return;
+    }
+    
+    toggleLoading(true, 'filterResults', `Đang lọc ${emails.length} emails...`);
+    
+    fetch('/api/filter', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            emails: emails,
+            filter_by: {
+                domains: domains ? domains.split(',').map(d => d.trim()) : [],
+                pattern: pattern || null,
+                include: include,
+                exclude: exclude,
+                case_sensitive: caseSensitive
+            }
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            displayFilterResults(data);
+        } else {
+            displayResult('filterResults', {message: data.message || 'Có lỗi xảy ra'}, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Filter Error:', error);
+        displayResult('filterResults', {message: 'Lỗi kết nối: ' + error.message}, 'error');
+    });
+}
+
+function displayFilterResults(data) {
+    const container = document.getElementById('filterResults');
+    const filtered = data.filtered || [];
+    const removed = data.removed || [];
+    
+    let html = `
+        <div class="results-summary">
+            <h3><i class="fas fa-check-circle"></i> Kết quả lọc</h3>
+            <div class="stats-row">
+                <div class="stat-item stat-total">
+                    <div class="stat-value">${data.total_input || 0}</div>
+                    <div class="stat-label">Tổng input</div>
+                </div>
+                <div class="stat-item stat-live">
+                    <div class="stat-value">${filtered.length}</div>
+                    <div class="stat-label">Đã lọc</div>
+                </div>
+                <div class="stat-item stat-die">
+                    <div class="stat-value">${removed.length}</div>
+                    <div class="stat-label">Đã loại bỏ</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="results-tabs">
+            <button class="tab-btn active" onclick="showFilterTab('filtered')">
+                <i class="fas fa-check-circle"></i> Đã lọc (${filtered.length})
+            </button>
+            <button class="tab-btn" onclick="showFilterTab('removed')">
+                <i class="fas fa-times-circle"></i> Đã loại bỏ (${removed.length})
+            </button>
+        </div>
+        
+        <div class="tab-content">
+            <div id="filterTab-filtered" class="tab-pane active">
+                <textarea readonly rows="10">${filtered.join('\\n')}</textarea>
+                <button class="btn btn-sm btn-primary" onclick="copyTabContent('filterTab-filtered')">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+                <button class="btn btn-sm btn-success" onclick="downloadTabContent('filterTab-filtered', 'filtered_emails.txt')">
+                    <i class="fas fa-download"></i> Tải xuống
+                </button>
+            </div>
+            <div id="filterTab-removed" class="tab-pane">
+                <textarea readonly rows="10">${removed.join('\\n')}</textarea>
+                <button class="btn btn-sm btn-primary" onclick="copyTabContent('filterTab-removed')">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+            </div>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+function showFilterTab(tabName) {
+    document.querySelectorAll('#filterResults .tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelectorAll('#filterResults .tab-pane').forEach(pane => {
+        pane.classList.remove('active');
+    });
+    
+    event.target.classList.add('active');
+    document.getElementById('filterTab-' + tabName).classList.add('active');
+}
+
+function clearFilterResults() {
+    document.getElementById('filterEmails').value = '';
+    document.getElementById('filterDomain').value = '';
+    document.getElementById('filterPattern').value = '';
+    document.getElementById('filterResults').innerHTML = '';
+}
+
+// ============================================
+// EMAIL ANALYZER TOOL
+// ============================================
+
+function runEmailAnalyzer() {
+    const emailsText = document.getElementById('analyzerEmails').value.trim();
+    const analyzeDomains = document.getElementById('analyzeDomains').checked;
+    const analyzePatterns = document.getElementById('analyzePatterns').checked;
+    const analyzeQuality = document.getElementById('analyzeQuality').checked;
+    
+    if (!emailsText) {
+        showNotification('Vui lòng nhập danh sách email', 'error');
+        return;
+    }
+    
+    const emails = parseEmails(emailsText);
+    
+    if (emails.length === 0) {
+        showNotification('Không tìm thấy email hợp lệ', 'error');
+        return;
+    }
+    
+    toggleLoading(true, 'analyzerResults', `Đang phân tích ${emails.length} emails...`);
+    
+    fetch('/api/analyze', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            emails: emails,
+            analyze: {
+                domains: analyzeDomains,
+                patterns: analyzePatterns,
+                quality: analyzeQuality
+            }
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            displayAnalyzerResults(data);
+        } else {
+            displayResult('analyzerResults', {message: data.message || 'Có lỗi xảy ra'}, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Analyzer Error:', error);
+        displayResult('analyzerResults', {message: 'Lỗi kết nối: ' + error.message}, 'error');
+    });
+}
+
+function displayAnalyzerResults(data) {
+    const container = document.getElementById('analyzerResults');
+    const analysis = data.analysis || {};
+    const domains = analysis.domains || {};
+    
+    // Domain distribution
+    let domainRows = '';
+    Object.entries(domains).slice(0, 10).forEach(([domain, count]) => {
+        const percentage = ((count / data.total) * 100).toFixed(1);
+        domainRows += `
+            <tr>
+                <td>${domain}</td>
+                <td>${count}</td>
+                <td>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: ${percentage}%"></div>
+                    </div>
+                </td>
+                <td>${percentage}%</td>
+            </tr>
+        `;
+    });
+    
+    let html = `
+        <div class="results-summary">
+            <h3><i class="fas fa-chart-pie"></i> Phân tích Email</h3>
+            <div class="stats-row">
+                <div class="stat-item stat-total">
+                    <div class="stat-value">${data.total || 0}</div>
+                    <div class="stat-label">Tổng số</div>
+                </div>
+                <div class="stat-item stat-info">
+                    <div class="stat-value">${Object.keys(domains).length}</div>
+                    <div class="stat-label">Domains</div>
+                </div>
+                <div class="stat-item stat-success">
+                    <div class="stat-value">${analysis.quality_score || 0}%</div>
+                    <div class="stat-label">Quality Score</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="results-table">
+            <h4>Top Domains</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Domain</th>
+                        <th>Count</th>
+                        <th>Distribution</th>
+                        <th>%</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${domainRows}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="result-actions">
+            <button class="btn btn-success" onclick="downloadAnalyzerResults()">
+                <i class="fas fa-download"></i> Tải báo cáo JSON
+            </button>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+function downloadAnalyzerResults() {
+    const table = document.querySelector('#analyzerResults table');
+    if (table) {
+        const data = {
+            timestamp: new Date().toISOString(),
+            analysis: 'Email Analysis Report'
+        };
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'email_analysis.json';
+        a.click();
+        window.URL.revokeObjectURL(url);
+        showNotification('Đã tải xuống', 'success');
+    }
+}
+
+function clearAnalyzerResults() {
+    document.getElementById('analyzerEmails').value = '';
+    document.getElementById('analyzerResults').innerHTML = '';
+}
+
+// ============================================
+// EMAIL DEDUPLICATOR TOOL
+// ============================================
+
+function runDeduplicator() {
+    const emailsText = document.getElementById('dedupEmails').value.trim();
+    const caseInsensitive = document.getElementById('dedupCaseInsensitive').checked;
+    const keepFirst = document.getElementById('dedupKeepFirst').checked;
+    const sortOutput = document.getElementById('dedupSortOutput').checked;
+    
+    if (!emailsText) {
+        showNotification('Vui lòng nhập danh sách email', 'error');
+        return;
+    }
+    
+    const emails = emailsText.split('\\n').map(e => e.trim()).filter(e => e);
+    
+    if (emails.length === 0) {
+        showNotification('Không tìm thấy email hợp lệ', 'error');
+        return;
+    }
+    
+    toggleLoading(true, 'dedupResults', `Đang xử lý ${emails.length} emails...`);
+    
+    fetch('/api/deduplicate', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            emails: emails,
+            options: {
+                case_insensitive: caseInsensitive,
+                keep_first: keepFirst,
+                sort_output: sortOutput
+            }
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            displayDedupResults(data);
+        } else {
+            displayResult('dedupResults', {message: data.message || 'Có lỗi xảy ra'}, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Dedup Error:', error);
+        displayResult('dedupResults', {message: 'Lỗi kết nối: ' + error.message}, 'error');
+    });
+}
+
+function displayDedupResults(data) {
+    const container = document.getElementById('dedupResults');
+    const unique = data.unique || [];
+    const duplicates = data.duplicates || [];
+    const removed = data.stats?.duplicates_removed || 0;
+    
+    let html = `
+        <div class="results-summary">
+            <h3><i class="fas fa-check-circle"></i> Kết quả loại bỏ trùng</h3>
+            <div class="stats-row">
+                <div class="stat-item stat-total">
+                    <div class="stat-value">${data.stats?.total_input || 0}</div>
+                    <div class="stat-label">Tổng input</div>
+                </div>
+                <div class="stat-item stat-live">
+                    <div class="stat-value">${unique.length}</div>
+                    <div class="stat-label">Unique</div>
+                </div>
+                <div class="stat-item stat-die">
+                    <div class="stat-value">${removed}</div>
+                    <div class="stat-label">Đã loại bỏ</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="result-list">
+            <h4>Email Unique (${unique.length})</h4>
+            <textarea readonly rows="15">${unique.join('\\n')}</textarea>
+        </div>
+        
+        <div class="result-actions">
+            <button class="btn btn-primary" onclick="copyDedupResults()">
+                <i class="fas fa-copy"></i> Copy tất cả
+            </button>
+            <button class="btn btn-success" onclick="downloadDedupResults()">
+                <i class="fas fa-download"></i> Tải xuống
+            </button>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+function copyDedupResults() {
+    const textarea = document.querySelector('#dedupResults textarea');
+    if (textarea) {
+        textarea.select();
+        document.execCommand('copy');
+        showNotification('Đã copy tất cả emails unique', 'success');
+    }
+}
+
+function downloadDedupResults() {
+    const textarea = document.querySelector('#dedupResults textarea');
+    if (textarea) {
+        const blob = new Blob([textarea.value], {type: 'text/plain'});
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'unique_emails.txt';
+        a.click();
+        window.URL.revokeObjectURL(url);
+        showNotification('Đã tải xuống', 'success');
+    }
+}
+
+function clearDedupResults() {
+    document.getElementById('dedupEmails').value = '';
+    document.getElementById('dedupResults').innerHTML = '';
+}
+
+console.log('✅ Tool Handlers loaded successfully (including Filter, Analyzer, Deduplicator)');
