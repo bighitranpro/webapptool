@@ -727,6 +727,9 @@
         }
     </style>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_improvements.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern_ui.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/micro_interactions.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/typography_spacing.css') }}">
 </head>
 <body>
     <!-- Navigation -->
@@ -749,17 +752,17 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero">
+    <section class="hero hero-modern">
         <div class="hero-content">
-            <h1>Công Cụ Email & Facebook<br>Chuyên Nghiệp Hàng Đầu</h1>
-            <p class="subtitle">Kiểm tra, tạo và phân tích email với độ chính xác 95%. Kiểm tra liên kết Facebook, trạng thái 2FA, khai thác trang - tất cả trong một nền tảng mạnh mẽ.</p>
-            <div class="hero-buttons">
-                <a href="/register" class="btn-primary">
-                    <i class="fas fa-rocket"></i>
+            <h1 class="fade-in-up">Công Cụ Email & Facebook<br>Chuyên Nghiệp Hàng Đầu</h1>
+            <p class="subtitle fade-in-up delay-1">Kiểm tra, tạo và phân tích email với độ chính xác 95%. Kiểm tra liên kết Facebook, trạng thái 2FA, khai thác trang - tất cả trong một nền tảng mạnh mẽ.</p>
+            <div class="hero-buttons fade-in-up delay-2">
+                <a href="/register" class="btn-primary btn-modern btn-gradient-primary hover-scale btn-ripple btn-shine">
+                    <i class="fas fa-rocket icon-bounce"></i>
                     Dùng Thử Miễn Phí
                 </a>
-                <button class="btn-secondary" onclick="showFeatureDemo()">
-                    <i class="fas fa-play"></i>
+                <button class="btn-secondary btn-modern hover-scale btn-ripple" onclick="showFeatureDemo()">
+                    <i class="fas fa-play icon-spin"></i>
                     Xem Demo
                 </button>
             </div>
@@ -771,48 +774,48 @@
         <h2 class="section-title">Tính Năng Mạnh Mẽ</h2>
         <p class="section-subtitle">Bộ công cụ toàn diện giúp bạn tối ưu hóa công việc với email và Facebook</p>
         <div class="features-grid">
-            <div class="feature-card" onclick="showLoginPrompt('Kiểm tra Email')">
-                <div class="feature-icon gold">
+            <div class="feature-card feature-card-modern modern-card scroll-reveal" onclick="showLoginPrompt('Kiểm tra Email')">
+                <div class="feature-icon gold animate-float">
                     <i class="fas fa-shield-check"></i>
                 </div>
                 <h3>Kiểm Tra Email</h3>
                 <p>Xác thực email với độ chính xác 95%. Phát hiện trạng thái LIVE/DIE, bản ghi MX, khả năng kết nối SMTP và khả năng nhận mã xác thực.</p>
             </div>
 
-            <div class="feature-card" onclick="showLoginPrompt('Tạo Email')">
-                <div class="feature-icon blue">
+            <div class="feature-card feature-card-modern modern-card scroll-reveal" onclick="showLoginPrompt('Tạo Email')">
+                <div class="feature-icon blue animate-float">
                     <i class="fas fa-random"></i>
                 </div>
                 <h3>Tạo Email</h3>
                 <p>Tạo email ngẫu nhiên không giới hạn hoặc theo mẫu tùy chỉnh trên nhiều tên miền. Hoàn hảo cho thử nghiệm và thao tác hàng loạt.</p>
             </div>
 
-            <div class="feature-card" onclick="showLoginPrompt('Công cụ Facebook')">
-                <div class="feature-icon green">
+            <div class="feature-card feature-card-modern modern-card scroll-reveal" onclick="showLoginPrompt('Công cụ Facebook')">
+                <div class="feature-icon green animate-float">
                     <i class="fab fa-facebook"></i>
                 </div>
                 <h3>Công Cụ Facebook</h3>
                 <p>Kiểm tra liên kết email-Facebook với 6 API, xác minh trạng thái 2FA, trích xuất trang và khai thác thông tin tài khoản có giá trị.</p>
             </div>
 
-            <div class="feature-card" onclick="showLoginPrompt('Trích xuất Email')">
-                <div class="feature-icon gold">
+            <div class="feature-card feature-card-modern modern-card scroll-reveal" onclick="showLoginPrompt('Trích xuất Email')">
+                <div class="feature-icon gold animate-float">
                     <i class="fas fa-search"></i>
                 </div>
                 <h3>Trích Xuất Email</h3>
                 <p>Trích xuất email từ văn bản, tệp hoặc URL. Nhận diện mẫu thông minh cho nhiều nguồn và định dạng khác nhau.</p>
             </div>
 
-            <div class="feature-card" onclick="showLoginPrompt('Phân tích Email')">
-                <div class="feature-icon blue">
+            <div class="feature-card feature-card-modern modern-card scroll-reveal" onclick="showLoginPrompt('Phân tích Email')">
+                <div class="feature-icon blue animate-float">
                     <i class="fas fa-chart-bar"></i>
                 </div>
                 <h3>Phân Tích Email</h3>
                 <p>Phân tích mẫu email, tên miền và thống kê. Nhận thông tin chi tiết từ danh sách email với báo cáo chi tiết.</p>
             </div>
 
-            <div class="feature-card" onclick="showLoginPrompt('Xử lý hàng loạt')">
-                <div class="feature-icon green">
+            <div class="feature-card feature-card-modern modern-card scroll-reveal" onclick="showLoginPrompt('Xử lý hàng loạt')">
+                <div class="feature-icon green animate-float">
                     <i class="fas fa-layer-group"></i>
                 </div>
                 <h3>Xử Lý Hàng Loạt</h3>
@@ -826,20 +829,20 @@
         <h2 class="section-title">Bảng Giá Đơn Giản, Minh Bạch</h2>
         <p class="section-subtitle">Chọn gói phù hợp với nhu cầu của bạn</p>
         <div class="pricing-grid">
-            <div class="pricing-card">
-                <div class="pricing-badge free">MIỄN PHÍ</div>
+            <div class="pricing-card modern-card glass-card scroll-reveal">
+                <div class="pricing-badge free badge-modern">MIỄN PHÍ</div>
                 <div class="pricing-price">0đ<span>/tháng</span></div>
                 <ul class="pricing-features">
                     <li><i class="fas fa-check"></i> 50 lượt kiểm tra/ngày</li>
                     <li><i class="fas fa-check"></i> Công cụ email cơ bản</li>
                     <li><i class="fas fa-check"></i> Hỗ trợ tiêu chuẩn</li>
                 </ul>
-                <a href="/register" class="btn-secondary" style="width: 100%;">Bắt Đầu Ngay</a>
+                <a href="/register" class="btn-secondary btn-modern hover-scale" style="width: 100%;">Bắt Đầu Ngay</a>
             </div>
 
-            <div class="pricing-card featured">
-                <div class="pricing-badge pro">PRO ⭐</div>
-                <div class="pricing-price">690K<span>/tháng</span></div>
+            <div class="pricing-card featured modern-card glass-card scroll-reveal hover-glow">
+                <div class="pricing-badge pro badge-modern badge-pulse">PRO ⭐</div>
+                <div class="pricing-price heading-gradient">690K<span>/tháng</span></div>
                 <ul class="pricing-features">
                     <li><i class="fas fa-check"></i> Không giới hạn kiểm tra</li>
                     <li><i class="fas fa-check"></i> Mở khóa tất cả công cụ</li>
@@ -847,11 +850,11 @@
                     <li><i class="fas fa-check"></i> Hỗ trợ VIP 24/7</li>
                     <li><i class="fas fa-check"></i> Truy cập API</li>
                 </ul>
-                <a href="/register" class="btn-primary" style="width: 100%;">Nâng Cấp PRO</a>
+                <a href="/register" class="btn-primary btn-modern btn-gradient-primary hover-scale btn-ripple btn-shine transition-smooth" style="width: 100%;">Nâng Cấp PRO</a>
             </div>
 
-            <div class="pricing-card">
-                <div class="pricing-badge pro">DOANH NGHIỆP</div>
+            <div class="pricing-card modern-card glass-card scroll-reveal">
+                <div class="pricing-badge pro badge-modern">DOANH NGHIỆP</div>
                 <div class="pricing-price">2.3M<span>/tháng</span></div>
                 <ul class="pricing-features">
                     <li><i class="fas fa-check"></i> Tất cả tính năng PRO</li>
@@ -859,18 +862,18 @@
                     <li><i class="fas fa-check"></i> Tích hợp tùy chỉnh</li>
                     <li><i class="fas fa-check"></i> Tùy chọn white-label</li>
                 </ul>
-                <a href="/register" class="btn-secondary" style="width: 100%;">Liên Hệ Sales</a>
+                <a href="/register" class="btn-secondary btn-modern hover-scale btn-ripple transition-smooth" style="width: 100%;">Liên Hệ Sales</a>
             </div>
         </div>
     </section>
 
     <!-- CTA Section -->
-    <section class="cta">
+    <section class="cta gradient-bg-animated">
         <div class="cta-content">
-            <h2>Sẵn Sàng Bắt Đầu?</h2>
-            <p>Tham gia cùng hàng nghìn người dùng tin tưởng Bi Tool cho nhu cầu tự động hóa email và Facebook của họ.</p>
-            <a href="/register" class="btn-primary" style="font-size: 20px; padding: 20px 48px;">
-                <i class="fas fa-user-plus"></i>
+            <h2 class="heading-gradient fade-in-up">Sẵn Sàng Bắt Đầu?</h2>
+            <p class="fade-in-up delay-1">Tham gia cùng hàng nghìn người dùng tin tưởng Bi Tool cho nhu cầu tự động hóa email và Facebook của họ.</p>
+            <a href="/register" class="btn-primary btn-modern btn-gradient-primary hover-scale btn-ripple btn-pulse btn-shine fade-in-up delay-2" style="font-size: 20px; padding: 20px 48px;">
+                <i class="fas fa-user-plus icon-bounce"></i>
                 Tạo Tài Khoản Miễn Phí
             </a>
         </div>
@@ -883,12 +886,12 @@
 
     <!-- Login Prompt Modal -->
     <div class="modal" id="loginModal">
-        <div class="modal-content">
-            <h2><i class="fas fa-lock"></i> Yêu Cầu Đăng Nhập</h2>
+        <div class="modal-content glass-card modern-card">
+            <h2 class="heading-gradient"><i class="fas fa-lock"></i> Yêu Cầu Đăng Nhập</h2>
             <p id="modalMessage">Vui lòng tạo tài khoản hoặc đăng nhập để truy cập tính năng này.</p>
             <div class="modal-buttons">
-                <a href="/register" class="btn-primary">Đăng Ký Ngay</a>
-                <a href="/login" class="btn-secondary">Đăng Nhập</a>
+                <a href="/register" class="btn-primary btn-modern btn-gradient-primary hover-scale">Đăng Ký Ngay</a>
+                <a href="/login" class="btn-secondary btn-modern hover-scale">Đăng Nhập</a>
             </div>
         </div>
     </div>
