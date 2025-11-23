@@ -1,4 +1,96 @@
 <!-- TOOLS CONTROL SECTION -->
+
+<!-- Tool Management Page -->
+<div class="admin-page" id="page-tool-management">
+    <div class="page-header">
+        <h2><i class="fas fa-cogs"></i> Quản lý Tools</h2>
+        <p>Kiểm soát hiển thị và bảo trì của các công cụ trên trang người dùng</p>
+        <div class="page-actions">
+            <input type="text" id="toolSearchInput" class="search-input" placeholder="Tìm kiếm công cụ..." onkeyup="searchTools()">
+            <button class="btn btn-primary" onclick="saveAllToolSettings()">
+                <i class="fas fa-save"></i> Lưu tất cả
+            </button>
+            <button class="btn btn-secondary" onclick="loadToolSettings()">
+                <i class="fas fa-sync-alt"></i> Làm mới
+            </button>
+        </div>
+    </div>
+
+    <!-- Tools Management Grid -->
+    <div class="tools-management-grid" id="toolsManagementGrid">
+        <div class="loading-indicator">
+            <i class="fas fa-spinner fa-spin"></i> Đang tải...
+        </div>
+    </div>
+
+    <!-- Tool Management Card Template (hidden) -->
+    <template id="toolManagementCardTemplate">
+        <div class="tool-management-card" data-tool-id="">
+            <div class="tool-card-header">
+                <div class="tool-info">
+                    <div class="tool-icon-wrapper">
+                        <i class="tool-icon-display"></i>
+                    </div>
+                    <div class="tool-details">
+                        <h4 class="tool-name-display"></h4>
+                        <p class="tool-category-display"></p>
+                    </div>
+                </div>
+                <div class="tool-status">
+                    <span class="status-badge"></span>
+                </div>
+            </div>
+            
+            <div class="tool-card-body">
+                <div class="tool-controls">
+                    <div class="control-row">
+                        <label class="control-label">
+                            <i class="fas fa-eye"></i> Hiển thị
+                        </label>
+                        <label class="switch">
+                            <input type="checkbox" class="tool-visible-toggle" onchange="updateToolStatus(this)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="control-row">
+                        <label class="control-label">
+                            <i class="fas fa-wrench"></i> Bảo trì
+                        </label>
+                        <label class="switch">
+                            <input type="checkbox" class="tool-maintenance-toggle" onchange="updateToolStatus(this)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="control-row maintenance-message-row" style="display: none;">
+                        <label class="control-label">
+                            <i class="fas fa-message"></i> Thông báo bảo trì
+                        </label>
+                        <input type="text" class="form-control tool-maintenance-msg" placeholder="Tool đang được nâng cấp...">
+                    </div>
+                    
+                    <div class="control-row">
+                        <label class="control-label">
+                            <i class="fas fa-sort"></i> Thứ tự
+                        </label>
+                        <input type="number" class="form-control tool-order-input" min="0" max="100" style="width: 80px;">
+                    </div>
+                </div>
+                
+                <div class="tool-card-footer">
+                    <button class="btn-sm btn-primary" onclick="saveToolSettings(this)">
+                        <i class="fas fa-save"></i> Lưu
+                    </button>
+                    <button class="btn-sm btn-secondary" onclick="resetToolSettings(this)">
+                        <i class="fas fa-undo"></i> Đặt lại
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+</div>
+
 <!-- Email Validator Control -->
 <div class="admin-page" id="page-validator">
     <div class="page-header">
