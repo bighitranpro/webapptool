@@ -982,6 +982,60 @@ def health_check():
     })
 
 
+@api_bp.route('/api/tools/visible', methods=['GET'])
+def get_visible_tools():
+    """Get list of visible tools (non-admin endpoint)"""
+    try:
+        import sqlite3
+        conn = sqlite3.connect('email_tool.db')
+        cursor = conn.cursor()
+        
+        # Get user role from session if available
+        from flask import session
+        from auth_vip import AuthVIPSystem
+        auth_system = AuthVIPSystem()
+        
+        user_role = 'user'  # Default
+        if 'session_token' in session:
+            try:
+                session_info = auth_system.verify_session(session['session_token'])
+                if session_info:
+                    user_role = session_info.get('role', 'user')
+            except:
+                pass
+        
+        # Get visible tools (not in maintenance mode)
+        cursor.execute('''
+            SELECT tool_id, tool_name, tool_category, icon_class, maintenance_message, requires_role
+            FROM tool_config
+            WHERE visible = 1
+            ORDER BY order_position ASC
+        ''')
+        
+        tools = []
+        for row in cursor.fetchall():
+            tool_requires_role = row[5] or 'user'
+            # Check if user has access to this tool
+            accessible = True
+            if tool_requires_role == 'admin' and user_role != 'admin':
+                accessible = False
+            
+            tools.append({
+                'tool_id': row[0],
+                'tool_name': row[1],
+                'tool_category': row[2],
+                'icon_class': row[3],
+                'maintenance': False,  # Visible tools are not in maintenance
+                'accessible': accessible
+            })
+        
+        conn.close()
+        return jsonify({'tools': tools})
+        
+    except Exception as e:
+        return jsonify({'error': str(e), 'tools': []}), 500
+
+
 @api_bp.route('/api/dashboard/stats', methods=['GET'])
 def dashboard_stats():
     """

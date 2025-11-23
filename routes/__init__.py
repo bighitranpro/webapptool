@@ -1,6 +1,6 @@
 """
 Routes Package
-Modular routing for BI GHI TOOL MMO
+Modular routing for Bi Tool (mochiphoto.click)
 """
 
 from .auth_routes import auth_bp

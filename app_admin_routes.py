@@ -1,6 +1,6 @@
 """
-Admin API Routes for BI GHI TOOL MMO
-Complete admin management endpoints
+Admin API Routes for Bi Tool (mochiphoto.click)
+Complete admin management endpoints including tool visibility control
 """
 
 from flask import Blueprint, request, jsonify, render_template, session
@@ -321,6 +321,245 @@ def api_get_logs():
         
         conn.close()
         return jsonify(logs)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@admin_bp.route('/api/tools')
+@admin_required
+def api_get_tools():
+    """Get all tools configuration"""
+    try:
+        conn = sqlite3.connect(auth_system.db_path)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT tool_id, tool_name, tool_category, icon_class, visible, 
+                   maintenance_mode, maintenance_message, order_position, requires_role
+            FROM tool_config
+            ORDER BY order_position ASC
+        ''')
+        
+        tools = []
+        for row in cursor.fetchall():
+            tools.append({
+                'tool_id': row[0],
+                'tool_name': row[1],
+                'tool_category': row[2],
+                'icon_class': row[3],
+                'visible': bool(row[4]),
+                'maintenance_mode': bool(row[5]),
+                'maintenance_message': row[6],
+                'order_position': row[7],
+                'requires_role': row[8]
+            })
+        
+        conn.close()
+        return jsonify(tools)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@admin_bp.route('/api/tools/<tool_id>', methods=['PUT'])
+@admin_required
+def api_update_tool(tool_id):
+    """Update tool configuration"""
+    try:
+        data = request.get_json()
+        
+        conn = sqlite3.connect(auth_system.db_path)
+        cursor = conn.cursor()
+        
+        # Build update query dynamically based on provided fields
+        update_fields = []
+        values = []
+        
+        if 'visible' in data:
+            update_fields.append('visible = ?')
+            values.append(1 if data['visible'] else 0)
+        
+        if 'maintenance_mode' in data:
+            update_fields.append('maintenance_mode = ?')
+            values.append(1 if data['maintenance_mode'] else 0)
+        
+        if 'maintenance_message' in data:
+            update_fields.append('maintenance_message = ?')
+            values.append(data['maintenance_message'])
+        
+        if 'order_position' in data:
+            update_fields.append('order_position = ?')
+            values.append(data['order_position'])
+        
+        if 'requires_role' in data:
+            update_fields.append('requires_role = ?')
+            values.append(data['requires_role'])
+        
+        if not update_fields:
+            return jsonify({'error': 'No fields to update'}), 400
+        
+        # Add updated_at and tool_id
+        update_fields.append('updated_at = ?')
+        values.append(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        values.append(tool_id)
+        
+        query = f"UPDATE tool_config SET {', '.join(update_fields)} WHERE tool_id = ?"
+        cursor.execute(query, values)
+        
+        if cursor.rowcount == 0:
+            conn.close()
+            return jsonify({'error': 'Tool not found'}), 404
+        
+        # Log activity
+        cursor.execute('''
+            INSERT INTO activity_logs (user_id, action, details)
+            VALUES (?, ?, ?)
+        ''', (session.get('user_id'), 'tool_updated', f'Updated tool: {tool_id}'))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'success': True})
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@admin_bp.route('/api/tools/batch-update', methods=['POST'])
+@admin_required
+def api_batch_update_tools():
+    """Batch update tool configurations"""
+    try:
+        data = request.get_json()
+        tools = data.get('tools', [])
+        
+        if not tools:
+            return jsonify({'error': 'No tools provided'}), 400
+        
+        conn = sqlite3.connect(auth_system.db_path)
+        cursor = conn.cursor()
+        
+        for tool in tools:
+            tool_id = tool.get('tool_id')
+            if not tool_id:
+                continue
+            
+            update_fields = []
+            values = []
+            
+            if 'visible' in tool:
+                update_fields.append('visible = ?')
+                values.append(1 if tool['visible'] else 0)
+            
+            if 'maintenance_mode' in tool:
+                update_fields.append('maintenance_mode = ?')
+                values.append(1 if tool['maintenance_mode'] else 0)
+            
+            if 'order_position' in tool:
+                update_fields.append('order_position = ?')
+                values.append(tool['order_position'])
+            
+            if update_fields:
+                update_fields.append('updated_at = ?')
+                values.append(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+                values.append(tool_id)
+                
+                query = f"UPDATE tool_config SET {', '.join(update_fields)} WHERE tool_id = ?"
+                cursor.execute(query, values)
+        
+        # Log activity
+        cursor.execute('''
+            INSERT INTO activity_logs (user_id, action, details)
+            VALUES (?, ?, ?)
+        ''', (session.get('user_id'), 'tools_batch_updated', f'Batch updated {len(tools)} tools'))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'success': True, 'updated': len(tools)})
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@admin_bp.route('/api/search')
+@admin_required
+def api_admin_search():
+    """Search across all admin features"""
+    try:
+        query = request.args.get('q', '').strip().lower()
+        
+        if not query:
+            return jsonify({'error': 'Search query required'}), 400
+        
+        conn = sqlite3.connect(auth_system.db_path)
+        cursor = conn.cursor()
+        
+        results = {
+            'users': [],
+            'tools': [],
+            'logs': [],
+            'subscriptions': []
+        }
+        
+        # Search users
+        cursor.execute('''
+            SELECT id, username, email, full_name, role, vip_level
+            FROM users
+            WHERE LOWER(username) LIKE ? OR LOWER(email) LIKE ? OR LOWER(full_name) LIKE ?
+            LIMIT 10
+        ''', (f'%{query}%', f'%{query}%', f'%{query}%'))
+        
+        for row in cursor.fetchall():
+            results['users'].append({
+                'id': row[0],
+                'username': row[1],
+                'email': row[2],
+                'full_name': row[3],
+                'role': row[4],
+                'vip_level': row[5]
+            })
+        
+        # Search tools
+        cursor.execute('''
+            SELECT tool_id, tool_name, tool_category, visible, maintenance_mode
+            FROM tool_config
+            WHERE LOWER(tool_name) LIKE ? OR LOWER(tool_id) LIKE ?
+            LIMIT 10
+        ''', (f'%{query}%', f'%{query}%'))
+        
+        for row in cursor.fetchall():
+            results['tools'].append({
+                'tool_id': row[0],
+                'tool_name': row[1],
+                'tool_category': row[2],
+                'visible': bool(row[3]),
+                'maintenance_mode': bool(row[4])
+            })
+        
+        # Search logs
+        cursor.execute('''
+            SELECT a.id, a.action, a.details, a.timestamp, u.username
+            FROM activity_logs a
+            LEFT JOIN users u ON a.user_id = u.id
+            WHERE LOWER(a.action) LIKE ? OR LOWER(a.details) LIKE ? OR LOWER(u.username) LIKE ?
+            ORDER BY a.timestamp DESC
+            LIMIT 10
+        ''', (f'%{query}%', f'%{query}%', f'%{query}%'))
+        
+        for row in cursor.fetchall():
+            results['logs'].append({
+                'id': row[0],
+                'action': row[1],
+                'details': row[2],
+                'timestamp': row[3],
+                'username': row[4]
+            })
+        
+        conn.close()
+        
+        return jsonify(results)
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500

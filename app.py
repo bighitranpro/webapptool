@@ -1,5 +1,5 @@
 """
-BI GHI TOOL MMO - Professional Email Tool Suite v2.1
+Bi Tool - Professional Tool Suite for mochiphoto.click v2.1
 Modular Architecture with Blueprint Separation
 """
 
@@ -9,7 +9,7 @@ import os
 
 # Initialize Flask app
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'bighi_tool_mmo_secret_2024_secure')
+app.secret_key = os.environ.get('SECRET_KEY', 'bi_tool_mochiphoto_secret_2024_secure')
 app.config['JSON_AS_ASCII'] = False  # Support Vietnamese characters
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # Disable caching for development
@@ -107,7 +107,8 @@ if __name__ == '__main__':
     
     print(f"""
     ╔══════════════════════════════════════════╗
-    ║      Email Tool Pro v2.1 - Modular       ║
+    ║      Bi Tool v2.1 - Modular              ║
+    ║      mochiphoto.click                    ║
     ║      Optimized Architecture              ║
     ╚══════════════════════════════════════════╝
     
@@ -118,6 +119,7 @@ if __name__ == '__main__':
        ✓ API Routes (email tools, validation, etc.)
        ✓ Dashboard Routes (user interface)
        ✓ Admin Routes (admin panel)
+       ✓ Settings Routes (user settings)
     
     🌐 Dashboard: http://localhost:{port}/
     🔍 API Health: http://localhost:{port}/api/health
