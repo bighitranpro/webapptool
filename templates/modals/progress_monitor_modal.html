@@ -1,0 +1,294 @@
+<!-- Progress Monitor Modal -->
+<div id="progressMonitorModal" class="modal">
+    <div class="modal-content modal-large">
+        <div class="modal-header">
+            <h2><i class="fas fa-tasks"></i> Progress Monitor</h2>
+            <div class="header-actions">
+                <button onclick="progressTrackerUI && progressTrackerUI.loadStatistics()" class="btn btn-sm btn-secondary">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+                <span class="modal-close" onclick="closeModal('progressMonitorModal')">&times;</span>
+            </div>
+        </div>
+        
+        <div class="modal-body">
+            <!-- Statistics Summary -->
+            <div id="progressStatsContainer">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Đang tải thống kê...</p>
+                </div>
+            </div>
+
+            <!-- Active Tasks -->
+            <div class="tasks-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-clock"></i> Active Tasks</h3>
+                    <div class="refresh-indicator">
+                        <i class="fas fa-circle pulse"></i>
+                        <span>Auto-refresh every 1s</span>
+                    </div>
+                </div>
+                
+                <div id="progressTasksContainer">
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Đang tải tasks...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Task History (Optional) -->
+            <div class="tasks-section" style="margin-top: 30px;">
+                <div class="section-header">
+                    <h3><i class="fas fa-history"></i> Recent History</h3>
+                    <button onclick="showTaskHistory()" class="btn btn-sm btn-secondary">
+                        <i class="fas fa-list"></i> View All
+                    </button>
+                </div>
+                
+                <div id="taskHistoryContainer">
+                    <p class="info-text">
+                        <i class="fas fa-info-circle"></i>
+                        Task history will be shown here
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-footer">
+            <button onclick="cleanupOldTasks()" class="btn btn-warning">
+                <i class="fas fa-broom"></i> Cleanup Old Tasks
+            </button>
+            <button onclick="closeModal('progressMonitorModal')" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.section-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.refresh-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #7f8c8d;
+}
+
+.refresh-indicator i {
+    color: #2ecc71;
+    font-size: 8px;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.3;
+    }
+}
+
+.pulse {
+    animation: pulse 1.5s infinite;
+}
+
+.tasks-section {
+    margin-top: 20px;
+}
+
+.info-text {
+    text-align: center;
+    padding: 40px 20px;
+    color: #95a5a6;
+    font-size: 14px;
+}
+
+.info-text i {
+    font-size: 32px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+}
+</style>
+
+<script>
+// Initialize progress monitor when modal opens
+function openProgressMonitor() {
+    openModal('progressMonitorModal');
+    
+    if (typeof progressTrackerUI !== 'undefined') {
+        progressTrackerUI.loadActiveTasks();
+        progressTrackerUI.loadStatistics();
+    }
+}
+
+// Cleanup old tasks
+async function cleanupOldTasks() {
+    if (!confirm('Xóa tất cả tasks đã hoàn thành? (Giữ lại trong 1 giờ gần nhất)')) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/progress/cleanup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ max_age_seconds: 3600 })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            if (typeof showNotification !== 'undefined') {
+                showNotification(`Đã xóa ${data.cleaned_count} tasks cũ`, 'success');
+            }
+            
+            if (typeof progressTrackerUI !== 'undefined') {
+                progressTrackerUI.loadActiveTasks();
+                progressTrackerUI.loadStatistics();
+            }
+        }
+    } catch (error) {
+        console.error('Cleanup error:', error);
+        if (typeof showNotification !== 'undefined') {
+            showNotification('Lỗi khi cleanup tasks', 'error');
+        }
+    }
+}
+
+// Show task history
+async function showTaskHistory() {
+    try {
+        const response = await fetch('/api/progress/all');
+        const data = await response.json();
+
+        if (data.success) {
+            const container = document.getElementById('taskHistoryContainer');
+            const tasks = Object.values(data.tasks);
+            
+            if (tasks.length === 0) {
+                container.innerHTML = '<p class="info-text"><i class="fas fa-inbox"></i>Không có task history</p>';
+                return;
+            }
+
+            // Filter to show only completed/failed/cancelled
+            const historyTasks = tasks.filter(t => 
+                ['completed', 'failed', 'cancelled'].includes(t.status)
+            );
+
+            if (historyTasks.length === 0) {
+                container.innerHTML = '<p class="info-text"><i class="fas fa-inbox"></i>Chưa có task nào hoàn thành</p>';
+                return;
+            }
+
+            let html = '<div class="history-list">';
+            
+            for (const task of historyTasks.slice(0, 10)) {
+                const statusIcon = task.status === 'completed' ? 'fa-check-circle' : 
+                                 task.status === 'failed' ? 'fa-times-circle' : 'fa-ban';
+                const statusColor = task.status === 'completed' ? '#2ecc71' : 
+                                  task.status === 'failed' ? '#e74c3c' : '#95a5a6';
+                
+                html += `
+                    <div class="history-item">
+                        <i class="fas ${statusIcon}" style="color: ${statusColor}"></i>
+                        <div class="history-info">
+                            <strong>${task.task_name}</strong>
+                            <span class="history-meta">
+                                ${task.current} / ${task.total} items • 
+                                ${task.updated_at}
+                            </span>
+                        </div>
+                        <button onclick="progressTrackerUI && progressTrackerUI.deleteTask('${task.task_id}')" 
+                                class="btn-icon btn-danger">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+    } catch (error) {
+        console.error('Load history error:', error);
+    }
+}
+</script>
+
+<style>
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.history-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.history-item:hover {
+    background: #e9ecef;
+}
+
+.history-item > i {
+    font-size: 24px;
+}
+
+.history-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.history-info strong {
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.history-meta {
+    font-size: 12px;
+    color: #7f8c8d;
+}
+</style>

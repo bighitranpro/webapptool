@@ -1,0 +1,713 @@
+<!-- Enhanced Email Generator Modal with Template Integration -->
+<div class="modal" id="generatorModal">
+    <div class="modal-content modal-xlarge">
+        <div class="modal-header">
+            <h2><i class="fas fa-random"></i> <span data-i18n="dashboard.email_generator.title">Tạo Email</span></h2>
+            <button class="modal-close" onclick="closeModal('generatorModal')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <!-- Tab Navigation -->
+            <div class="generator-tabs">
+                <button class="generator-tab active" onclick="switchGeneratorTab('manual')" id="manualTabBtn">
+                    <i class="fas fa-keyboard"></i>
+                    <span>Tạo Thủ Công</span>
+                </button>
+                <button class="generator-tab" onclick="switchGeneratorTab('template')" id="templateTabBtn">
+                    <i class="fas fa-layer-group"></i>
+                    <span>Từ Template</span>
+                    <span class="tab-badge">17 mẫu</span>
+                </button>
+            </div>
+
+            <!-- Manual Generation Tab -->
+            <div class="generator-tab-content active" id="manualGeneratorTab">
+                <div class="tool-description">
+                    <p data-i18n="dashboard.email_generator.description">Tạo danh sách email ngẫu nhiên với nhiều tùy chọn tùy chỉnh.</p>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="genCount">
+                            <i class="fas fa-hashtag"></i> Số lượng Email
+                        </label>
+                        <input type="number" id="genCount" value="100" min="1" max="10000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="genDomain">
+                            <i class="fas fa-globe"></i> Domain
+                        </label>
+                        <select id="genDomain" onchange="toggleCustomDomainInput()">
+                            <option value="gmail.com">gmail.com</option>
+                            <option value="yahoo.com">yahoo.com</option>
+                            <option value="outlook.com">outlook.com</option>
+                            <option value="hotmail.com">hotmail.com</option>
+                            <option value="custom">Tùy chỉnh...</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group" id="customDomainGroup" style="display: none;">
+                    <label for="customDomains">
+                        <i class="fas fa-list"></i> Danh sách Domain tùy chỉnh
+                        <span class="label-hint">(Mỗi domain một dòng)</span>
+                    </label>
+                    <textarea id="customDomains" rows="3" placeholder="domain1.com&#10;domain2.com"></textarea>
+                </div>
+                
+                <div class="options-grid">
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="genNumbers" checked>
+                        <span>Thêm số</span>
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="genDots" checked>
+                        <span>Thêm dấu chấm</span>
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="genUnderscores">
+                        <span>Thêm gạch dưới</span>
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="genUnique" checked>
+                        <span>Không trùng lặp</span>
+                    </label>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn btn-primary" onclick="runEmailGenerator()">
+                        <i class="fas fa-play"></i> <span data-i18n="common.generate">Tạo</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearGeneratorResults()">
+                        <i class="fas fa-eraser"></i> <span data-i18n="common.clear">Xóa</span>
+                    </button>
+                </div>
+                
+                <div id="generatorResults" class="results-container"></div>
+            </div>
+
+            <!-- Template Generation Tab -->
+            <div class="generator-tab-content" id="templateGeneratorTab" style="display: none;">
+                <div class="tool-description">
+                    <p><i class="fas fa-info-circle"></i> Chọn một template và điền thông tin để tạo emails chuyên nghiệp.</p>
+                </div>
+
+                <!-- Search and Filter -->
+                <div class="template-controls-inline">
+                    <div class="search-box-compact">
+                        <i class="fas fa-search"></i>
+                        <input 
+                            type="text" 
+                            id="genTemplateSearch" 
+                            placeholder="Tìm kiếm template..."
+                            onkeyup="filterGeneratorTemplates(this.value)"
+                        >
+                    </div>
+                    
+                    <div id="genTemplateCategoryFilter" class="category-filter-inline">
+                        <!-- Categories will be loaded by JS -->
+                    </div>
+                </div>
+
+                <!-- Template Grid -->
+                <div class="template-grid-compact" id="genTemplateGrid">
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Đang tải templates...</p>
+                    </div>
+                </div>
+
+                <!-- Selected Template Form -->
+                <div class="template-form-compact" style="display: none;" id="genTemplateForm">
+                    <div class="section-divider-mini">
+                        <i class="fas fa-edit"></i> Điền thông tin template
+                    </div>
+                    
+                    <div id="genTemplateVariables">
+                        <!-- Form will be generated by JS -->
+                    </div>
+                </div>
+
+                <!-- Generated Output -->
+                <div class="template-output-compact" style="display: none;" id="genTemplateOutput">
+                    <div class="section-divider-mini">
+                        <i class="fas fa-check-circle"></i> Emails đã tạo
+                    </div>
+                    
+                    <div id="genTemplateResults">
+                        <!-- Output will be generated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Tab System */
+.generator-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 0;
+}
+
+.generator-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-weight: 600;
+    color: #7f8c8d;
+    transition: all 0.3s;
+    position: relative;
+    bottom: -2px;
+}
+
+.generator-tab:hover {
+    color: var(--primary-color, #3498db);
+    background: rgba(52, 152, 219, 0.05);
+}
+
+.generator-tab.active {
+    color: var(--primary-color, #3498db);
+    border-bottom-color: var(--primary-color, #3498db);
+    background: transparent;
+}
+
+.generator-tab i {
+    font-size: 18px;
+}
+
+.tab-badge {
+    background: #e74c3c;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.generator-tab-content {
+    display: none;
+    animation: fadeIn 0.3s;
+}
+
+.generator-tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Compact Template Controls */
+.template-controls-inline {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.search-box-compact {
+    flex: 1;
+    min-width: 250px;
+    position: relative;
+}
+
+.search-box-compact i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #95a5a6;
+    font-size: 14px;
+}
+
+.search-box-compact input {
+    width: 100%;
+    padding: 10px 12px 10px 38px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.search-box-compact input:focus {
+    border-color: var(--primary-color, #3498db);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.category-filter-inline {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.category-pill {
+    padding: 8px 16px;
+    background: #f8f9fa;
+    border: 2px solid #e0e0e0;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 13px;
+    font-weight: 600;
+    color: #7f8c8d;
+}
+
+.category-pill:hover {
+    border-color: var(--primary-color, #3498db);
+    color: var(--primary-color, #3498db);
+}
+
+.category-pill.active {
+    background: var(--primary-color, #3498db);
+    border-color: var(--primary-color, #3498db);
+    color: white;
+}
+
+/* Compact Template Grid */
+.template-grid-compact {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.template-card-mini {
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.template-card-mini:hover {
+    border-color: var(--primary-color, #3498db);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.template-card-mini.selected {
+    border-color: var(--primary-color, #3498db);
+    background: rgba(52, 152, 219, 0.05);
+}
+
+.template-card-mini h4 {
+    margin: 0 0 6px 0;
+    font-size: 14px;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.template-card-mini p {
+    margin: 0;
+    font-size: 12px;
+    color: #7f8c8d;
+    line-height: 1.4;
+}
+
+.template-category-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #e0e0e0;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #7f8c8d;
+    text-transform: uppercase;
+    margin-top: 6px;
+}
+
+/* Compact Form */
+.template-form-compact {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.section-divider-mini {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-divider-mini i {
+    color: var(--primary-color, #3498db);
+}
+
+.template-output-compact {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    text-align: center;
+    padding: 40px 20px;
+    color: #95a5a6;
+}
+
+.loading-spinner i {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+/* Custom scrollbar for template grid */
+.template-grid-compact::-webkit-scrollbar {
+    width: 8px;
+}
+
+.template-grid-compact::-webkit-scrollbar-track {
+    background: #e0e0e0;
+    border-radius: 4px;
+}
+
+.template-grid-compact::-webkit-scrollbar-thumb {
+    background: #95a5a6;
+    border-radius: 4px;
+}
+
+.template-grid-compact::-webkit-scrollbar-thumb:hover {
+    background: #7f8c8d;
+}
+</style>
+
+<script>
+// Generator Tab Switching
+function switchGeneratorTab(tab) {
+    // Update tab buttons
+    document.querySelectorAll('.generator-tab').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    if (tab === 'manual') {
+        document.getElementById('manualTabBtn').classList.add('active');
+        document.getElementById('manualGeneratorTab').style.display = 'block';
+        document.getElementById('templateGeneratorTab').style.display = 'none';
+    } else if (tab === 'template') {
+        document.getElementById('templateTabBtn').classList.add('active');
+        document.getElementById('manualGeneratorTab').style.display = 'none';
+        document.getElementById('templateGeneratorTab').style.display = 'block';
+        
+        // Load templates on first open
+        if (!window.generatorTemplatesLoaded) {
+            loadGeneratorTemplates();
+            window.generatorTemplatesLoaded = true;
+        }
+    }
+}
+
+// Toggle custom domain input
+function toggleCustomDomainInput() {
+    const domain = document.getElementById('genDomain').value;
+    const customGroup = document.getElementById('customDomainGroup');
+    customGroup.style.display = domain === 'custom' ? 'block' : 'none';
+}
+
+// Load templates into generator modal
+let generatorTemplates = [];
+let generatorSelectedTemplate = null;
+
+async function loadGeneratorTemplates() {
+    try {
+        const response = await fetch('/api/templates/list');
+        const data = await response.json();
+        
+        if (data.success) {
+            generatorTemplates = data.templates;
+            displayGeneratorTemplates(generatorTemplates);
+            displayGeneratorCategories(data.categories);
+        }
+    } catch (error) {
+        console.error('Load templates error:', error);
+        document.getElementById('genTemplateGrid').innerHTML = 
+            '<p class="error-text"><i class="fas fa-exclamation-circle"></i> Lỗi tải templates</p>';
+    }
+}
+
+function displayGeneratorTemplates(templates) {
+    const grid = document.getElementById('genTemplateGrid');
+    
+    if (templates.length === 0) {
+        grid.innerHTML = '<p class="info-text">Không tìm thấy template</p>';
+        return;
+    }
+    
+    let html = '';
+    templates.forEach(template => {
+        html += `
+            <div class="template-card-mini" onclick="selectGeneratorTemplate('${template.id}')">
+                <h4>
+                    <i class="fas fa-envelope"></i>
+                    ${template.name}
+                </h4>
+                <p>${template.description}</p>
+                <span class="template-category-badge">${template.category}</span>
+            </div>
+        `;
+    });
+    
+    grid.innerHTML = html;
+}
+
+function displayGeneratorCategories(categories) {
+    const container = document.getElementById('genTemplateCategoryFilter');
+    
+    let html = '<div class="category-pill active" onclick="filterGeneratorByCategory(\'all\')">Tất cả</div>';
+    
+    for (const [key, name] of Object.entries(categories)) {
+        html += `<div class="category-pill" onclick="filterGeneratorByCategory('${key}')">${name}</div>`;
+    }
+    
+    container.innerHTML = html;
+}
+
+function filterGeneratorByCategory(category) {
+    // Update active pill
+    document.querySelectorAll('#genTemplateCategoryFilter .category-pill').forEach(pill => {
+        pill.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // Filter templates
+    if (category === 'all') {
+        displayGeneratorTemplates(generatorTemplates);
+    } else {
+        const filtered = generatorTemplates.filter(t => t.category === category);
+        displayGeneratorTemplates(filtered);
+    }
+}
+
+function filterGeneratorTemplates(query) {
+    if (!query.trim()) {
+        displayGeneratorTemplates(generatorTemplates);
+        return;
+    }
+    
+    query = query.toLowerCase();
+    const filtered = generatorTemplates.filter(t => 
+        t.name.toLowerCase().includes(query) || 
+        t.description.toLowerCase().includes(query) ||
+        t.tags.some(tag => tag.toLowerCase().includes(query))
+    );
+    
+    displayGeneratorTemplates(filtered);
+}
+
+function selectGeneratorTemplate(templateId) {
+    // Update selected state
+    document.querySelectorAll('.template-card-mini').forEach(card => {
+        card.classList.remove('selected');
+    });
+    event.currentTarget.classList.add('selected');
+    
+    // Find template
+    generatorSelectedTemplate = generatorTemplates.find(t => t.id === templateId);
+    
+    if (generatorSelectedTemplate) {
+        renderGeneratorTemplateForm();
+    }
+}
+
+function renderGeneratorTemplateForm() {
+    const container = document.getElementById('genTemplateVariables');
+    const formSection = document.getElementById('genTemplateForm');
+    
+    let html = '<div class="form-row">';
+    
+    // Add count input first
+    html += `
+        <div class="form-group">
+            <label>
+                <i class="fas fa-hashtag"></i> Số lượng
+            </label>
+            <input type="number" id="genTemplateCount" value="10" min="1" max="1000" class="form-control">
+        </div>
+    `;
+    
+    // Add variable inputs
+    generatorSelectedTemplate.variables.forEach(varName => {
+        html += `
+            <div class="form-group">
+                <label>
+                    <i class="fas fa-edit"></i> ${varName}
+                </label>
+                <input type="text" id="genVar_${varName}" placeholder="${varName}" class="form-control">
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    
+    html += `
+        <div class="modal-actions">
+            <button class="btn btn-primary" onclick="generateFromTemplate()">
+                <i class="fas fa-magic"></i> Tạo Emails
+            </button>
+            <button class="btn btn-secondary" onclick="clearGeneratorTemplateForm()">
+                <i class="fas fa-times"></i> Hủy
+            </button>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+    formSection.style.display = 'block';
+    formSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+async function generateFromTemplate() {
+    if (!generatorSelectedTemplate) {
+        if (typeof showNotification !== 'undefined') {
+            showNotification('Vui lòng chọn template', 'error');
+        }
+        return;
+    }
+    
+    // Collect variables
+    const variables = {};
+    generatorSelectedTemplate.variables.forEach(varName => {
+        const input = document.getElementById(`genVar_${varName}`);
+        if (input) {
+            variables[varName] = input.value.trim();
+        }
+    });
+    
+    const count = parseInt(document.getElementById('genTemplateCount').value) || 10;
+    
+    try {
+        const response = await fetch('/api/templates/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                template_id: generatorSelectedTemplate.id,
+                variables: variables,
+                count: count
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            displayGeneratorTemplateOutput(data.emails, data.count);
+            
+            if (typeof showNotification !== 'undefined') {
+                showNotification(`Đã tạo ${data.count} emails từ template`, 'success');
+            }
+        } else {
+            if (typeof showNotification !== 'undefined') {
+                showNotification(data.message || 'Lỗi tạo emails', 'error');
+            }
+        }
+    } catch (error) {
+        console.error('Generate error:', error);
+        if (typeof showNotification !== 'undefined') {
+            showNotification('Lỗi kết nối API', 'error');
+        }
+    }
+}
+
+function displayGeneratorTemplateOutput(emails, count) {
+    const container = document.getElementById('genTemplateResults');
+    const outputSection = document.getElementById('genTemplateOutput');
+    
+    let html = `
+        <div class="output-header">
+            <h3>
+                <i class="fas fa-check-circle"></i>
+                Đã tạo ${count} emails
+            </h3>
+            <div class="output-actions">
+                <button class="btn btn-sm btn-secondary" onclick="copyGeneratorTemplateEmails()">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+                <button class="btn btn-sm btn-secondary" onclick="downloadGeneratorTemplateEmails()">
+                    <i class="fas fa-download"></i> Download
+                </button>
+            </div>
+        </div>
+        <div class="email-list">
+    `;
+    
+    emails.forEach((email, index) => {
+        html += `
+            <div class="email-item">
+                <span class="email-number">${index + 1}.</span>
+                <span class="email-address">${email}</span>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    
+    container.innerHTML = html;
+    outputSection.style.display = 'block';
+    outputSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    
+    // Store emails for copy/download
+    window.generatorTemplateEmails = emails;
+}
+
+function copyGeneratorTemplateEmails() {
+    if (!window.generatorTemplateEmails) return;
+    
+    const text = window.generatorTemplateEmails.join('\n');
+    navigator.clipboard.writeText(text).then(() => {
+        if (typeof showNotification !== 'undefined') {
+            showNotification('Đã copy emails vào clipboard', 'success');
+        }
+    });
+}
+
+function downloadGeneratorTemplateEmails() {
+    if (!window.generatorTemplateEmails) return;
+    
+    const text = window.generatorTemplateEmails.join('\n');
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `emails_${Date.now()}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function clearGeneratorTemplateForm() {
+    document.getElementById('genTemplateForm').style.display = 'none';
+    document.getElementById('genTemplateOutput').style.display = 'none';
+    
+    // Deselect template
+    document.querySelectorAll('.template-card-mini').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    generatorSelectedTemplate = null;
+}
+</script>

@@ -11,6 +11,14 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/i18n.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_mobile_fix.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tool_management.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_improvements.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_fixes.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/toast.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark_mode.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern_ui.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_modern.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/micro_interactions.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/typography_spacing.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.css">
 </head>
@@ -162,19 +170,19 @@
             <div class="admin-page active" id="page-overview">
                 <!-- System Stats -->
                 <div class="stats-grid">
-                    <div class="stat-card">
+                    <div class="stat-card stats-card-modern modern-card glass-card hover-scale fade-in-up">
                         <div class="stat-card-header">
-                            <div class="stat-icon blue">
+                            <div class="stat-icon blue animate-float">
                                 <i class="fas fa-users"></i>
                             </div>
-                            <div class="stat-change positive">
+                            <div class="stat-change positive badge-modern badge-glow">
                                 <i class="fas fa-arrow-up"></i> +5%
                             </div>
                         </div>
                         <div class="stat-label">Tổng Users</div>
-                        <div class="stat-value" id="totalUsers">0</div>
-                        <div class="stat-progress">
-                            <div class="stat-progress-bar blue" style="width: 75%"></div>
+                        <div class="stat-value heading-gradient" id="totalUsers">0</div>
+                        <div class="stat-progress progress-modern">
+                            <div class="stat-progress-bar blue progress-shimmer" style="width: 75%"></div>
                         </div>
                         <div class="stat-footer">
                             <span class="stat-footer-text">Active users</span>
@@ -182,19 +190,19 @@
                         </div>
                     </div>
 
-                    <div class="stat-card">
+                    <div class="stat-card stats-card-modern modern-card glass-card hover-scale fade-in-up delay-1">
                         <div class="stat-card-header">
-                            <div class="stat-icon purple">
+                            <div class="stat-icon purple animate-float">
                                 <i class="fas fa-crown"></i>
                             </div>
-                            <div class="stat-change positive">
+                            <div class="stat-change positive badge-modern badge-pulse">
                                 <i class="fas fa-arrow-up"></i> +12%
                             </div>
                         </div>
                         <div class="stat-label">VIP Users</div>
-                        <div class="stat-value" id="vipUsers">0</div>
-                        <div class="stat-progress">
-                            <div class="stat-progress-bar purple" style="width: 45%"></div>
+                        <div class="stat-value heading-gradient" id="vipUsers">0</div>
+                        <div class="stat-progress progress-modern">
+                            <div class="stat-progress-bar purple progress-shimmer" style="width: 45%"></div>
                         </div>
                         <div class="stat-footer">
                             <span class="stat-footer-text">Revenue</span>
@@ -202,19 +210,19 @@
                         </div>
                     </div>
 
-                    <div class="stat-card">
+                    <div class="stat-card stats-card-modern modern-card glass-card hover-scale fade-in-up delay-2">
                         <div class="stat-card-header">
-                            <div class="stat-icon green">
+                            <div class="stat-icon green animate-float">
                                 <i class="fas fa-tasks"></i>
                             </div>
-                            <div class="stat-change positive">
+                            <div class="stat-change positive badge-modern badge-glow">
                                 <i class="fas fa-arrow-up"></i> +28%
                             </div>
                         </div>
                         <div class="stat-label">Total Operations</div>
-                        <div class="stat-value" id="totalOps">0</div>
-                        <div class="stat-progress">
-                            <div class="stat-progress-bar green" style="width: 85%"></div>
+                        <div class="stat-value heading-gradient" id="totalOps">0</div>
+                        <div class="stat-progress progress-modern">
+                            <div class="stat-progress-bar green progress-shimmer" style="width: 85%"></div>
                         </div>
                         <div class="stat-footer">
                             <span class="stat-footer-text">Today</span>
@@ -222,19 +230,19 @@
                         </div>
                     </div>
 
-                    <div class="stat-card">
+                    <div class="stat-card stats-card-modern modern-card glass-card hover-scale fade-in-up delay-3">
                         <div class="stat-card-header">
-                            <div class="stat-icon red">
+                            <div class="stat-icon red animate-float">
                                 <i class="fas fa-server"></i>
                             </div>
-                            <div class="stat-change positive">
+                            <div class="stat-change positive badge-modern badge-pulse">
                                 <i class="fas fa-check"></i> Online
                             </div>
                         </div>
                         <div class="stat-label">System Status</div>
-                        <div class="stat-value">100%</div>
-                        <div class="stat-progress">
-                            <div class="stat-progress-bar green" style="width: 100%"></div>
+                        <div class="stat-value heading-gradient">100%</div>
+                        <div class="stat-progress progress-modern">
+                            <div class="stat-progress-bar green progress-shimmer" style="width: 100%"></div>
                         </div>
                         <div class="stat-footer">
                             <span class="stat-footer-text">Uptime</span>
@@ -245,10 +253,10 @@
 
                 <!-- Charts Section -->
                 <div class="charts-section">
-                    <div class="chart-container">
+                    <div class="chart-container modern-card glass-card scroll-reveal">
                         <div class="chart-header">
-                            <h3><i class="fas fa-chart-line"></i> User Growth</h3>
-                            <select id="chartPeriod" class="chart-select">
+                            <h3 class="heading-gradient"><i class="fas fa-chart-line"></i> User Growth</h3>
+                            <select id="chartPeriod" class="chart-select btn-modern">
                                 <option value="7">7 Days</option>
                                 <option value="30" selected>30 Days</option>
                                 <option value="90">90 Days</option>
@@ -257,22 +265,22 @@
                         <canvas id="userGrowthChart"></canvas>
                     </div>
 
-                    <div class="chart-container">
+                    <div class="chart-container modern-card glass-card scroll-reveal">
                         <div class="chart-header">
-                            <h3><i class="fas fa-chart-pie"></i> VIP Distribution</h3>
+                            <h3 class="heading-gradient"><i class="fas fa-chart-pie"></i> VIP Distribution</h3>
                         </div>
                         <canvas id="vipDistributionChart"></canvas>
                     </div>
                 </div>
 
                 <!-- Recent Activity -->
-                <div class="activity-section mt-4">
+                <div class="activity-section mt-4 modern-card glass-card scroll-reveal">
                     <div class="section-header">
-                        <h2 class="section-title">
+                        <h2 class="section-title heading-gradient">
                             <i class="fas fa-history"></i>
                             Recent Activities
                         </h2>
-                        <button class="view-all-btn" onclick="loadPage('logs')">View All</button>
+                        <button class="view-all-btn btn-modern btn-gradient-primary hover-scale" onclick="loadPage('logs')">View All</button>
                     </div>
 
                     <div class="activity-list" id="recentActivities">
@@ -283,9 +291,9 @@
 
             <!-- Users Management Page -->
             <div class="admin-page" id="page-users">
-                <div class="page-header">
-                    <h2><i class="fas fa-users"></i> Quản lý Users</h2>
-                    <button class="btn-primary" onclick="showAddUserModal()">
+                <div class="page-header fade-in-up">
+                    <h2 class="heading-gradient"><i class="fas fa-users"></i> Quản lý Users</h2>
+                    <button class="btn-primary btn-modern btn-gradient-primary hover-scale" onclick="showAddUserModal()">
                         <i class="fas fa-plus"></i> Thêm User
                     </button>
                 </div>
@@ -648,5 +656,8 @@
     <script src="{{ url_for('static', filename='js/admin_mobile.js') }}"></script>
     <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
     <script src="{{ url_for('static', filename='js/admin_tools.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dark_mode.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/admin_mobile_fixes.js') }}"></script>
 </body>
 </html>

@@ -1,0 +1,411 @@
+/**
+ * UI Improvements - Balanced sizing for better UX
+ * Điều chỉnh kích thước cân bằng để dễ sử dụng hơn
+ */
+
+/* ========================================
+   LANDING PAGE IMPROVEMENTS
+   ======================================== */
+
+/* Hero Section - Giảm kích thước quá lớn */
+.hero h1 {
+    font-size: 48px !important;  /* Giảm từ 68px */
+    letter-spacing: -1px !important;
+    line-height: 1.2 !important;
+    margin-bottom: 20px !important;
+}
+
+.hero .subtitle {
+    font-size: 18px !important;  /* Giảm từ 22px */
+    margin-bottom: 36px !important;
+    line-height: 1.6 !important;
+}
+
+.hero-buttons .btn-primary,
+.hero-buttons .btn-secondary {
+    font-size: 16px !important;  /* Giảm từ 18px */
+    padding: 14px 32px !important;  /* Giảm từ 18px 40px */
+}
+
+/* Section Titles - Cân bằng hơn */
+.section-title {
+    font-size: 36px !important;  /* Giảm từ 52px */
+    margin-bottom: 16px !important;
+    letter-spacing: -0.5px !important;
+}
+
+.section-subtitle {
+    font-size: 16px !important;  /* Giảm từ 20px */
+    margin-bottom: 48px !important;
+}
+
+/* Feature Cards - Cải thiện spacing */
+.feature-card {
+    padding: 28px !important;  /* Giảm từ 40px nếu có */
+}
+
+.feature-card h3 {
+    font-size: 20px !important;  /* Cân bằng */
+    margin-bottom: 12px !important;
+}
+
+.feature-card p {
+    font-size: 15px !important;
+    line-height: 1.6 !important;
+}
+
+.feature-icon {
+    font-size: 36px !important;  /* Giảm nếu quá lớn */
+    margin-bottom: 16px !important;
+}
+
+/* ========================================
+   DASHBOARD IMPROVEMENTS
+   ======================================== */
+
+/* Sidebar - Tối ưu kích thước */
+.sidebar {
+    width: 260px !important;  /* Giảm từ 280px */
+}
+
+.sidebar-header h2 {
+    font-size: 22px !important;
+}
+
+.sidebar-header span {
+    font-size: 12px !important;
+}
+
+.nav-item {
+    padding: 10px 16px !important;
+    font-size: 14px !important;
+}
+
+.nav-item i {
+    font-size: 16px !important;
+    min-width: 20px !important;
+}
+
+.nav-section-title {
+    font-size: 11px !important;
+    padding: 12px 16px 8px !important;
+}
+
+/* Tool Cards - Cân bằng kích thước */
+.tool-card {
+    padding: 20px !important;
+    border-radius: 12px !important;
+}
+
+.tool-card h3 {
+    font-size: 18px !important;
+    margin-bottom: 8px !important;
+}
+
+.tool-card p,
+.tool-description {
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+}
+
+.tool-icon {
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 24px !important;
+}
+
+.tool-stats {
+    font-size: 13px !important;
+}
+
+.tool-badge {
+    font-size: 11px !important;
+    padding: 4px 10px !important;
+}
+
+/* Stats Cards - Tối ưu */
+.stat-card {
+    padding: 20px !important;
+}
+
+.stat-label {
+    font-size: 13px !important;
+    margin-bottom: 8px !important;
+}
+
+.stat-value {
+    font-size: 28px !important;  /* Giảm từ 36px+ */
+    margin-bottom: 12px !important;
+}
+
+.stat-footer-text {
+    font-size: 12px !important;
+}
+
+/* ========================================
+   MODALS IMPROVEMENTS
+   ======================================== */
+
+/* Modal Headers */
+.modal-header h2 {
+    font-size: 20px !important;
+}
+
+.modal-header h3 {
+    font-size: 18px !important;
+}
+
+/* Form Elements - Kích thước chuẩn */
+.form-group label {
+    font-size: 14px !important;
+    margin-bottom: 6px !important;
+}
+
+.form-control,
+textarea,
+input[type="text"],
+input[type="email"],
+input[type="number"],
+select {
+    font-size: 14px !important;
+    padding: 10px 14px !important;
+    line-height: 1.5 !important;
+}
+
+textarea {
+    min-height: 120px !important;
+}
+
+/* Buttons - Cân bằng kích thước */
+.btn,
+button:not(.modal-close):not(.sidebar-toggle) {
+    font-size: 14px !important;
+    padding: 10px 20px !important;
+    border-radius: 8px !important;
+}
+
+.btn-primary {
+    font-weight: 600 !important;
+}
+
+.btn-sm {
+    font-size: 13px !important;
+    padding: 8px 16px !important;
+}
+
+.btn-lg {
+    font-size: 16px !important;
+    padding: 14px 28px !important;
+}
+
+/* Modal Actions */
+.modal-actions {
+    gap: 12px !important;
+    margin-top: 20px !important;
+}
+
+/* Checkboxes and Labels */
+.checkbox-option,
+.checkbox-label {
+    font-size: 14px !important;
+}
+
+.checkbox-option input,
+.checkbox-label input {
+    width: 16px !important;
+    height: 16px !important;
+}
+
+/* ========================================
+   RESULTS DISPLAY
+   ======================================== */
+
+.results-container {
+    margin-top: 24px !important;
+}
+
+.results-tabs button {
+    font-size: 14px !important;
+    padding: 10px 20px !important;
+}
+
+.results-table {
+    font-size: 14px !important;
+}
+
+.results-table th {
+    font-size: 13px !important;
+    padding: 12px !important;
+}
+
+.results-table td {
+    padding: 10px 12px !important;
+}
+
+/* ========================================
+   ADMIN PANEL IMPROVEMENTS
+   ======================================== */
+
+.page-title {
+    font-size: 26px !important;
+}
+
+.admin-content h2 {
+    font-size: 22px !important;
+}
+
+.admin-content h3 {
+    font-size: 18px !important;
+}
+
+.data-table {
+    font-size: 14px !important;
+}
+
+.data-table th {
+    font-size: 13px !important;
+    padding: 12px !important;
+}
+
+.data-table td {
+    padding: 10px 12px !important;
+}
+
+/* Tool Management Cards */
+.tool-management-card {
+    padding: 18px !important;
+}
+
+.tool-management-card h4 {
+    font-size: 16px !important;
+}
+
+.control-label {
+    font-size: 13px !important;
+}
+
+/* ========================================
+   NOTIFICATIONS & TOASTS
+   ======================================== */
+
+.notification {
+    font-size: 14px !important;
+    padding: 14px 18px !important;
+}
+
+.notification-icon {
+    font-size: 18px !important;
+}
+
+/* ========================================
+   RESPONSIVE ADJUSTMENTS
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* Mobile - Giảm thêm kích thước */
+    .hero h1 {
+        font-size: 32px !important;
+    }
+    
+    .hero .subtitle {
+        font-size: 16px !important;
+    }
+    
+    .section-title {
+        font-size: 28px !important;
+    }
+    
+    .sidebar {
+        width: 100% !important;
+    }
+    
+    .tool-card {
+        padding: 16px !important;
+    }
+    
+    .modal-content {
+        margin: 10px !important;
+        max-width: calc(100% - 20px) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Extra small screens */
+    .hero h1 {
+        font-size: 26px !important;
+    }
+    
+    .btn {
+        padding: 10px 16px !important;
+        font-size: 13px !important;
+    }
+}
+
+/* ========================================
+   SPACING CONSISTENCY
+   ======================================== */
+
+/* Consistent margins */
+.section {
+    padding: 60px 0 !important;
+}
+
+.mb-1 { margin-bottom: 8px !important; }
+.mb-2 { margin-bottom: 16px !important; }
+.mb-3 { margin-bottom: 24px !important; }
+.mb-4 { margin-bottom: 32px !important; }
+
+.mt-1 { margin-top: 8px !important; }
+.mt-2 { margin-top: 16px !important; }
+.mt-3 { margin-top: 24px !important; }
+.mt-4 { margin-top: 32px !important; }
+
+/* Consistent gaps */
+.gap-sm { gap: 8px !important; }
+.gap-md { gap: 16px !important; }
+.gap-lg { gap: 24px !important; }
+
+/* ========================================
+   ICON SIZES
+   ======================================== */
+
+.fa-xs { font-size: 12px !important; }
+.fa-sm { font-size: 14px !important; }
+.fa-md { font-size: 16px !important; }
+.fa-lg { font-size: 20px !important; }
+.fa-xl { font-size: 24px !important; }
+.fa-2xl { font-size: 32px !important; }
+
+/* ========================================
+   ACCESSIBILITY IMPROVEMENTS
+   ======================================== */
+
+/* Ensure minimum touch target size */
+button, a, input[type="checkbox"], input[type="radio"] {
+    min-height: 32px !important;
+    min-width: 32px !important;
+}
+
+/* Better focus states */
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 2px solid var(--accent-gold, #ffd700) !important;
+    outline-offset: 2px !important;
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+.text-sm { font-size: 13px !important; }
+.text-base { font-size: 14px !important; }
+.text-md { font-size: 16px !important; }
+.text-lg { font-size: 18px !important; }
+.text-xl { font-size: 20px !important; }
+
+.font-normal { font-weight: 400 !important; }
+.font-medium { font-weight: 500 !important; }
+.font-semibold { font-weight: 600 !important; }
+.font-bold { font-weight: 700 !important; }

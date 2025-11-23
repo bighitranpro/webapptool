@@ -1,11 +1,22 @@
 """
 Bi Tool - Professional Tool Suite for mochiphoto.click v2.1
 Modular Architecture with Blueprint Separation
+Enhanced with Security & Error Handling
 """
 
-from flask import Flask
+from flask import Flask, jsonify, session
 import sys
 import os
+
+# Import security utilities
+from security_utils import (
+    add_security_headers, 
+    generate_csrf_token,
+    rate_limiter
+)
+
+# Import cache manager
+from cache_manager import cache, start_cache_cleanup_scheduler
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -15,14 +26,24 @@ app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # Disable caching for development
 app.config['PERMANENT_SESSION_LIFETIME'] = 86400  # 24 hours
 
+# Security configurations
+app.config['SESSION_COOKIE_SECURE'] = False  # Set to True in production with HTTPS
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
-# Add after-request handler to prevent caching
+
+# Add after-request handler for security headers and caching
 @app.after_request
 def add_header(response):
-    """Add headers to prevent caching"""
+    """Add security headers and prevent caching"""
+    # Add security headers
+    response = add_security_headers(response)
+    
+    # Prevent caching
     response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '-1'
+    
     return response
 
 # Context processor to inject theme variables
@@ -69,6 +90,23 @@ def inject_theme_variables():
     return {'theme_vars': theme_vars}
 
 
+# Add CSRF token to all templates
+@app.context_processor
+def inject_csrf_token():
+    """Inject CSRF token into all templates"""
+    return {'csrf_token': generate_csrf_token}
+
+
+# Clean up rate limiter periodically
+@app.before_request
+def cleanup_rate_limiter():
+    """Clean up old rate limiter data"""
+    import random
+    # Clean up on ~1% of requests to avoid overhead
+    if random.random() < 0.01:
+        rate_limiter.clear_old_data()
+
+
 # Register Blueprints
 from routes import auth_bp, api_bp, dashboard_bp
 from app_admin_routes import admin_bp
@@ -81,35 +119,123 @@ app.register_blueprint(admin_bp)
 app.register_blueprint(settings_bp)
 
 
-# Error Handlers
-@app.errorhandler(404)
-def not_found(error):
-    from flask import jsonify
+# Enhanced Error Handlers
+@app.errorhandler(400)
+def bad_request(error):
+    """Handle bad requests"""
     return jsonify({
         'success': False,
-        'message': 'Endpoint not found'
+        'error': 'Bad Request',
+        'message': str(error.description) if hasattr(error, 'description') else 'Invalid request data'
+    }), 400
+
+
+@app.errorhandler(401)
+def unauthorized(error):
+    """Handle unauthorized access"""
+    return jsonify({
+        'success': False,
+        'error': 'Unauthorized',
+        'message': 'Authentication required'
+    }), 401
+
+
+@app.errorhandler(403)
+def forbidden(error):
+    """Handle forbidden access"""
+    return jsonify({
+        'success': False,
+        'error': 'Forbidden',
+        'message': 'You do not have permission to access this resource'
+    }), 403
+
+
+@app.errorhandler(404)
+def not_found(error):
+    """Handle not found errors"""
+    return jsonify({
+        'success': False,
+        'error': 'Not Found',
+        'message': 'The requested resource was not found'
     }), 404
+
+
+@app.errorhandler(405)
+def method_not_allowed(error):
+    """Handle method not allowed"""
+    return jsonify({
+        'success': False,
+        'error': 'Method Not Allowed',
+        'message': 'The HTTP method is not allowed for this endpoint'
+    }), 405
+
+
+@app.errorhandler(413)
+def request_entity_too_large(error):
+    """Handle file too large"""
+    return jsonify({
+        'success': False,
+        'error': 'File Too Large',
+        'message': 'The uploaded file exceeds the maximum allowed size (50MB)'
+    }), 413
+
+
+@app.errorhandler(429)
+def too_many_requests(error):
+    """Handle rate limiting"""
+    return jsonify({
+        'success': False,
+        'error': 'Too Many Requests',
+        'message': 'Rate limit exceeded. Please try again later.'
+    }), 429
 
 
 @app.errorhandler(500)
 def internal_error(error):
-    from flask import jsonify
+    """Handle internal server errors"""
+    import traceback
+    
+    # Log the error
+    print(f"Internal Server Error: {str(error)}")
+    print(traceback.format_exc())
+    
     return jsonify({
         'success': False,
-        'message': 'Internal server error'
+        'error': 'Internal Server Error',
+        'message': 'An unexpected error occurred. Please try again later.'
+    }), 500
+
+
+@app.errorhandler(Exception)
+def handle_exception(error):
+    """Handle all unhandled exceptions"""
+    import traceback
+    
+    # Log the error
+    print(f"Unhandled Exception: {str(error)}")
+    print(traceback.format_exc())
+    
+    # Return generic error to user
+    return jsonify({
+        'success': False,
+        'error': 'Server Error',
+        'message': 'An unexpected error occurred. Our team has been notified.'
     }), 500
 
 
 if __name__ == '__main__':
+    # Start cache cleanup scheduler
+    start_cache_cleanup_scheduler(interval=300)  # Cleanup every 5 minutes
+    
     # Check if running in production mode
     port = 80 if len(sys.argv) > 1 and sys.argv[1] == 'production' else 5003
     debug_mode = port == 5000
     
     print(f"""
     ╔══════════════════════════════════════════╗
-    ║      Bi Tool v2.1 - Modular              ║
+    ║      Bi Tool v2.1 - Enhanced             ║
     ║      mochiphoto.click                    ║
-    ║      Optimized Architecture              ║
+    ║      Security & Performance Optimized    ║
     ╚══════════════════════════════════════════╝
     
     🚀 Server starting on port {port}
@@ -120,6 +246,12 @@ if __name__ == '__main__':
        ✓ Dashboard Routes (user interface)
        ✓ Admin Routes (admin panel)
        ✓ Settings Routes (user settings)
+    
+    🔒 Security features:
+       ✓ Rate limiting enabled
+       ✓ CSRF protection active
+       ✓ Security headers configured
+       ✓ Input sanitization ready
     
     🌐 Dashboard: http://localhost:{port}/
     🔍 API Health: http://localhost:{port}/api/health

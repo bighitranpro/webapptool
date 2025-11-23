@@ -27,6 +27,13 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tool_results.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_enhancements.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/i18n.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_improvements.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/toast.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark_mode.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern_ui.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/micro_interactions.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/typography_spacing.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/template_progress_ui.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -79,6 +86,11 @@
                         <i class="fas fa-search"></i>
                         <span data-i18n="dashboard.email_extractor.title">Trích xuất Email</span>
                     </a>
+                    <a href="#templates" class="nav-item" onclick="openModal('templateSelectorModal')">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Email Templates</span>
+                        <span class="nav-badge" style="background: #e74c3c;">MỚI</span>
+                    </a>
                 </div>
             </div>
 
@@ -120,6 +132,11 @@
                     <a href="#dedup" class="nav-item" onclick="openModal('deduplicatorModal')">
                         <i class="fas fa-clone"></i>
                         <span data-i18n="sidebar.deduplicator">Loại bỏ trùng</span>
+                    </a>
+                    <a href="#progress" class="nav-item" onclick="openProgressMonitor()">
+                        <i class="fas fa-tasks"></i>
+                        <span>Theo dõi tiến độ</span>
+                        <span class="nav-badge" style="background: #e74c3c;">MỚI</span>
                     </a>
                 </div>
             </div>
@@ -233,16 +250,16 @@
         <!-- Dashboard Content -->
         <div class="dashboard-content">
             <!-- Welcome Section -->
-            <section class="welcome-section">
-                <h1><span data-i18n="dashboard.welcome">Chào mừng trở lại</span>, <span class="highlight">{{ user.full_name or user.username }}</span>! 👋</h1>
+            <section class="welcome-section fade-in-up">
+                <h1 class="heading-gradient"><span data-i18n="dashboard.welcome">Chào mừng trở lại</span>, <span class="highlight">{{ user.full_name or user.username }}</span>! 👋</h1>
                 <div class="welcome-stats">
-                    <div class="stat-mini">
+                    <div class="stat-mini glass fade-in-up delay-1">
                         <i class="fas fa-envelope"></i> {{ stats.total_activities or 0 }} <span data-i18n="dashboard.total_actions">Hành động</span>
                     </div>
-                    <div class="stat-mini">
+                    <div class="stat-mini glass fade-in-up delay-2">
                         <i class="fas fa-clock"></i> {{ stats.login_count or 0 }} <span data-i18n="dashboard.logins">Đăng nhập</span>
                     </div>
-                    <div class="stat-mini">
+                    <div class="stat-mini glass fade-in-up delay-3">
                         <i class="fas fa-calendar"></i> <span data-i18n="dashboard.member_since">Thành viên từ</span> {{ stats.created_at.split()[0] if stats.created_at else 'N/A' }}
                     </div>
                 </div>
@@ -306,19 +323,19 @@
 
             <!-- Statistics Cards (Hidden globally, shown per tool) -->
             <div class="stats-grid" style="display: none;">
-                <div class="stat-card">
+                <div class="stat-card stats-card-modern modern-card hover-scale scroll-reveal">
                     <div class="stat-card-header">
                         <div class="stat-icon green">
                             <i class="fas fa-check-circle"></i>
                         </div>
-                        <div class="stat-change positive">
+                        <div class="stat-change positive badge-modern badge-glow">
                             <i class="fas fa-arrow-up"></i> +12%
                         </div>
                     </div>
                     <div class="stat-label" data-i18n="dashboard.live_emails">Email LIVE</div>
-                    <div class="stat-value" id="liveEmails">0</div>
-                    <div class="stat-progress">
-                        <div class="stat-progress-bar green" id="liveProgress" style="width: 0%"></div>
+                    <div class="stat-value heading-gradient" id="liveEmails">0</div>
+                    <div class="stat-progress progress-modern">
+                        <div class="stat-progress-bar green progress-shimmer" id="liveProgress" style="width: 0%"></div>
                     </div>
                     <div class="stat-footer">
                         <span class="stat-footer-text" data-i18n="dashboard.success_rate">Tỷ lệ thành công</span>
@@ -326,19 +343,19 @@
                     </div>
                 </div>
 
-                <div class="stat-card">
+                <div class="stat-card stats-card-modern modern-card hover-scale scroll-reveal">
                     <div class="stat-card-header">
                         <div class="stat-icon red">
                             <i class="fas fa-times-circle"></i>
                         </div>
-                        <div class="stat-change negative">
+                        <div class="stat-change negative badge-modern">
                             <i class="fas fa-arrow-down"></i> -8%
                         </div>
                     </div>
                     <div class="stat-label" data-i18n="dashboard.die_emails">Email DIE</div>
-                    <div class="stat-value" id="dieEmails">0</div>
-                    <div class="stat-progress">
-                        <div class="stat-progress-bar red" id="dieProgress" style="width: 0%"></div>
+                    <div class="stat-value heading-gradient" id="dieEmails">0</div>
+                    <div class="stat-progress progress-modern">
+                        <div class="stat-progress-bar red progress-shimmer" id="dieProgress" style="width: 0%"></div>
                     </div>
                     <div class="stat-footer">
                         <span class="stat-footer-text" data-i18n="dashboard.failure_rate">Tỷ lệ thất bại</span>
@@ -346,19 +363,19 @@
                     </div>
                 </div>
 
-                <div class="stat-card">
+                <div class="stat-card stats-card-modern modern-card hover-scale scroll-reveal">
                     <div class="stat-card-header">
                         <div class="stat-icon blue">
                             <i class="fas fa-envelope"></i>
                         </div>
-                        <div class="stat-change positive">
+                        <div class="stat-change positive badge-modern">
                             <i class="fas fa-equals"></i> Stable
                         </div>
                     </div>
                     <div class="stat-label" data-i18n="dashboard.total_processed">Tổng đã xử lý</div>
-                    <div class="stat-value" id="totalEmails">0</div>
-                    <div class="stat-progress">
-                        <div class="stat-progress-bar blue" id="totalProgress" style="width: 0%"></div>
+                    <div class="stat-value heading-gradient" id="totalEmails">0</div>
+                    <div class="stat-progress progress-modern">
+                        <div class="stat-progress-bar blue progress-shimmer" id="totalProgress" style="width: 0%"></div>
                     </div>
                     <div class="stat-footer">
                         <span class="stat-footer-text" data-i18n="dashboard.last_7_days">7 ngày qua</span>
@@ -366,19 +383,19 @@
                     </div>
                 </div>
 
-                <div class="stat-card">
+                <div class="stat-card stats-card-modern modern-card hover-scale scroll-reveal">
                     <div class="stat-card-header">
                         <div class="stat-icon purple">
                             <i class="fas fa-key"></i>
                         </div>
-                        <div class="stat-change positive">
+                        <div class="stat-change positive badge-modern badge-pulse">
                             <i class="fas fa-arrow-up"></i> +15%
                         </div>
                     </div>
                     <div class="stat-label" data-i18n="dashboard.can_receive_code">Nhận được mã</div>
-                    <div class="stat-value" id="canReceiveCode">0</div>
-                    <div class="stat-progress">
-                        <div class="stat-progress-bar purple" id="codeProgress" style="width: 0%"></div>
+                    <div class="stat-value heading-gradient" id="canReceiveCode">0</div>
+                    <div class="stat-progress progress-modern">
+                        <div class="stat-progress-bar purple progress-shimmer" id="codeProgress" style="width: 0%"></div>
                     </div>
                     <div class="stat-footer">
                         <span class="stat-footer-text" data-i18n="dashboard.2fa_ready">Sẵn sàng 2FA</span>
@@ -390,9 +407,9 @@
             <!-- Tools Grid -->
             <div class="tools-grid">
                 <!-- Email Validator -->
-                <div class="tool-card" onclick="openModal('validatorModal')">
+                <div class="tool-card modern-card glass-card hover-scale scroll-reveal" onclick="openModal('validatorModal')">
                     <div class="tool-card-header">
-                        <div class="tool-icon gradient-blue">
+                        <div class="tool-icon gradient-blue animate-float">
                             <i class="fas fa-shield-check"></i>
                         </div>
                         <div class="tool-info">
@@ -405,7 +422,7 @@
                         <span class="tool-stat"><i class="fas fa-bolt"></i> <span data-i18n="dashboard.fast">Nhanh</span></span>
                     </div>
                     <div class="tool-card-footer">
-                        <span class="tool-badge popular" data-i18n="dashboard.popular">Phổ biến</span>
+                        <span class="tool-badge popular badge-modern badge-glow" data-i18n="dashboard.popular">Phổ biến</span>
                         <div class="tool-arrow">
                             <i class="fas fa-arrow-right"></i>
                         </div>
@@ -413,9 +430,9 @@
                 </div>
 
                 <!-- Email Generator -->
-                <div class="tool-card" onclick="openModal('generatorModal')">
+                <div class="tool-card modern-card glass-card hover-scale scroll-reveal" onclick="openModal('generatorModal')">
                     <div class="tool-card-header">
-                        <div class="tool-icon gradient-green">
+                        <div class="tool-icon gradient-green animate-float">
                             <i class="fas fa-random"></i>
                         </div>
                         <div class="tool-info">
@@ -428,7 +445,7 @@
                         <span class="tool-stat"><i class="fas fa-globe"></i> <span data-i18n="dashboard.multi_domain">Nhiều tên miền</span></span>
                     </div>
                     <div class="tool-card-footer">
-                        <span class="tool-badge new" data-i18n="common.new">Mới</span>
+                        <span class="tool-badge new badge-modern badge-pulse" data-i18n="common.new">Mới</span>
                         <div class="tool-arrow">
                             <i class="fas fa-arrow-right"></i>
                         </div>
@@ -436,9 +453,9 @@
                 </div>
 
                 <!-- FB Linked Checker -->
-                <div class="tool-card" onclick="openModal('fbLinkedModal')">
+                <div class="tool-card modern-card glass-card hover-scale scroll-reveal" onclick="openModal('fbLinkedModal')">
                     <div class="tool-card-header">
-                        <div class="tool-icon gradient-purple">
+                        <div class="tool-icon gradient-purple animate-float">
                             <i class="fab fa-facebook"></i>
                         </div>
                         <div class="tool-info">
@@ -451,7 +468,7 @@
                         <span class="tool-stat"><i class="fas fa-shield-alt"></i> <span data-i18n="dashboard.secure">Bảo mật</span></span>
                     </div>
                     <div class="tool-card-footer">
-                        <span class="tool-badge pro" data-i18n="vip.pro.short">Pro</span>
+                        <span class="tool-badge pro badge-modern badge-glow" data-i18n="vip.pro.short">Pro</span>
                         <div class="tool-arrow">
                             <i class="fas fa-arrow-right"></i>
                         </div>
@@ -459,9 +476,9 @@
                 </div>
 
                 <!-- Check 2FA -->
-                <div class="tool-card" onclick="openModal('check2faModal')">
+                <div class="tool-card modern-card glass-card hover-scale scroll-reveal" onclick="openModal('check2faModal')">
                     <div class="tool-card-header">
-                        <div class="tool-icon gradient-orange">
+                        <div class="tool-icon gradient-orange animate-float">
                             <i class="fas fa-shield-alt"></i>
                         </div>
                         <div class="tool-info">
@@ -474,7 +491,7 @@
                         <span class="tool-stat"><i class="fas fa-pager"></i> <span data-i18n="dashboard.pages">Trang</span></span>
                     </div>
                     <div class="tool-card-footer">
-                        <span class="tool-badge hot" data-i18n="dashboard.hot">Nóng</span>
+                        <span class="tool-badge hot badge-modern badge-pulse" data-i18n="dashboard.hot">Nóng</span>
                         <div class="tool-arrow">
                             <i class="fas fa-arrow-right"></i>
                         </div>
@@ -1143,82 +1160,8 @@
         </div>
     </div>
 
-    <!-- Email Generator Modal -->
-    <div class="modal" id="generatorModal">
-        <div class="modal-content" style="max-width: 900px;">
-            <div class="modal-header">
-                <h2><i class="fas fa-random"></i> <span data-i18n="dashboard.email_generator.title">Tạo Email</span></h2>
-                <button class="modal-close" onclick="closeModal('generatorModal')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="tool-description">
-                    <p data-i18n="dashboard.email_generator.description">Tạo danh sách email ngẫu nhiên với nhiều tùy chọn tùy chỉnh.</p>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="genCount">
-                            <i class="fas fa-hashtag"></i> Số lượng Email
-                        </label>
-                        <input type="number" id="genCount" value="100" min="1" max="10000">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="genDomain">
-                            <i class="fas fa-globe"></i> Domain
-                        </label>
-                        <select id="genDomain">
-                            <option value="gmail.com">gmail.com</option>
-                            <option value="yahoo.com">yahoo.com</option>
-                            <option value="outlook.com">outlook.com</option>
-                            <option value="hotmail.com">hotmail.com</option>
-                            <option value="custom">Tùy chỉnh...</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-group" id="customDomainGroup" style="display: none;">
-                    <label for="customDomains">
-                        <i class="fas fa-list"></i> Danh sách Domain tùy chỉnh
-                        <span class="label-hint">(Mỗi domain một dòng)</span>
-                    </label>
-                    <textarea id="customDomains" rows="3" placeholder="domain1.com&#10;domain2.com"></textarea>
-                </div>
-                
-                <div class="options-grid">
-                    <label class="checkbox-option">
-                        <input type="checkbox" id="genNumbers" checked>
-                        <span>Thêm số</span>
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" id="genDots" checked>
-                        <span>Thêm dấu chấm</span>
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" id="genUnderscores">
-                        <span>Thêm gạch dưới</span>
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" id="genUnique" checked>
-                        <span>Không trùng lặp</span>
-                    </label>
-                </div>
-                
-                <div class="modal-actions">
-                    <button class="btn btn-primary" onclick="runEmailGenerator()">
-                        <i class="fas fa-play"></i> <span data-i18n="common.generate">Tạo</span>
-                    </button>
-                    <button class="btn btn-secondary" onclick="clearGeneratorResults()">
-                        <i class="fas fa-eraser"></i> <span data-i18n="common.clear">Xóa</span>
-                    </button>
-                </div>
-                
-                <div id="generatorResults" class="results-container"></div>
-            </div>
-        </div>
-    </div>
+    <!-- Enhanced Email Generator Modal with Template Integration -->
+    {% include 'modals/generator_enhanced_modal.html' %}
 
     <!-- Email Extractor Modal -->
     <div class="modal" id="extractorModal">
@@ -1559,10 +1502,16 @@
         </div>
     </div>
 
+    <!-- Template Selector Modal -->
+    {% include 'modals/template_selector_modal.html' %}
+
+    <!-- Progress Monitor Modal -->
+    {% include 'modals/progress_monitor_modal.html' %}
+
     <!-- Core Scripts (Load first) -->
     <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
     <script src="{{ url_for('static', filename='js/modals.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/api.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/api_complete.js') }}"></script>
     <script src="{{ url_for('static', filename='js/tool_handlers.js') }}"></script>
     
     <!-- I18N Scripts -->
@@ -1583,10 +1532,16 @@
     <script src="{{ url_for('static', filename='js/activity_feed.js') }}"></script>
     
     <!-- Tool-specific Scripts (No duplicates) -->
+    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dark_mode.js') }}"></script>
     <script src="{{ url_for('static', filename='js/tool_visibility.js') }}"></script>
     <script src="{{ url_for('static', filename='js/fb_linked_checker.js') }}"></script>
     <script src="{{ url_for('static', filename='js/check_2fa.js') }}"></script>
     <script src="{{ url_for('static', filename='js/page_mining.js') }}"></script>
+    
+    <!-- Template & Progress Tracking Scripts -->
+    <script src="{{ url_for('static', filename='js/template_manager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/progress_tracker_ui.js') }}"></script>
     
     <!-- Admin Functions -->
     <script>
