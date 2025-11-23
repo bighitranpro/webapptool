@@ -1,0 +1,487 @@
+/**
+ * Template and Progress Tracking UI Styles
+ */
+
+/* ==================== TEMPLATE SYSTEM ==================== */
+
+.category-pills {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.category-pill {
+    padding: 8px 16px;
+    border: 2px solid var(--border-color, #e0e0e0);
+    background: white;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.category-pill:hover {
+    border-color: var(--primary-color, #3498db);
+    background: var(--primary-light, #ecf5ff);
+    transform: translateY(-2px);
+}
+
+.category-pill.active {
+    border-color: var(--primary-color, #3498db);
+    background: var(--primary-color, #3498db);
+    color: white;
+}
+
+.template-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.template-card {
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.template-card:hover {
+    border-color: var(--primary-color, #3498db);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px);
+}
+
+.template-card.active {
+    border-color: var(--success-color, #2ecc71);
+    background: var(--success-light, #e8f8f0);
+}
+
+.template-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.template-card-header h4 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.template-badge {
+    padding: 4px 10px;
+    background: var(--primary-light, #ecf5ff);
+    color: var(--primary-color, #3498db);
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.template-description {
+    color: #7f8c8d;
+    font-size: 14px;
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+.template-pattern {
+    display: block;
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: #e74c3c;
+    margin-bottom: 15px;
+    word-break: break-all;
+}
+
+.template-examples {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+.template-examples strong {
+    display: block;
+    font-size: 12px;
+    color: #7f8c8d;
+    margin-bottom: 8px;
+}
+
+.example-email {
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: #2c3e50;
+    padding: 4px 0;
+}
+
+.template-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.template-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.template-tags .tag {
+    padding: 3px 8px;
+    background: #ecf0f1;
+    color: #7f8c8d;
+    border-radius: 10px;
+    font-size: 11px;
+}
+
+.template-form-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.template-form-header h3 {
+    margin: 0 0 8px 0;
+    font-size: 22px;
+}
+
+.template-form-header p {
+    margin: 0 0 12px 0;
+    opacity: 0.9;
+}
+
+.template-form-header code {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 8px 12px;
+    border-radius: 6px;
+    display: inline-block;
+    font-family: 'Courier New', monospace;
+}
+
+.template-variable-input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.template-variable-input:focus {
+    border-color: var(--primary-color, #3498db);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+/* ==================== PROGRESS TRACKING ==================== */
+
+.progress-tasks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 20px;
+}
+
+.progress-task-card {
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s;
+}
+
+.progress-task-card:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.progress-task-card.status-running {
+    border-left: 4px solid #3498db;
+}
+
+.progress-task-card.status-paused {
+    border-left: 4px solid #f39c12;
+}
+
+.progress-task-card.status-completed {
+    border-left: 4px solid #2ecc71;
+}
+
+.progress-task-card.status-failed {
+    border-left: 4px solid #e74c3c;
+}
+
+.progress-task-card.status-cancelled {
+    border-left: 4px solid #95a5a6;
+}
+
+.task-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.task-info h4 {
+    margin: 0 0 5px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.task-id {
+    font-size: 12px;
+    color: #95a5a6;
+    font-family: 'Courier New', monospace;
+}
+
+.task-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: #ecf0f1;
+    color: #7f8c8d;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.btn-icon:hover {
+    background: #d5dbdb;
+    transform: scale(1.1);
+}
+
+.btn-icon.btn-danger {
+    background: #ffe6e6;
+    color: #e74c3c;
+}
+
+.btn-icon.btn-danger:hover {
+    background: #ffcccc;
+}
+
+.progress-bar-container {
+    background: #ecf0f1;
+    border-radius: 10px;
+    height: 28px;
+    overflow: hidden;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #3498db 0%, #2ecc71 100%);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.progress-text {
+    color: white;
+    font-weight: 600;
+    font-size: 13px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.task-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.task-stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #7f8c8d;
+}
+
+.task-stat i {
+    color: #3498db;
+}
+
+.task-errors {
+    background: #ffe6e6;
+    padding: 10px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #e74c3c;
+}
+
+.task-errors .btn-link {
+    margin-left: auto;
+    color: #e74c3c;
+    text-decoration: underline;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-weight: 600;
+}
+
+.task-card-footer {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #ecf0f1;
+    display: flex;
+    justify-content: space-between;
+}
+
+.task-time {
+    font-size: 11px;
+    color: #95a5a6;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid #e0e0e0;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.stat-card:hover {
+    border-color: var(--primary-color, #3498db);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card i {
+    font-size: 32px;
+    color: var(--primary-color, #3498db);
+    margin-bottom: 10px;
+}
+
+.stat-value {
+    font-size: 36px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #7f8c8d;
+    font-weight: 500;
+}
+
+.stat-card.status-running i { color: #3498db; }
+.stat-card.status-completed i { color: #2ecc71; }
+.stat-card.status-failed i { color: #e74c3c; }
+
+.errors-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.error-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.error-number {
+    width: 30px;
+    height: 30px;
+    background: #e74c3c;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.error-details {
+    flex: 1;
+}
+
+.error-message {
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.error-time {
+    font-size: 11px;
+    color: #95a5a6;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 768px) {
+    .template-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .progress-tasks-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .category-pills {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}

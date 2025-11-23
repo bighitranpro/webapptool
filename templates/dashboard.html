@@ -33,6 +33,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/modern_ui.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/micro_interactions.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/typography_spacing.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/template_progress_ui.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -85,6 +86,11 @@
                         <i class="fas fa-search"></i>
                         <span data-i18n="dashboard.email_extractor.title">Trích xuất Email</span>
                     </a>
+                    <a href="#templates" class="nav-item" onclick="openModal('templateSelectorModal')">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Email Templates</span>
+                        <span class="nav-badge" style="background: #e74c3c;">MỚI</span>
+                    </a>
                 </div>
             </div>
 
@@ -126,6 +132,11 @@
                     <a href="#dedup" class="nav-item" onclick="openModal('deduplicatorModal')">
                         <i class="fas fa-clone"></i>
                         <span data-i18n="sidebar.deduplicator">Loại bỏ trùng</span>
+                    </a>
+                    <a href="#progress" class="nav-item" onclick="openProgressMonitor()">
+                        <i class="fas fa-tasks"></i>
+                        <span>Theo dõi tiến độ</span>
+                        <span class="nav-badge" style="background: #e74c3c;">MỚI</span>
                     </a>
                 </div>
             </div>
@@ -1149,82 +1160,8 @@
         </div>
     </div>
 
-    <!-- Email Generator Modal -->
-    <div class="modal" id="generatorModal">
-        <div class="modal-content" style="max-width: 900px;">
-            <div class="modal-header">
-                <h2><i class="fas fa-random"></i> <span data-i18n="dashboard.email_generator.title">Tạo Email</span></h2>
-                <button class="modal-close" onclick="closeModal('generatorModal')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="tool-description">
-                    <p data-i18n="dashboard.email_generator.description">Tạo danh sách email ngẫu nhiên với nhiều tùy chọn tùy chỉnh.</p>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="genCount">
-                            <i class="fas fa-hashtag"></i> Số lượng Email
-                        </label>
-                        <input type="number" id="genCount" value="100" min="1" max="10000">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="genDomain">
-                            <i class="fas fa-globe"></i> Domain
-                        </label>
-                        <select id="genDomain">
-                            <option value="gmail.com">gmail.com</option>
-                            <option value="yahoo.com">yahoo.com</option>
-                            <option value="outlook.com">outlook.com</option>
-                            <option value="hotmail.com">hotmail.com</option>
-                            <option value="custom">Tùy chỉnh...</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-group" id="customDomainGroup" style="display: none;">
-                    <label for="customDomains">
-                        <i class="fas fa-list"></i> Danh sách Domain tùy chỉnh
-                        <span class="label-hint">(Mỗi domain một dòng)</span>
-                    </label>
-                    <textarea id="customDomains" rows="3" placeholder="domain1.com&#10;domain2.com"></textarea>
-                </div>
-                
-                <div class="options-grid">
-                    <label class="checkbox-option">
-                        <input type="checkbox" id="genNumbers" checked>
-                        <span>Thêm số</span>
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" id="genDots" checked>
-                        <span>Thêm dấu chấm</span>
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" id="genUnderscores">
-                        <span>Thêm gạch dưới</span>
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" id="genUnique" checked>
-                        <span>Không trùng lặp</span>
-                    </label>
-                </div>
-                
-                <div class="modal-actions">
-                    <button class="btn btn-primary" onclick="runEmailGenerator()">
-                        <i class="fas fa-play"></i> <span data-i18n="common.generate">Tạo</span>
-                    </button>
-                    <button class="btn btn-secondary" onclick="clearGeneratorResults()">
-                        <i class="fas fa-eraser"></i> <span data-i18n="common.clear">Xóa</span>
-                    </button>
-                </div>
-                
-                <div id="generatorResults" class="results-container"></div>
-            </div>
-        </div>
-    </div>
+    <!-- Enhanced Email Generator Modal with Template Integration -->
+    {% include 'modals/generator_enhanced_modal.html' %}
 
     <!-- Email Extractor Modal -->
     <div class="modal" id="extractorModal">
@@ -1565,10 +1502,16 @@
         </div>
     </div>
 
+    <!-- Template Selector Modal -->
+    {% include 'modals/template_selector_modal.html' %}
+
+    <!-- Progress Monitor Modal -->
+    {% include 'modals/progress_monitor_modal.html' %}
+
     <!-- Core Scripts (Load first) -->
     <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
     <script src="{{ url_for('static', filename='js/modals.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/api.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/api_complete.js') }}"></script>
     <script src="{{ url_for('static', filename='js/tool_handlers.js') }}"></script>
     
     <!-- I18N Scripts -->
@@ -1595,6 +1538,10 @@
     <script src="{{ url_for('static', filename='js/fb_linked_checker.js') }}"></script>
     <script src="{{ url_for('static', filename='js/check_2fa.js') }}"></script>
     <script src="{{ url_for('static', filename='js/page_mining.js') }}"></script>
+    
+    <!-- Template & Progress Tracking Scripts -->
+    <script src="{{ url_for('static', filename='js/template_manager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/progress_tracker_ui.js') }}"></script>
     
     <!-- Admin Functions -->
     <script>

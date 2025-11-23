@@ -10,6 +10,7 @@ from database import Database
 from modules import (
     EmailValidator,
     EmailGenerator,
+    EmailGeneratorAdvanced,
     EmailExtractor,
     EmailFormatter,
     EmailFilter,
@@ -20,7 +21,12 @@ from modules import (
     EmailBatchProcessor,
     FBLinkedChecker,
     EmailPass2FAChecker,
-    PageMining
+    PageMining,
+    EmailTemplateSystem,
+    RealtimeProgressTracker,
+    get_global_tracker,
+    ProgressIntegration,
+    get_progress_integration
 )
 from modules.page_mining_enhanced import PageMiningEnhanced
 
@@ -43,6 +49,11 @@ batch_processor = EmailBatchProcessor()
 fb_checker = FBLinkedChecker()
 pass_2fa_checker = EmailPass2FAChecker()
 page_miner = PageMining()
+
+# Initialize NEW modules
+template_system = EmailTemplateSystem()
+progress_tracker = get_global_tracker()
+progress_integration = get_progress_integration()
 
 # Initialize Enhanced Page Mining Module
 page_miner_enhanced = PageMiningEnhanced(api_configs={
@@ -1759,3 +1770,748 @@ def get_stats_summary():
         
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
+
+
+# ==========================================
+# EMAIL TEMPLATE SYSTEM ENDPOINTS
+# ==========================================
+
+@api_bp.route('/api/templates/list', methods=['GET'])
+def api_list_templates():
+    """Get all email templates"""
+    try:
+        category = request.args.get('category')
+        
+        if category:
+            templates = template_system.get_templates_by_category(category)
+        else:
+            templates = template_system.get_all_templates()
+        
+        return jsonify({
+            'success': True,
+            'templates': templates,
+            'count': len(templates),
+            'categories': template_system.get_categories()
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api_bp.route('/api/templates/<template_id>', methods=['GET'])
+def api_get_template(template_id):
+    """Get specific template by ID"""
+    try:
+        template = template_system.get_template(template_id)
+        
+        if not template:
+            return jsonify({
+                'success': False,
+                'message': 'Template not found'
+            }), 404
+        
+        return jsonify({
+            'success': True,
+            'template': template
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api_bp.route('/api/templates/search', methods=['GET'])
+def api_search_templates():
+    """Search templates by query"""
+    try:
+        query = request.args.get('q', '')
+        
+        if not query:
+            return jsonify({
+                'success': False,
+                'message': 'Search query required'
+            }), 400
+        
+        results = template_system.search_templates(query)
+        
+        return jsonify({
+            'success': True,
+            'results': results,
+            'count': len(results),
+            'query': query
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api_bp.route('/api/templates/generate', methods=['POST'])
+def api_generate_from_template():
+    """Generate emails from template"""
+    try:
+        data = request.get_json()
+        template_id = data.get('template_id')
+        variables = data.get('variables', {})
+        count = int(data.get('count', 1))
+        
+        if not template_id:
+            return jsonify({
+                'success': False,
+                'message': 'Template ID required'
+            }), 400
+        
+        if count < 1 or count > 10000:
+            return jsonify({
+                'success': False,
+                'message': 'Count must be between 1 and 10,000'
+            }), 400
+        
+        result = template_system.generate_from_template(template_id, variables, count)
+        
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api_bp.route('/api/templates/categories', methods=['GET'])
+def api_get_template_categories():
+    """Get all template categories"""
+    try:
+        categories = template_system.get_categories()
+        
+        return jsonify({
+            'success': True,
+            'categories': categories
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+# ==========================================
+# REAL-TIME PROGRESS TRACKING ENDPOINTS
+# ==========================================
+
+@api_bp.route('/api/progress/<task_id>', methods=['GET'])
+def api_get_progress(task_id):
+    """Get progress for specific task"""
+    try:
+        task = progress_tracker.get_task(task_id)
+        
+        if not task:
+            return jsonify({
+                'success': False,
+                'message': 'Task not found'
+            }), 404
+        
+        return jsonify({
+            'success': True,
+            'task': task
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api_bp.route('/api/progress/all', methods=['GET'])
+def api_get_all_progress():
+    """Get all tasks progress"""
+    try:
+        tasks = progress_tracker.get_all_tasks()
+        
+        return jsonify({
+            'success': True,
+            'tasks': tasks,
+            'count': len(tasks)
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api_bp.route('/api/progress/active', methods=['GET'])
+def api_get_active_progress():
+    """Get only active tasks"""
+    try:
+        tasks = progress_tracker.get_active_tasks()
+        
+        return jsonify({
+            'success': True,
+            'tasks': tasks,
+            'count': len(tasks)
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api_bp.route('/api/progress/<task_id>/cancel', methods=['POST'])
+def api_cancel_task(task_id):
+    """Cancel a running task"""
+    try:
+        success = progress_tracker.cancel_task(task_id)
+        
+        if not success:
+            return jsonify({
+                'success': False,
+                'message': 'Task not found or cannot be cancelled'
+            }), 400
+        
+        return jsonify({
+            'success': True,
+            'message': 'Task cancelled successfully'
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api_bp.route('/api/progress/<task_id>/pause', methods=['POST'])
+def api_pause_task(task_id):
+    """Pause a running task"""
+    try:
+        success = progress_tracker.pause_task(task_id)
+        
+        if not success:
+            return jsonify({
+                'success': False,
+                'message': 'Task not found or cannot be paused'
+            }), 400
+        
+        return jsonify({
+            'success': True,
+            'message': 'Task paused successfully'
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api_bp.route('/api/progress/<task_id>/resume', methods=['POST'])
+def api_resume_task(task_id):
+    """Resume a paused task"""
+    try:
+        success = progress_tracker.resume_task(task_id)
+        
+        if not success:
+            return jsonify({
+                'success': False,
+                'message': 'Task not found or cannot be resumed'
+            }), 400
+        
+        return jsonify({
+            'success': True,
+            'message': 'Task resumed successfully'
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api_bp.route('/api/progress/<task_id>', methods=['DELETE'])
+def api_delete_task(task_id):
+    """Delete a task"""
+    try:
+        success = progress_tracker.delete_task(task_id)
+        
+        if not success:
+            return jsonify({
+                'success': False,
+                'message': 'Task not found'
+            }), 404
+        
+        return jsonify({
+            'success': True,
+            'message': 'Task deleted successfully'
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api_bp.route('/api/progress/statistics', methods=['GET'])
+def api_progress_statistics():
+    """Get overall progress statistics"""
+    try:
+        stats = progress_tracker.get_statistics()
+        
+        return jsonify({
+            'success': True,
+            'statistics': stats
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api_bp.route('/api/progress/cleanup', methods=['POST'])
+def api_cleanup_tasks():
+    """Cleanup old completed tasks"""
+    try:
+        max_age = request.json.get('max_age_seconds', 3600) if request.json else 3600
+        cleaned = progress_tracker.cleanup_old_tasks(max_age)
+        
+        return jsonify({
+            'success': True,
+            'cleaned_count': cleaned,
+            'message': f'Cleaned up {cleaned} old tasks'
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+# ============================================================================
+# PROGRESS-ENABLED ENDPOINTS
+# ============================================================================
+
+@api_bp.route('/api/validate-with-progress', methods=['POST'])
+def api_validate_with_progress():
+    """
+    Email validation with real-time progress tracking
+    
+    Request:
+        {
+            "emails": ["email1@gmail.com", "email2@yahoo.com"],
+            "options": {
+                "check_mx": true,
+                "max_workers": 10
+            }
+        }
+    
+    Response:
+        {
+            "success": true,
+            "task_id": "uuid",
+            "message": "Validation started in background",
+            "track_url": "/api/progress/{task_id}"
+        }
+    """
+    try:
+        data = request.get_json()
+        emails = data.get('emails', [])
+        options = data.get('options', {})
+        
+        if not emails:
+            return jsonify({
+                'success': False,
+                'message': 'No emails provided'
+            }), 400
+        
+        # Use progress integration
+        result = progress_integration.validate_with_progress(
+            emails=emails,
+            validator_func=validator.bulk_validate,
+            task_name=f"Validate {len(emails)} emails",
+            **options
+        )
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+
+@api_bp.route('/api/extract-with-progress', methods=['POST'])
+def api_extract_with_progress():
+    """
+    Email extraction with real-time progress tracking
+    
+    Request:
+        {
+            "text": "text containing emails...",
+            "options": {
+                "remove_dups": true
+            }
+        }
+    
+    Response:
+        {
+            "success": true,
+            "task_id": "uuid",
+            "message": "Extraction started in background",
+            "track_url": "/api/progress/{task_id}"
+        }
+    """
+    try:
+        data = request.get_json()
+        text = data.get('text', '')
+        options = data.get('options', {})
+        
+        if not text:
+            return jsonify({
+                'success': False,
+                'message': 'No text provided'
+            }), 400
+        
+        # Use progress integration
+        result = progress_integration.extract_with_progress(
+            text=text,
+            extractor_func=extractor.extract_and_process,
+            task_name=f"Extract emails from text",
+            **options
+        )
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+
+@api_bp.route('/api/smtp-validate', methods=['POST'])
+def api_smtp_validate():
+    """
+    Advanced SMTP validation - check if email mailbox actually exists
+    
+    Request:
+        {
+            "emails": ["email1@gmail.com", "email2@yahoo.com"],
+            "options": {
+                "timeout": 10,
+                "max_workers": 5
+            }
+        }
+    
+    Response:
+        {
+            "success": true,
+            "stats": {
+                "total": 2,
+                "valid": 1,
+                "invalid": 1,
+                "unknown": 0,
+                "smtp_checked": 2,
+                "processing_time": 5.2,
+                "emails_per_second": 0.38
+            },
+            "results": {
+                "valid": [...],
+                "invalid": [...],
+                "unknown": [...]
+            }
+        }
+    """
+    try:
+        from modules import get_smtp_validator
+        
+        data = request.get_json()
+        emails = data.get('emails', [])
+        options = data.get('options', {})
+        
+        if not emails:
+            return jsonify({
+                'success': False,
+                'message': 'No emails provided'
+            }), 400
+        
+        timeout = options.get('timeout', 10)
+        max_workers = options.get('max_workers', 5)
+        
+        # Get SMTP validator
+        smtp_validator = get_smtp_validator(timeout=timeout, max_workers=max_workers)
+        
+        # Run validation
+        result = smtp_validator.bulk_validate(emails)
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+
+@api_bp.route('/api/smtp-validate-single', methods=['POST'])
+def api_smtp_validate_single():
+    """
+    Validate single email via SMTP
+    
+    Request:
+        {
+            "email": "test@example.com",
+            "timeout": 10
+        }
+    
+    Response:
+        {
+            "success": true,
+            "result": {
+                "email": "test@example.com",
+                "valid": true,
+                "status": "VALID",
+                "smtp_check": true,
+                "deliverable": true,
+                "mx_records": ["mx1.example.com", "mx2.example.com"],
+                "reason": null
+            }
+        }
+    """
+    try:
+        from modules import get_smtp_validator
+        
+        data = request.get_json()
+        email = data.get('email', '')
+        timeout = data.get('timeout', 10)
+        
+        if not email:
+            return jsonify({
+                'success': False,
+                'message': 'No email provided'
+            }), 400
+        
+        # Get SMTP validator
+        smtp_validator = get_smtp_validator(timeout=timeout)
+        
+        # Validate
+        result = smtp_validator.validate_email(email)
+        
+        return jsonify({
+            'success': True,
+            'result': result
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+
+# ============================================================================
+# CUSTOM TEMPLATES ENDPOINTS
+# ============================================================================
+
+@api_bp.route('/api/custom-templates', methods=['GET'])
+def api_list_custom_templates():
+    """List all custom templates accessible to user"""
+    try:
+        from modules.custom_template_manager import get_custom_template_manager
+        
+        user_id = session.get('user_id', 0)
+        category = request.args.get('category')
+        
+        manager = get_custom_template_manager()
+        templates = manager.list_templates(user_id=user_id, category=category)
+        
+        return jsonify({
+            'success': True,
+            'count': len(templates),
+            'templates': templates
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api_bp.route('/api/custom-templates', methods=['POST'])
+def api_create_custom_template():
+    """Create new custom template"""
+    try:
+        from modules.custom_template_manager import get_custom_template_manager
+        
+        user_id = session.get('user_id', 0)
+        if not user_id:
+            return jsonify({'success': False, 'message': 'Login required'}), 401
+        
+        data = request.get_json()
+        
+        manager = get_custom_template_manager()
+        result = manager.create_template(
+            user_id=user_id,
+            name=data.get('name'),
+            pattern=data.get('pattern'),
+            description=data.get('description', ''),
+            category=data.get('category', 'custom'),
+            variables=data.get('variables'),
+            tags=data.get('tags'),
+            examples=data.get('examples'),
+            is_public=data.get('is_public', False)
+        )
+        
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api_bp.route('/api/custom-templates/<template_id>', methods=['PUT'])
+def api_update_custom_template(template_id):
+    """Update custom template"""
+    try:
+        from modules.custom_template_manager import get_custom_template_manager
+        
+        user_id = session.get('user_id', 0)
+        if not user_id:
+            return jsonify({'success': False, 'message': 'Login required'}), 401
+        
+        data = request.get_json()
+        
+        manager = get_custom_template_manager()
+        result = manager.update_template(template_id, user_id, data)
+        
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api_bp.route('/api/custom-templates/<template_id>', methods=['DELETE'])
+def api_delete_custom_template(template_id):
+    """Delete custom template"""
+    try:
+        from modules.custom_template_manager import get_custom_template_manager
+        
+        user_id = session.get('user_id', 0)
+        if not user_id:
+            return jsonify({'success': False, 'message': 'Login required'}), 401
+        
+        manager = get_custom_template_manager()
+        result = manager.delete_template(template_id, user_id)
+        
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+# Statistics Endpoints
+@api_bp.route('/api/statistics', methods=['GET'])
+def api_get_statistics():
+    """Get usage statistics"""
+    try:
+        from modules.usage_statistics import get_usage_statistics
+        user_id = session.get('user_id')
+        days = int(request.args.get('days', 30))
+        stats = get_usage_statistics()
+        result = stats.get_stats(user_id=user_id, days=days)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+# ============================================================================
+# ULTRA HIGH-PERFORMANCE EMAIL GENERATOR
+# ============================================================================
+
+@api_bp.route('/api/generate-ultra', methods=['POST'])
+def api_generate_ultra():
+    """
+    Ultra high-performance email generation
+    
+    Performance Targets:
+        - <1ms per email
+        - 10,000+ batch support
+        - 100% unique guarantee
+        - RFC-5322 compliant
+        - Crypto-grade random
+    
+    Request:
+        {
+            "count": 100,
+            "domains": ["gmail.com", "yahoo.com"],
+            "use_threading": false,
+            "num_threads": 4
+        }
+    
+    Response:
+        {
+            "success": true,
+            "count": 100,
+            "emails": [...],
+            "performance": {
+                "total_time_ms": 45.2,
+                "avg_time_per_email_ms": 0.452,
+                "emails_per_second": 2212.39,
+                "target_met": true
+            },
+            "quality": {
+                "unique_guarantee": true,
+                "duplicates_avoided": 0,
+                "unique_count": 100,
+                "rfc5322_compliant": true
+            },
+            "domain_stats": {...}
+        }
+    """
+    try:
+        from modules.email_generator_ultra import get_ultra_generator
+        
+        data = request.get_json()
+        count = data.get('count', 100)
+        domains = data.get('domains')
+        use_threading = data.get('use_threading', False)
+        num_threads = data.get('num_threads', 4)
+        
+        # Validate count
+        if count < 1 or count > 100000:
+            return jsonify({
+                'success': False,
+                'message': 'Count must be between 1 and 100,000'
+            }), 400
+        
+        # Get generator
+        generator = get_ultra_generator(domains)
+        
+        # Generate emails
+        if use_threading and count >= 1000:
+            result = generator.generate_batch_threaded(count, num_threads)
+        else:
+            result = generator.generate_batch(count)
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+
+@api_bp.route('/api/generate-ultra/single', methods=['GET'])
+def api_generate_ultra_single():
+    """Generate single email with ultra generator"""
+    try:
+        from modules.email_generator_ultra import get_ultra_generator
+        
+        domains = request.args.getlist('domains')
+        generator = get_ultra_generator(domains if domains else None)
+        
+        result = generator.generate_single()
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+
+@api_bp.route('/api/generate-ultra/metrics', methods=['GET'])
+def api_generate_ultra_metrics():
+    """Get ultra generator metrics"""
+    try:
+        from modules.email_generator_ultra import get_ultra_generator
+        
+        generator = get_ultra_generator()
+        metrics = generator.get_metrics()
+        
+        return jsonify({
+            'success': True,
+            'metrics': metrics
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+
+@api_bp.route('/api/generate-ultra/reset', methods=['POST'])
+def api_generate_ultra_reset():
+    """Reset ultra generator cache"""
+    try:
+        from modules.email_generator_ultra import get_ultra_generator
+        
+        generator = get_ultra_generator()
+        generator.reset_cache()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Cache reset successfully'
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
