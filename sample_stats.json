@@ -1,0 +1,21 @@
+{
+  "total": 1000,
+  "valid": 1000,
+  "invalid": 0,
+  "vietnamese": 796,
+  "english": 204,
+  "locale_distribution": {
+    "vi": "79.6%",
+    "en": "20.4%"
+  },
+  "domain_distribution": {
+    "gmail.com": 308,
+    "yahoo.com": 331,
+    "outlook.com": 361
+  },
+  "persona_distribution": {
+    "personal": 1000
+  },
+  "deduplication_enabled": true,
+  "unique_emails": 1000
+}

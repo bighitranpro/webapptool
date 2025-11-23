@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Settings - BIGHI Tool MMO</title>
+    <link rel="stylesheet" href="/static/css/settings.css">
+</head>
+<body>
+    <div class="settings-container">
+        <header class="settings-header">
+            <h1>⚙️ System Settings</h1>
+            <p>Configure your BIGHI Tool MMO platform</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="general">🏠 General</button>
+            <button class="tab-btn" data-tab="branding">🎨 Branding</button>
+            <button class="tab-btn" data-tab="generator">⚡ Generator</button>
+            <button class="tab-btn" data-tab="domains">🌐 Domains</button>
+            <button class="tab-btn" data-tab="smtp">📧 SMTP</button>
+            <button class="tab-btn" data-tab="notifications">🔔 Notifications</button>
+        </div>
+
+        <!-- General Settings Tab -->
+        <div class="tab-content active" id="general-tab">
+            <h2>General Settings</h2>
+            <form id="general-form">
+                <div class="form-group">
+                    <label>Tool Name</label>
+                    <input type="text" name="tool_name" placeholder="BIGHI Tool MMO" required>
+                </div>
+                <div class="form-group">
+                    <label>Tool Description</label>
+                    <textarea name="tool_description" rows="3" placeholder="Professional Email & Facebook Tools Platform"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Company Name</label>
+                    <input type="text" name="company_name" placeholder="BIGHI Agency">
+                </div>
+                <div class="form-group">
+                    <label>Company Website</label>
+                    <input type="url" name="company_website" placeholder="https://bighi.agency">
+                </div>
+                <div class="form-group">
+                    <label>Support Email</label>
+                    <input type="email" name="support_email" placeholder="support@bighi.agency">
+                </div>
+                <div class="form-group">
+                    <label>Support Phone</label>
+                    <input type="tel" name="support_phone" placeholder="+84 123 456 789">
+                </div>
+                <button type="submit" class="btn btn-primary">💾 Save General Settings</button>
+            </form>
+        </div>
+
+        <!-- Branding Tab -->
+        <div class="tab-content" id="branding-tab">
+            <h2>Branding & Appearance</h2>
+            
+            <div class="upload-section">
+                <h3>Logo</h3>
+                <div class="upload-area" id="logo-upload-area">
+                    <img id="logo-preview" src="" alt="Logo Preview" style="display:none; max-width: 200px; margin-bottom: 10px;">
+                    <input type="file" id="logo-file" accept="image/*" style="display:none;">
+                    <button type="button" class="btn" onclick="document.getElementById('logo-file').click()">📁 Choose Logo</button>
+                    <p class="upload-hint">PNG, JPG, SVG (max 5MB)</p>
+                </div>
+            </div>
+
+            <div class="upload-section">
+                <h3>Favicon</h3>
+                <div class="upload-area" id="favicon-upload-area">
+                    <img id="favicon-preview" src="" alt="Favicon Preview" style="display:none; max-width: 64px; margin-bottom: 10px;">
+                    <input type="file" id="favicon-file" accept="image/*" style="display:none;">
+                    <button type="button" class="btn" onclick="document.getElementById('favicon-file').click()">📁 Choose Favicon</button>
+                    <p class="upload-hint">ICO, PNG (32x32 or 64x64)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generator Tab -->
+        <div class="tab-content" id="generator-tab">
+            <h2>Email Generator Configuration</h2>
+            <form id="generator-form">
+                <div class="form-group">
+                    <label>Default Email Count</label>
+                    <input type="number" name="default_email_count" min="1" max="1000" value="10">
+                </div>
+                <div class="form-group">
+                    <label>Maximum Email Count</label>
+                    <input type="number" name="max_email_count" min="1" max="10000" value="1000">
+                </div>
+                <div class="form-group">
+                    <label>Default Locale</label>
+                    <select name="default_locale">
+                        <option value="vi">Vietnamese (Tiếng Việt)</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Default Persona</label>
+                    <select name="default_persona">
+                        <option value="personal">Personal</option>
+                        <option value="business">Business</option>
+                        <option value="casual">Casual</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Number Probability (0-1)</label>
+                    <input type="number" name="number_probability" step="0.1" min="0" max="1" value="0.6">
+                </div>
+                <div class="form-group">
+                    <label>Year Probability (0-1)</label>
+                    <input type="number" name="year_probability" step="0.1" min="0" max="1" value="0.3">
+                </div>
+                <div class="form-group">
+                    <label>Year Range Start</label>
+                    <input type="number" name="year_range_start" min="1950" max="2010" value="1980">
+                </div>
+                <div class="form-group">
+                    <label>Year Range End</label>
+                    <input type="number" name="year_range_end" min="1950" max="2010" value="2005">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="dedup" checked>
+                        Enable Deduplication
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">💾 Save Generator Config</button>
+            </form>
+        </div>
+
+        <!-- Domains Tab -->
+        <div class="tab-content" id="domains-tab">
+            <h2>Email Domains</h2>
+            
+            <div class="domain-section">
+                <h3>Allowed Domains</h3>
+                <div id="allowed-domains-list" class="domain-list"></div>
+                <div class="domain-input-group">
+                    <input type="text" id="new-allowed-domain" placeholder="example.com">
+                    <button type="button" class="btn" onclick="addDomain('allowed')">➕ Add Domain</button>
+                </div>
+            </div>
+
+            <div class="domain-section">
+                <h3>Custom Domains</h3>
+                <div id="custom-domains-list" class="domain-list"></div>
+                <div class="domain-input-group">
+                    <input type="text" id="new-custom-domain" placeholder="custom.com">
+                    <button type="button" class="btn" onclick="addDomain('custom')">➕ Add Domain</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SMTP Tab -->
+        <div class="tab-content" id="smtp-tab">
+            <h2>SMTP Configuration</h2>
+            <form id="smtp-form">
+                <div class="form-group">
+                    <label>SMTP Host</label>
+                    <input type="text" name="smtp_host" placeholder="smtp.gmail.com">
+                </div>
+                <div class="form-group">
+                    <label>SMTP Port</label>
+                    <input type="number" name="smtp_port" value="587">
+                </div>
+                <div class="form-group">
+                    <label>SMTP Username</label>
+                    <input type="text" name="smtp_user" placeholder="user@gmail.com">
+                </div>
+                <div class="form-group">
+                    <label>SMTP Password</label>
+                    <input type="password" name="smtp_password" placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="smtp_use_tls" checked>
+                        Use TLS Encryption
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">💾 Save SMTP Settings</button>
+            </form>
+        </div>
+
+        <!-- Notifications Tab -->
+        <div class="tab-content" id="notifications-tab">
+            <h2>Notification Settings</h2>
+            <form id="notifications-form">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="enable_email_notifications" checked>
+                        Enable Email Notifications
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">💾 Save Notification Settings</button>
+            </form>
+        </div>
+
+        <!-- Toast Container -->
+        <div id="toast-container"></div>
+    </div>
+
+    <script src="/static/js/settings.js"></script>
+</body>
+</html>

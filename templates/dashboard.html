@@ -22,6 +22,9 @@
     </style>
     
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_pro.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_fix.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_notice.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tool_results.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/i18n.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -121,7 +124,8 @@
             </div>
         </nav>
 
-        <div class="sidebar-footer">
+        <!-- VIP Badge Disabled -->
+        <!-- <div class="sidebar-footer">
             <div class="user-plan">
                 <i class="fas fa-crown"></i>
                 <div>
@@ -129,7 +133,7 @@
                     <small data-i18n="vip.unlimited">Không giới hạn</small>
                 </div>
             </div>
-        </div>
+        </div> -->
     </aside>
 
     <!-- Main Content -->
@@ -218,8 +222,64 @@
                 </div>
             </section>
 
-            <!-- Statistics Cards -->
-            <div class="stats-grid">
+            <!-- Admin Notice Banner -->
+            <div class="admin-notice-banner" id="adminNotice">
+                <div class="admin-notice-content">
+                    <div class="admin-notice-header">
+                        <div class="admin-notice-icon">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                        <div class="admin-notice-title">
+                            <h3>
+                                <span data-i18n="admin_notice.title">Thông Báo Quan Trọng</span>
+                                <span class="admin-notice-badge" data-i18n="admin_notice.badge">Admin</span>
+                            </h3>
+                            <p data-i18n="admin_notice.subtitle">Vui lòng đọc kỹ nội quy và hướng dẫn sử dụng</p>
+                        </div>
+                        <button class="admin-notice-close" onclick="toggleNotice()" title="Thu gọn/Mở rộng">
+                            <i class="fas fa-chevron-up"></i>
+                        </button>
+                    </div>
+                    <div class="admin-notice-body">
+                        <h4><i class="fas fa-info-circle"></i> <span data-i18n="admin_notice.rules_title">Nội Quy Sử Dụng</span></h4>
+                        <ul class="admin-notice-list">
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <span data-i18n="admin_notice.rule1">Sử dụng công cụ đúng mục đích, không spam hoặc gửi nội dung vi phạm pháp luật</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <span data-i18n="admin_notice.rule2">Giới hạn kiểm tra: FREE 50/ngày, BASIC 500/ngày, PRO không giới hạn</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <span data-i18n="admin_notice.rule3">Bảo mật thông tin tài khoản, không chia sẻ API key cho người khác</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <span data-i18n="admin_notice.rule4">Liên hệ support nếu gặp lỗi hoặc cần hỗ trợ kỹ thuật</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <span data-i18n="admin_notice.rule5">Cập nhật thường xuyên để trải nghiệm tính năng mới nhất</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="admin-notice-footer">
+                        <div class="admin-notice-footer-text">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span data-i18n="admin_notice.updated">Cập nhật lần cuối: 23/11/2024</span>
+                        </div>
+                        <div class="admin-notice-footer-text">
+                            <i class="fas fa-headset"></i>
+                            <span>Support: <a href="mailto:support@bighi.agency" style="color: #ffd700;">support@bighi.agency</a></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Cards (Hidden globally, shown per tool) -->
+            <div class="stats-grid" style="display: none;">
                 <div class="stat-card">
                     <div class="stat-card-header">
                         <div class="stat-icon green">
@@ -570,8 +630,8 @@
                     </div>
                 </div>
 
-                <!-- VIP Package Details -->
-                <div class="info-card vip-package">
+                <!-- VIP Package Details (Disabled) -->
+                <div class="info-card vip-package" style="display: none;">
                     <div class="info-card-header">
                         <div class="info-icon gold">
                             <i class="fas fa-crown"></i>
@@ -660,16 +720,7 @@
                     <div class="notification-time">2 <span data-i18n="notifications_panel.hours_ago">giờ trước</span></div>
                 </div>
             </div>
-            <div class="notification-item unread">
-                <div class="notification-icon warning">
-                    <i class="fas fa-crown"></i>
-                </div>
-                <div class="notification-content">
-                    <div class="notification-title" data-i18n="notifications_panel.upgrade_pro">Nâng cấp lên PRO</div>
-                    <div class="notification-message" data-i18n="notifications_panel.upgrade_pro_msg">Nhận kiểm tra không giới hạn và mở khóa tất cả tính năng nâng cao</div>
-                    <div class="notification-time">1 <span data-i18n="notifications_panel.days_ago">ngày trước</span></div>
-                </div>
-            </div>
+            <!-- VIP Upgrade Notification (Disabled) -->
             <div class="notification-item read">
                 <div class="notification-icon success">
                     <i class="fas fa-user-check"></i>
@@ -730,6 +781,8 @@
                             <label data-i18n="settings_modal.profile.username">Tên đăng nhập</label>
                             <input type="text" class="form-control" value="{{ user.username }}" readonly>
                         </div>
+                        <!-- VIP Level (Disabled) -->
+                        <!--
                         <div class="form-group">
                             <label data-i18n="settings_modal.profile.vip_level">Cấp VIP</label>
                             <div class="vip-display">
@@ -739,6 +792,7 @@
                                 </button>
                             </div>
                         </div>
+                        -->
                         <button class="btn-primary"><i class="fas fa-save"></i> <span data-i18n="settings_modal.profile.save_changes">Lưu Thay Đổi</span></button>
                     </div>
 
@@ -999,9 +1053,321 @@
         };
     </script>
 
+    <!-- ========================================
+         MODALS - Tool Windows
+         ======================================== -->
+    
+    <!-- Email Validator Modal -->
+    <div class="modal" id="validatorModal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-shield-check"></i> <span data-i18n="dashboard.email_validator.title">Kiểm tra Email</span></h2>
+                <button class="modal-close" onclick="closeModal('validatorModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="tool-description">
+                    <p data-i18n="dashboard.email_validator.description">Kiểm tra tính hợp lệ của email, phát hiện LIVE/DIE, kiểm tra khả năng nhận code.</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="validatorEmails">
+                        <i class="fas fa-envelope"></i> <span data-i18n="dashboard.email_validator.input_label">Danh sách Email</span>
+                        <span class="label-hint">(Mỗi email một dòng)</span>
+                    </label>
+                    <textarea 
+                        id="validatorEmails" 
+                        rows="10" 
+                        placeholder="email1@gmail.com&#10;email2@yahoo.com&#10;email3@outlook.com"
+                        data-i18n-placeholder="dashboard.email_validator.input_placeholder"
+                    ></textarea>
+                </div>
+                
+                <div class="options-grid">
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="checkMX" checked>
+                        <span>Kiểm tra MX Record</span>
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="checkSMTP" checked>
+                        <span>Kiểm tra SMTP</span>
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="checkDisposable" checked>
+                        <span>Lọc Email Tạm</span>
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="checkFBCompat" checked>
+                        <span>Kiểm tra tương thích Facebook</span>
+                    </label>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn btn-primary" onclick="runEmailValidator()">
+                        <i class="fas fa-play"></i> <span data-i18n="common.run">Chạy</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearValidatorResults()">
+                        <i class="fas fa-eraser"></i> <span data-i18n="common.clear">Xóa</span>
+                    </button>
+                </div>
+                
+                <div id="validatorResults" class="results-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Generator Modal -->
+    <div class="modal" id="generatorModal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-random"></i> <span data-i18n="dashboard.email_generator.title">Tạo Email</span></h2>
+                <button class="modal-close" onclick="closeModal('generatorModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="tool-description">
+                    <p data-i18n="dashboard.email_generator.description">Tạo danh sách email ngẫu nhiên với nhiều tùy chọn tùy chỉnh.</p>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="genCount">
+                            <i class="fas fa-hashtag"></i> Số lượng Email
+                        </label>
+                        <input type="number" id="genCount" value="100" min="1" max="10000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="genDomain">
+                            <i class="fas fa-globe"></i> Domain
+                        </label>
+                        <select id="genDomain">
+                            <option value="gmail.com">gmail.com</option>
+                            <option value="yahoo.com">yahoo.com</option>
+                            <option value="outlook.com">outlook.com</option>
+                            <option value="hotmail.com">hotmail.com</option>
+                            <option value="custom">Tùy chỉnh...</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group" id="customDomainGroup" style="display: none;">
+                    <label for="customDomains">
+                        <i class="fas fa-list"></i> Danh sách Domain tùy chỉnh
+                        <span class="label-hint">(Mỗi domain một dòng)</span>
+                    </label>
+                    <textarea id="customDomains" rows="3" placeholder="domain1.com&#10;domain2.com"></textarea>
+                </div>
+                
+                <div class="options-grid">
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="genNumbers" checked>
+                        <span>Thêm số</span>
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="genDots" checked>
+                        <span>Thêm dấu chấm</span>
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="genUnderscores">
+                        <span>Thêm gạch dưới</span>
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="genUnique" checked>
+                        <span>Không trùng lặp</span>
+                    </label>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn btn-primary" onclick="runEmailGenerator()">
+                        <i class="fas fa-play"></i> <span data-i18n="common.generate">Tạo</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearGeneratorResults()">
+                        <i class="fas fa-eraser"></i> <span data-i18n="common.clear">Xóa</span>
+                    </button>
+                </div>
+                
+                <div id="generatorResults" class="results-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Extractor Modal -->
+    <div class="modal" id="extractorModal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-search"></i> <span data-i18n="dashboard.email_extractor.title">Trích xuất Email</span></h2>
+                <button class="modal-close" onclick="closeModal('extractorModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="tool-description">
+                    <p data-i18n="dashboard.email_extractor.description">Trích xuất tất cả email từ văn bản, HTML, hoặc URL.</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="extractorInput">
+                        <i class="fas fa-file-alt"></i> Văn bản đầu vào
+                    </label>
+                    <textarea 
+                        id="extractorInput" 
+                        rows="10" 
+                        placeholder="Dán văn bản, HTML hoặc URL tại đây..."
+                    ></textarea>
+                </div>
+                
+                <div class="options-grid">
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="extractUnique" checked>
+                        <span>Chỉ email duy nhất</span>
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="extractSort">
+                        <span>Sắp xếp theo domain</span>
+                    </label>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn btn-primary" onclick="runEmailExtractor()">
+                        <i class="fas fa-play"></i> <span data-i18n="common.extract">Trích xuất</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearExtractorResults()">
+                        <i class="fas fa-eraser"></i> <span data-i18n="common.clear">Xóa</span>
+                    </button>
+                </div>
+                
+                <div id="extractorResults" class="results-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Facebook Linked Checker Modal -->
+    <div class="modal" id="fbLinkedModal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2><i class="fab fa-facebook"></i> <span data-i18n="dashboard.fb_checker.title">Kiểm tra Facebook Linked</span></h2>
+                <button class="modal-close" onclick="closeModal('fbLinkedModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="tool-description">
+                    <p data-i18n="dashboard.fb_checker.description">Kiểm tra email có liên kết với tài khoản Facebook không.</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="fbLinkedEmails">
+                        <i class="fas fa-envelope"></i> Danh sách Email
+                        <span class="label-hint">(Mỗi email một dòng)</span>
+                    </label>
+                    <textarea 
+                        id="fbLinkedEmails" 
+                        rows="10" 
+                        placeholder="email1@gmail.com&#10;email2@yahoo.com"
+                    ></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn btn-primary" onclick="runFBLinkedChecker()">
+                        <i class="fas fa-play"></i> <span data-i18n="common.check">Kiểm tra</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearFBLinkedResults()">
+                        <i class="fas fa-eraser"></i> <span data-i18n="common.clear">Xóa</span>
+                    </button>
+                </div>
+                
+                <div id="fbLinkedResults" class="results-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Check 2FA Modal -->
+    <div class="modal" id="check2faModal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-shield-alt"></i> <span data-i18n="dashboard.pass_2fa_checker.title">Kiểm tra 2FA</span></h2>
+                <button class="modal-close" onclick="closeModal('check2faModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="tool-description">
+                    <p data-i18n="dashboard.pass_2fa_checker.description">Kiểm tra email|password có bật 2FA không.</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="check2faInput">
+                        <i class="fas fa-key"></i> Danh sách Email:Password
+                        <span class="label-hint">(Format: email:password, mỗi dòng một tài khoản)</span>
+                    </label>
+                    <textarea 
+                        id="check2faInput" 
+                        rows="10" 
+                        placeholder="email1@gmail.com:password123&#10;email2@yahoo.com:pass456"
+                    ></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn btn-primary" onclick="runCheck2FA()">
+                        <i class="fas fa-play"></i> <span data-i18n="common.check">Kiểm tra</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearCheck2FAResults()">
+                        <i class="fas fa-eraser"></i> <span data-i18n="common.clear">Xóa</span>
+                    </button>
+                </div>
+                
+                <div id="check2faResults" class="results-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Mining Modal -->
+    <div class="modal" id="miningModal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-search-dollar"></i> <span data-i18n="dashboard.page_mining.title">Mining Facebook Page</span></h2>
+                <button class="modal-close" onclick="closeModal('miningModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="tool-description">
+                    <p data-i18n="dashboard.page_mining.description">Khai thác thông tin từ Facebook Page (ID, tên, followers, v.v.)</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="miningUrls">
+                        <i class="fas fa-link"></i> Danh sách UID Facebook
+                        <span class="label-hint">(Mỗi UID một dòng - VD: 100001234567890)</span>
+                    </label>
+                    <textarea 
+                        id="miningUrls" 
+                        rows="10" 
+                        placeholder="100001234567890&#10;100009876543210&#10;100012345678901"
+                    ></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn btn-primary" onclick="runPageMining()">
+                        <i class="fas fa-play"></i> <span data-i18n="common.mine">Khai thác</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearMiningResults()">
+                        <i class="fas fa-eraser"></i> <span data-i18n="common.clear">Xóa</span>
+                    </button>
+                </div>
+                
+                <div id="miningResults" class="results-container"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Core Scripts (Load first) -->
     <script src="{{ url_for('static', filename='js/modals.js') }}"></script>
     <script src="{{ url_for('static', filename='js/api.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tool_handlers.js') }}"></script>
     
     <!-- I18N Scripts -->
     <script src="{{ url_for('static', filename='js/translations/vi.js') }}"></script>
@@ -1024,5 +1390,32 @@
     <script src="{{ url_for('static', filename='js/fb_linked_checker.js') }}"></script>
     <script src="{{ url_for('static', filename='js/check_2fa.js') }}"></script>
     <script src="{{ url_for('static', filename='js/page_mining.js') }}"></script>
+    
+    <!-- Admin Notice Toggle Script -->
+    <script>
+        function toggleNotice() {
+            const notice = document.getElementById('adminNotice');
+            const icon = notice.querySelector('.admin-notice-close i');
+            
+            notice.classList.toggle('collapsed');
+            
+            if (notice.classList.contains('collapsed')) {
+                icon.className = 'fas fa-chevron-down';
+            } else {
+                icon.className = 'fas fa-chevron-up';
+            }
+            
+            // Save state to localStorage
+            localStorage.setItem('adminNoticeCollapsed', notice.classList.contains('collapsed'));
+        }
+        
+        // Restore state on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const collapsed = localStorage.getItem('adminNoticeCollapsed') === 'true';
+            if (collapsed) {
+                toggleNotice();
+            }
+        });
+    </script>
 </body>
 </html>

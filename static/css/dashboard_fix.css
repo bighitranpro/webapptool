@@ -1,0 +1,435 @@
+/* ============================================
+   DASHBOARD UI FIXES
+   Fix VIP badge, stats cards, and add admin notice
+   ============================================ */
+
+/* ============================================
+   FIX 1: VIP BADGE - Prevent covering menu items
+   ============================================ */
+
+.sidebar {
+    /* Add padding at bottom for footer */
+    padding-bottom: 100px !important;
+}
+
+.sidebar-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    padding: 15px;
+    border-top: 1px solid var(--border-color);
+    background: var(--primary-darker);
+    z-index: 1001;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.user-plan {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: var(--gradient-gold);
+    border-radius: 10px;
+    box-shadow: var(--shadow-gold);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.user-plan:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(243, 156, 18, 0.4);
+}
+
+.user-plan i {
+    font-size: 20px;
+    color: white;
+}
+
+.user-plan div {
+    flex: 1;
+}
+
+.user-plan span {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+}
+
+.user-plan small {
+    display: block;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.85);
+    margin-top: 2px;
+}
+
+/* Make last nav section have margin bottom */
+.nav-section:last-of-type .nav-section-content {
+    margin-bottom: 20px;
+}
+
+/* ============================================
+   FIX 2: HIDE GLOBAL STATS CARDS
+   Stats should be in each tool, not global
+   ============================================ */
+
+.stats-grid {
+    display: none !important;
+}
+
+/* ============================================
+   FIX 3: ADMIN NOTICE BANNER
+   Rules/Announcements at top center
+   ============================================ */
+
+.admin-notice-banner {
+    margin: 20px auto;
+    max-width: 1200px;
+    padding: 20px 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-notice-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.05) 50%, transparent 70%);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.admin-notice-content {
+    position: relative;
+    z-index: 1;
+}
+
+.admin-notice-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.admin-notice-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+    backdrop-filter: blur(10px);
+}
+
+.admin-notice-title {
+    flex: 1;
+}
+
+.admin-notice-title h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.admin-notice-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.admin-notice-title p {
+    margin: 5px 0 0 0;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.admin-notice-body {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+.admin-notice-body h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-notice-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.admin-notice-list li {
+    padding: 10px 0;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-notice-list li:last-child {
+    border-bottom: none;
+}
+
+.admin-notice-list li i {
+    color: #ffd700;
+    font-size: 16px;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.admin-notice-footer {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.admin-notice-footer-text {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.75);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-notice-footer-text i {
+    color: #ffd700;
+}
+
+.admin-notice-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+    backdrop-filter: blur(10px);
+}
+
+.admin-notice-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+/* Admin notice collapsed state */
+.admin-notice-banner.collapsed {
+    padding: 15px 30px;
+}
+
+.admin-notice-banner.collapsed .admin-notice-body,
+.admin-notice-banner.collapsed .admin-notice-footer {
+    display: none;
+}
+
+.admin-notice-banner.collapsed .admin-notice-header {
+    margin-bottom: 0;
+}
+
+/* ============================================
+   TOOL STATS (Individual tool statistics)
+   ============================================ */
+
+.tool-stats-section {
+    margin: 20px 0;
+    padding: 20px;
+    background: var(--card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.tool-stats-section h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 15px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tool-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+}
+
+.tool-stat-item {
+    padding: 15px;
+    background: var(--secondary-dark);
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    transition: all var(--transition-fast);
+}
+
+.tool-stat-item:hover {
+    border-color: var(--accent-gold);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.tool-stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.tool-stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.tool-stat-value.green {
+    color: var(--success-green);
+}
+
+.tool-stat-value.red {
+    color: var(--danger-red);
+}
+
+.tool-stat-value.blue {
+    color: var(--info-blue);
+}
+
+.tool-stat-value.purple {
+    color: var(--purple);
+}
+
+.tool-stat-change {
+    font-size: 11px;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.tool-stat-change.positive {
+    color: var(--success-green);
+}
+
+.tool-stat-change.negative {
+    color: var(--danger-red);
+}
+
+/* ============================================
+   RESPONSIVE FIXES
+   ============================================ */
+
+@media (max-width: 768px) {
+    .sidebar-footer {
+        width: 280px;
+    }
+
+    .admin-notice-banner {
+        margin: 15px;
+        padding: 15px 20px;
+    }
+
+    .admin-notice-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .admin-notice-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+
+    .admin-notice-title h3 {
+        font-size: 18px;
+    }
+
+    .admin-notice-body {
+        padding: 15px;
+    }
+
+    .admin-notice-list li {
+        font-size: 13px;
+    }
+
+    .tool-stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.hidden {
+    display: none !important;
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-down {
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        max-height: 0;
+        opacity: 0;
+    }
+    to {
+        max-height: 500px;
+        opacity: 1;
+    }
+}

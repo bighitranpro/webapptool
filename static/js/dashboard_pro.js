@@ -720,3 +720,35 @@ notificationStyles.textContent = `
     }
 `;
 document.head.appendChild(notificationStyles);
+
+// Admin Notice Toggle Function
+function toggleNotice() {
+    const notice = document.getElementById('adminNotice');
+    if (notice) {
+        notice.classList.toggle('collapsed');
+        
+        // Save preference
+        const isCollapsed = notice.classList.contains('collapsed');
+        localStorage.setItem('adminNoticeCollapsed', isCollapsed);
+        
+        // Update icon
+        const icon = notice.querySelector('.admin-notice-close i');
+        if (icon) {
+            icon.className = isCollapsed ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+        }
+    }
+}
+
+// Load admin notice state on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const notice = document.getElementById('adminNotice');
+    const isCollapsed = localStorage.getItem('adminNoticeCollapsed') === 'true';
+    
+    if (notice && isCollapsed) {
+        notice.classList.add('collapsed');
+        const icon = notice.querySelector('.admin-notice-close i');
+        if (icon) {
+            icon.className = 'fas fa-chevron-down';
+        }
+    }
+});

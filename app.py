@@ -72,11 +72,13 @@ def inject_theme_variables():
 # Register Blueprints
 from routes import auth_bp, api_bp, dashboard_bp
 from app_admin_routes import admin_bp
+from routes.settings_routes import settings_bp
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(api_bp)
 app.register_blueprint(dashboard_bp)
 app.register_blueprint(admin_bp)
+app.register_blueprint(settings_bp)
 
 
 # Error Handlers
