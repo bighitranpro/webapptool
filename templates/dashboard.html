@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_fix.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_notice.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tool_results.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_enhancements.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/i18n.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -122,6 +123,31 @@
                     </a>
                 </div>
             </div>
+
+            {% if user.role == 'admin' %}
+            <div class="nav-section" data-section="admin">
+                <span class="nav-section-title">
+                    <i class="fas fa-shield-alt"></i> QUẢN TRỊ
+                </span>
+                <a href="/admin/" class="nav-item nav-item-admin" target="_blank">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Admin Dashboard</span>
+                    <span class="nav-badge badge-admin">Admin</span>
+                </a>
+                <a href="#settings" class="nav-item" onclick="openModal('settingsModal')">
+                    <i class="fas fa-cog"></i>
+                    <span data-i18n="sidebar.settings">Cài đặt</span>
+                </a>
+                <a href="#users" class="nav-item" onclick="openAdminUsers()">
+                    <i class="fas fa-users"></i>
+                    <span>Quản lý Users</span>
+                </a>
+                <a href="#system-logs" class="nav-item" onclick="openSystemLogs()">
+                    <i class="fas fa-list-alt"></i>
+                    <span>System Logs</span>
+                </a>
+            </div>
+            {% endif %}
         </nav>
 
         <!-- VIP Badge Disabled -->
@@ -1390,6 +1416,19 @@
     <script src="{{ url_for('static', filename='js/fb_linked_checker.js') }}"></script>
     <script src="{{ url_for('static', filename='js/check_2fa.js') }}"></script>
     <script src="{{ url_for('static', filename='js/page_mining.js') }}"></script>
+    
+    <!-- Admin Functions -->
+    <script>
+        function openAdminUsers() {
+            // For now, redirect to admin panel
+            window.open('/admin/', '_blank');
+        }
+        
+        function openSystemLogs() {
+            // For now, redirect to admin panel
+            window.open('/admin/', '_blank');
+        }
+    </script>
     
     <!-- Admin Notice Toggle Script -->
     <script>
